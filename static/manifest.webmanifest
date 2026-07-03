@@ -1,0 +1,25 @@
+{
+  "name": "Jussa Aero · Rotas, Tempo e Combustível",
+  "short_name": "Jussa Aero",
+  "description": "Calcule distância, proa, tempo de voo e consumo de combustível entre aeroportos do mundo todo. Compare aeronaves, veja o radar meteorológico e cartas de aproximação.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070d18",
+  "theme_color": "#070d18",
+  "categories": ["travel", "navigation", "utilities", "education"],
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/static/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Calculadora de rota", "url": "/", "description": "Distância, tempo e combustível entre aeroportos" },
+    { "name": "Comparar aeronaves", "url": "/comparar" },
+    { "name": "Radar meteorológico", "url": "/radar" },
+    { "name": "Cartas de aproximação", "url": "/cartas" }
+  ]
+}

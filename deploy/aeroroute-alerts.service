@@ -1,0 +1,11 @@
+[Unit]
+Description=Jussa Aero - checagem de alertas de tempo (push)
+After=network.target
+
+[Service]
+Type=oneshot
+User=jussa
+Group=jussa
+WorkingDirectory=/home/jussa/FileShare/development/aero_route
+EnvironmentFile=/etc/aeroroute.env
+ExecStart=/home/jussa/FileShare/development/aero_route/.venv/bin/python -m app.alerts check

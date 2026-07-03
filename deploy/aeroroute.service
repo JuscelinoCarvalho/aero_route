@@ -1,0 +1,18 @@
+[Unit]
+Description=AeroRoute - calculadora de rotas/combustivel de voo (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=jussa
+Group=jussa
+WorkingDirectory=/home/jussa/FileShare/development/aero_route
+# Carrega segredos (REDEMET, AISWEB) deste arquivo. O "-" torna-o opcional:
+# se o arquivo não existir, o serviço sobe mesmo assim (endpoints respondem 503).
+EnvironmentFile=-/etc/aeroroute.env
+ExecStart=/home/jussa/FileShare/development/aero_route/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8090
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

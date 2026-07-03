@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{cmp_title}}</title>
+  <meta name="description" content="{{cmp_desc}}" />
+  {{hreflang}}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body class="page-wide">
+  <div class="wrap">
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
+      </div>
+      <h1 style="font-size:18px">Jussa Aero<small>{{mb_sub}}</small></h1>
+    </div>
+
+    <div class="tag"><span>{{mb_tag}}</span><span>{{mb_tag2}}</span></div>
+
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar" class="active">{{nav_compare}}</a>
+      <a href="/tempo">{{nav_tempo}}</a>
+      <a href="/radar">{{nav_radar}}</a>
+      <a href="/cartas">{{nav_cartas}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;margin:6px 0 10px">{{mb_h2}}</h2>
+    <p style="font-size:14px;color:#c3d3e6;margin-bottom:16px">{{mb_intro}}</p>
+
+    <div class="calc-main">
+      <div class="calc-controls">
+        <!-- Seleção de aeronaves -->
+        <div class="ac-row">
+          <label>{{mb_lbl_ac}}</label>
+          <div class="field ac-field">
+            <input id="aircraft-input" placeholder="Digite marca ou modelo: A320, Boeing 737, Phenom…" autocomplete="off" spellcheck="false" />
+            <div class="ac" id="acAircraft"></div>
+          </div>
+          <div class="sel-chips" id="sel-chips"></div>
+        </div>
+
+        <!-- Aeroporto base -->
+        <div class="ac-row">
+          <label>{{mb_lbl_base}}</label>
+          <div class="field">
+            <input id="airport" placeholder="GRU, SBGR ou cidade…" autocomplete="off" spellcheck="false" />
+            <div class="ac" id="acAirport"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-side">
+        <div class="panel">
+          <div id="map" class="plot"></div>
+        </div>
+        <div id="cmp-out"></div>
+      </div>
+    </div>
+
+    <p class="note">Alcance máximo aproximado de catálogo (sem carga/vento). Os círculos são geodésicos (distância real sobre a esfera). * Preço aproximado de referência (em US$ milhões): valor novo para modelos em produção e de mercado típico para fora de linha — apenas referência, preços reais variam muito por ano, horas e estado. Estimativas didáticas, não usar para planejamento operacional ou decisão de compra.</p>
+
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot" style="margin-top:24px">
+      <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
+      <a href="/curiosidades" style="color:var(--cyan);text-decoration:none">{{nav_curio}}</a> ·
+      <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{nav_rotas}}</a> ·
+      <a href="/sobre" style="color:var(--cyan);text-decoration:none">{{foot_about}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/comparar.js"></script>
+</body>
+</html>

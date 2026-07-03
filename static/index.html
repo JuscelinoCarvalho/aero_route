@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{home_title}}</title>
+  <meta name="description" content="{{home_desc}}" />
+  {{hreflang}}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- MONETIZAÇÃO · Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body class="page-wide">
+  <div class="wrap">
+    <!-- Header -->
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
+        </svg>
+      </div>
+      <h1>Jussa Aero<small>flight planning · jussa.com.br</small></h1>
+    </div>
+
+    <div class="tag">
+      <span>{{home_tag}}</span>
+      <span>STATUS <b>{{status_online}}</b></span>
+    </div>
+
+    {{lang_switcher}}
+
+    <!-- Navegação -->
+    <nav class="nav">
+      <a href="/" class="active">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/tempo">{{nav_tempo}}</a>
+      <a href="/radar">{{nav_radar}}</a>
+      <a href="/cartas">{{nav_cartas}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <!-- Layout: controles em cima, mapa grande centralizado embaixo -->
+    <div class="calc-main">
+      <div class="calc-controls">
+        <!-- Origem / Destino -->
+        <div class="route">
+          <div class="field">
+            <label>{{home_origin}}</label>
+            <input id="orig" placeholder="GRU" autocomplete="off" spellcheck="false" />
+            <div class="ac" id="acOrig"></div>
+          </div>
+          <button class="swap" id="swap" title="{{home_swap}}">⇄</button>
+          <div class="field">
+            <label>{{home_dest}}</label>
+            <input id="dest" placeholder="LIS" autocomplete="off" spellcheck="false" />
+            <div class="ac" id="acDest"></div>
+          </div>
+        </div>
+
+        <!-- Aeronave (busca) -->
+        <div class="ac-row">
+          <label>{{home_aircraft}}</label>
+          <div class="field ac-field">
+            <input id="aircraft-input" placeholder="A320, Boeing 737, Phenom…" autocomplete="off" spellcheck="false" />
+            <div class="ac" id="acAircraft"></div>
+          </div>
+        </div>
+
+        <!-- Reserva de combustível (alcance usável p/ planejar escalas) -->
+        <div class="ac-row">
+          <label>{{home_reserve}}</label>
+          <select id="reserve" class="sel">
+            <option value="1.0">{{home_reserve_none}}</option>
+            <option value="0.95">95%</option>
+            <option value="0.9">90%</option>
+            <option value="0.85" selected>{{home_reserve_rec}}</option>
+            <option value="0.8">80%</option>
+            <option value="0.75">{{home_reserve_cons}}</option>
+          </select>
+        </div>
+
+        <!-- Ficha técnica da aeronave selecionada -->
+        <div id="aircraft-card"></div>
+
+        <div class="note" id="note">
+          {{home_note}}
+        </div>
+      </div>
+
+      <!-- Painel: mapa + leituras (resultado acima ou abaixo do mapa via flag) -->
+      <div class="calc-side">
+        <div id="out-top"></div>
+        <div class="panel">
+          <div id="map" class="plot"></div>
+          <div id="out-bottom"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONETIZAÇÃO · anúncios via Google Auto Ads (posicionados automaticamente).
+         O script no <head> já habilita; basta ativar Auto Ads no painel do AdSense. -->
+
+    <!-- MONETIZAÇÃO · afiliados -->
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot">
+      Jussa Aero · {{home_foot}}<br />
+      <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{foot_routes}}</a> ·
+      <a href="/curiosidades" style="color:var(--cyan);text-decoration:none">{{foot_curio}}</a> ·
+      <a href="/sobre" style="color:var(--cyan);text-decoration:none">{{foot_about}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

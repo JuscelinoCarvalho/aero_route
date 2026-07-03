@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{abt_title}}</title>
+  <meta name="description" content="{{abt_desc}}" />
+  {{hreflang}}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .doc{max-width:680px;margin:0 auto}
+    .doc h2{font-family:"Chakra Petch",sans-serif;font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--cyan);margin:24px 0 8px}
+    .doc p,.doc li{font-size:14px;color:#c3d3e6;margin-bottom:8px}
+    .doc ul{padding-left:20px}
+    .doc a{color:var(--cyan)}
+    .back{display:inline-block;margin-bottom:8px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);text-decoration:none}
+    .cta{display:inline-block;margin-top:18px;background:rgba(31,216,230,.12);border:1px solid var(--cyan);color:var(--cyan);padding:11px 18px;border-radius:9px;text-decoration:none;font-family:"Chakra Petch",sans-serif;font-weight:600;letter-spacing:.04em}
+  </style>
+</head>
+<body>
+  <div class="wrap doc">
+    <a class="back" href="/">{{ab_back}}</a>
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
+      </div>
+      <h1>Jussa Aero<small>{{ab_sub}}</small></h1>
+    </div>
+
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2>{{ab_h_what}}</h2>
+    <p>{{ab_p_what1}}</p>
+    <p>{{ab_p_what2}}</p>
+
+    <h2>{{ab_h_how}}</h2>
+    <ul>
+      <li>{{ab_li_dist}}</li>
+      <li>{{ab_li_hdg}}</li>
+      <li>{{ab_li_time}}</li>
+      <li>{{ab_li_fuel}}</li>
+    </ul>
+    <p>{{ab_p_data}}</p>
+
+    <h2>{{ab_h_disc}}</h2>
+    <p>{{ab_p_disc}}</p>
+
+    <h2>{{ab_h_who}}</h2>
+    <p>{{ab_p_who}}<a href="mailto:juscelino.carvalho@gmail.com">juscelino.carvalho@gmail.com</a>.</p>
+
+    <a class="cta" href="/">{{ab_cta}}</a>
+    <p style="margin-top:24px"><a class="back" href="/static/privacidade.html">{{foot_privacy}}</a></p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{chr_title}}</title>
+  <meta name="description" content="{{chr_desc}}" />
+  {{hreflang}}
+  <meta property="og:title" content="Cartas de Aproximação dos aeródromos do Brasil | Jussa Aero" />
+  <meta property="og:description" content="Cartas IAC e aeronáuticas oficiais (DECEA/AISWEB): ver, imprimir, baixar e compartilhar em PDF." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aero.jussa.com.br/cartas" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- MONETIZAÇÃO · Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
+        </svg>
+      </div>
+      <h1>Jussa Aero<small>{{cb_sub}}</small></h1>
+    </div>
+
+    <div class="tag">
+      <span>{{cb_tag}}</span>
+      <span>{{src}} <b>DECEA / AISWEB</b></span>
+    </div>
+
+    <!-- Navegação -->
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/tempo">{{nav_tempo}}</a>
+      <a href="/radar">{{nav_radar}}</a>
+      <a href="/cartas" class="active">{{nav_cartas}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 8px">{{cb_h2}}</h2>
+    <p style="font-size:14px;color:#c3d3e6;margin-bottom:14px">
+      {{cb_intro}}
+    </p>
+
+    <!-- Seleção: aeródromo + tipo -->
+    <div class="route" style="grid-template-columns:1fr 1fr">
+      <div class="field">
+        <label>{{cb_lbl_aero}}</label>
+        <input id="aero" placeholder="SBGR, SBSP, Congonhas…" autocomplete="off" spellcheck="false" />
+        <div class="ac" id="acAero"></div>
+      </div>
+      <div class="field">
+        <label>{{cb_lbl_type}}</label>
+        <select id="tipo" class="c-select">
+          <option value="IAC">{{cb_opt_iac}}</option>
+          <option value="VAC">{{cb_opt_vac}}</option>
+          <option value="ADC">{{cb_opt_adc}}</option>
+          <option value="SID">{{cb_opt_sid}}</option>
+          <option value="STAR">{{cb_opt_star}}</option>
+          <option value="AOC">{{cb_opt_aoc}}</option>
+          <option value="ALL">{{cb_opt_all}}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Resultado: lista de cartas -->
+    <div id="c-list" class="c-list"></div>
+
+    <!-- Visualizador de PDF + ações -->
+    <div class="panel" id="c-viewer" style="display:none;margin-top:14px">
+      <div class="c-toolbar">
+        <span class="c-title" id="c-title">—</span>
+        <div class="c-actions">
+          <button class="r-btn sm" id="c-print" title="{{cb_print}}">🖶</button>
+          <button class="r-btn sm" id="c-down" title="{{cb_download}}">⬇</button>
+          <button class="r-btn sm" id="c-share" title="{{cb_share}}">⤴</button>
+          <button class="r-btn sm" id="c-open" title="{{cb_newtab}}">⛶</button>
+        </div>
+      </div>
+      <div class="c-view" id="c-view">
+        <canvas id="c-canvas" class="c-canvas" aria-label="Carta aeronáutica"></canvas>
+        <div class="c-load" id="c-load" hidden><span class="spin"></span></div>
+      </div>
+      <div class="c-navbar">
+        <button class="r-btn sm" id="c-prev" title="{{cb_prevp}}">‹</button>
+        <span class="c-page" id="c-page">1 / 1</span>
+        <button class="r-btn sm" id="c-next" title="{{cb_nextp}}">›</button>
+        <span class="c-sep"></span>
+        <button class="r-btn sm" id="c-zout" title="{{cb_zoomout}}">−</button>
+        <span class="c-zoom" id="c-zoom">100%</span>
+        <button class="r-btn sm" id="c-zin" title="{{cb_zoomin}}">+</button>
+        <button class="r-btn sm" id="c-zfit" title="{{cb_fit}}">⤢</button>
+      </div>
+    </div>
+
+    <div class="c-status" id="c-status">{{cb_status0}}</div>
+
+    <div class="note">
+      {{cb_note}}
+    </div>
+
+    <!-- MONETIZAÇÃO · afiliados -->
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot">
+      Jussa Aero · Python + FastAPI · cartas © DECEA/AISWEB (fonte oficial)<br />
+      <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
+      <a href="/radar" style="color:var(--cyan);text-decoration:none">{{nav_radar}}</a> ·
+      <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{nav_rotas}}</a> ·
+      <a href="/sobre" style="color:var(--cyan);text-decoration:none">{{foot_about}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <style>
+    .c-select{
+      width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+      font-family:"Inter",sans-serif;font-size:14px;font-weight:500;padding:12px;border-radius:9px;
+      outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;
+    }
+    .c-select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(31,216,230,.16)}
+    .c-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+    .c-card{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);
+      border:1px solid var(--line);border-radius:11px;padding:12px 14px;cursor:pointer;transition:.15s;
+    }
+    .c-card:hover{border-color:var(--cyan);background:#0e1c33}
+    .c-card.on{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(31,216,230,.18)}
+    .c-card .c-nm{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:14px;color:var(--ink);letter-spacing:.02em}
+    .c-card .c-meta{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+    .c-card .c-type{
+      flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--cyan);
+      border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase;
+    }
+    .c-toolbar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0b1626}
+    .c-title{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13.5px;color:var(--ink);flex:1;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em}
+    .c-actions{display:flex;gap:7px;flex:none}
+    /* Visor PDF.js: área com scroll (pan) + canvas renderizado; pinça = zoom */
+    .c-view{position:relative;width:100%;height:560px;overflow:auto;background:#0b1626;display:block;
+      -webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior:contain}
+    .c-canvas{display:block;margin:0 auto;transform-origin:0 0;background:#fff}
+    .c-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,22,38,.55)}
+    .c-load[hidden]{display:none}
+    .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--cyan);border-radius:50%;
+      animation:c-spin .8s linear infinite}
+    @keyframes c-spin{to{transform:rotate(360deg)}}
+    .c-navbar{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;
+      padding:9px 12px;border-top:1px solid var(--line);background:#0b1626}
+    .c-page,.c-zoom{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);
+      min-width:54px;text-align:center;letter-spacing:.04em}
+    .c-sep{width:1px;height:22px;background:var(--line);margin:0 3px}
+    .c-status{margin-top:12px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--muted);
+      letter-spacing:.03em;line-height:1.6;padding-left:12px;border-left:2px solid var(--cyan-dim)}
+    .c-status.err{color:var(--amber);border-left-color:var(--amber)}
+    /* reaproveita .r-btn do radar (definido aqui também p/ esta página) */
+    .r-btn{flex:none;width:38px;height:38px;border:1px solid var(--line);background:var(--panel-2);
+      color:var(--cyan);border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;
+      justify-content:center;transition:.15s;font-family:"Inter",sans-serif}
+    .r-btn:hover{background:#16335a}
+    .r-btn.sm{width:36px;height:36px;font-size:15px}
+    @media (max-width:480px){.c-view{height:64vh}}
+  </style>
+
+  <script src="/static/vendor/pdfjs/pdf.min.js"></script>
+  <script src="/static/cartas.js"></script>
+</body>
+</html>

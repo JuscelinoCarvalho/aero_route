@@ -1,0 +1,232 @@
+:root{
+  --bg:#070d18;
+  --panel:#0d1729;
+  --panel-2:#10203a;
+  --line:#1c3151;
+  --cyan:#1fd8e6;
+  --cyan-dim:#0e7e88;
+  --amber:#ffb23e;
+  --green:#5ef08a;
+  --ink:#e7f0fb;
+  --muted:#6f87a8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #112a47 0%, transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.5;
+  min-height:100vh;
+  padding:18px 16px 60px;
+}
+.wrap{max-width:680px;margin:0 auto}
+
+/* Header */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.badge{
+  width:42px;height:42px;border-radius:9px;flex:none;
+  background:linear-gradient(150deg,var(--cyan-dim),#0a3b52);
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 18px rgba(31,216,230,.25);
+}
+.badge svg{width:24px;height:24px}
+h1{
+  font-family:"Chakra Petch",sans-serif;
+  font-weight:700;font-size:21px;letter-spacing:.06em;
+  text-transform:uppercase;line-height:1.05;
+}
+h1 small{display:block;font-size:10.5px;letter-spacing:.34em;color:var(--cyan);font-weight:500}
+.tag{
+  margin:14px 0 18px;font-family:"JetBrains Mono",monospace;
+  font-size:11px;color:var(--muted);letter-spacing:.04em;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:7px 0;display:flex;justify-content:space-between;
+}
+.tag b{color:var(--green);font-weight:500}
+
+/* Navegação */
+.nav{display:flex;gap:10px 22px;flex-wrap:wrap;justify-content:center;margin:0 0 18px}
+.nav a{
+  font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent;transition:.15s;
+}
+.nav a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
+.nav a.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+/* Campo de aeronave (texto normal, não-caixa-alta) */
+.ac-field input{text-transform:none;font-family:"Inter",sans-serif;font-size:15px;font-weight:500;letter-spacing:0}
+.ac .cat{font-size:11px;color:var(--muted)}
+
+/* Chips de aeronaves selecionadas (comparador) */
+.sel-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.sel-chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:6px 12px;font-size:12.5px;font-weight:600}
+.sel-chip .nm2{font-family:"Chakra Petch",sans-serif;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.sel-chip .dot{width:9px;height:9px;border-radius:50%}
+.sel-chip .x{cursor:pointer;font-size:15px;line-height:1;opacity:.7;margin-left:2px}
+.sel-chip .x:hover{opacity:1}
+
+/* Origem / Destino */
+.route{display:grid;grid-template-columns:1fr 34px 1fr;gap:8px;align-items:end;margin-bottom:14px}
+.field{position:relative}
+.field label{
+  display:block;font-family:"JetBrains Mono",monospace;font-size:10px;
+  letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;
+}
+.field input{
+  width:100%;background:var(--panel);border:1px solid var(--line);
+  color:var(--ink);font-family:"Chakra Petch",sans-serif;font-size:18px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;padding:11px 12px;border-radius:9px;outline:none;
+}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(31,216,230,.16)}
+.field input::placeholder{color:#385373;font-weight:400}
+.sel{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);font-family:"Inter",sans-serif;font-size:15px;padding:11px 12px;border-radius:9px;outline:none;cursor:pointer}
+.sel:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(31,216,230,.16)}
+.sel option{background:#0d1729;color:var(--ink)}
+.swap{
+  height:44px;border:1px solid var(--line);background:var(--panel-2);color:var(--cyan);
+  border-radius:9px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.swap:hover{background:#16335a}
+
+/* Autocomplete */
+.ac{
+  position:absolute;z-index:1000;left:0;right:0;top:100%;margin-top:4px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:9px;overflow:hidden;
+  box-shadow:0 14px 40px rgba(0,0,0,.55);max-height:260px;overflow-y:auto;display:none;
+}
+.ac.open{display:block}
+.ac div{padding:9px 12px;cursor:pointer;border-bottom:1px solid #14253f}
+.ac div:last-child{border-bottom:none}
+.ac div:hover,.ac div.hl{background:#16335a}
+.ac .code{font-family:"Chakra Petch",sans-serif;font-weight:700;color:var(--cyan);letter-spacing:.06em}
+.ac .nm{font-size:12px;color:var(--muted)}
+
+/* Aeronave (chips) */
+.ac-row{margin-bottom:16px}
+.ac-row label{
+  display:block;font-family:"JetBrains Mono",monospace;font-size:10px;
+  letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:7px;
+}
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.chip{
+  flex:none;background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  padding:8px 13px;border-radius:30px;font-size:12.5px;cursor:pointer;white-space:nowrap;
+  font-weight:500;transition:.15s;
+}
+.chip.on{background:rgba(31,216,230,.12);border-color:var(--cyan);color:var(--cyan)}
+
+/* Painel: mapa + leituras */
+.panel{
+  background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);
+  border:1px solid var(--line);border-radius:14px;padding:4px 0 2px;overflow:hidden;
+}
+.plot{width:100%;height:300px;display:block;background:#06101f;border-bottom:1px solid var(--line)}
+.leaflet-container{background:#cfe8f5;font-family:"Inter",sans-serif}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.cell{background:#0b1626;padding:14px 16px}
+.cell .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.cell .v{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:27px;letter-spacing:.02em;margin-top:3px;color:var(--ink);font-variant-numeric:tabular-nums}
+.cell .u{font-size:12px;color:var(--cyan);font-weight:500;margin-left:5px}
+.cell.amber .v{color:var(--amber)}
+.cell.cyan .v{color:var(--cyan)}
+.cell.green .v{color:var(--green)}
+.cell.full{grid-column:1 / -1}
+/* Combustível: fica ao lado da Proa, sem deixar célula vazia (no wide, span 3). */
+.cell.fuel{grid-column:auto}
+/* Resultado acima do mapa: dá respiro e arredonda (fica fora do .panel). */
+#out-top:not(:empty){margin-bottom:14px}
+#out-top .readouts{border-radius:12px;overflow:hidden}
+#out-top .empty{border:1px solid var(--line);border-radius:12px}
+.empty{padding:42px 20px;text-align:center;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.05em}
+
+.note{
+  font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--muted);
+  margin-top:14px;line-height:1.7;padding-left:14px;border-left:2px solid var(--cyan-dim);
+}
+
+/* Rota com escalas / alerta de inalcançável */
+.route-alert{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:13px;display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.route-alert.warn{background:rgba(224,49,49,.10);border:1px solid rgba(224,49,49,.45);color:#f3c8c8}
+.route-alert.info{background:rgba(31,216,230,.08);border:1px solid var(--cyan);color:#c5eef3}
+.legs{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.leg{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.leg:last-child{border-bottom:none}
+.leg .n{width:22px;height:22px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--cyan);flex:none}
+.leg .rt{font-family:"Chakra Petch",sans-serif;font-weight:600;color:var(--ink)}
+.leg .meta{margin-left:auto;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:11px;text-align:right}
+
+/* Monetização · anúncio */
+.ad-slot{
+  margin-top:20px;min-height:100px;border:1px dashed var(--line);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:#3a5273;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+}
+
+/* Monetização · afiliados */
+.aff{margin-top:20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px}
+.aff-h{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.aff-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.aff-card{
+  display:flex;flex-direction:column;gap:3px;padding:12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--panel-2);text-decoration:none;transition:.15s;
+}
+.aff-card:hover{border-color:var(--cyan);background:#16335a}
+.aff-card .t{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13.5px;color:var(--ink)}
+.aff-card .d{font-size:11px;color:var(--muted)}
+
+.foot{margin-top:28px;text-align:center;color:#3a5273;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.05em}
+
+/* Pílulas de links (rotas, aeródromos) */
+.rel{background:var(--panel-2);border:1px solid var(--line);border-radius:30px;padding:7px 13px;font-size:12.5px;color:var(--cyan);text-decoration:none;display:inline-block}
+.rel:hover{background:#16335a}
+
+/* Ficha técnica (comparador) */
+.ficha-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:6px 0 4px}
+.ficha{border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:11px;padding:12px 14px;background:var(--panel)}
+.ficha-h{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.ficha-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.ficha-name{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:13.5px;color:var(--ink);line-height:1.15}
+.ficha-cat{font-size:10.5px;color:var(--muted)}
+.ficha-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.ficha-row:last-child{border-bottom:none}
+.ficha-row .fk{color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ficha-row .fv{color:#dce6f3;text-align:right}
+
+/* Layout empilhado e centralizado: controles em cima, mapa grande embaixo.
+   Aplica-se só às páginas com .page-wide (calculadora, comparador, radar). */
+.calc-main{display:block}
+@media (min-width:1024px){
+  .page-wide .wrap{max-width:900px}
+  .calc-controls{max-width:640px;margin:0 auto}
+  .calc-main .plot{height:min(72vh,640px)}
+  .calc-main .readouts{grid-template-columns:1fr 1fr 1fr 1fr}
+  .calc-main .cell.fuel{grid-column:span 3}  /* preenche ao lado da Proa */
+}
+@media (min-width:1500px){
+  .page-wide .wrap{max-width:1040px}
+  .calc-main .plot{height:min(76vh,720px)}
+}
+
+@media (max-width:420px){
+  .cell .v{font-size:23px}
+  h1{font-size:18px}
+  .aff-grid{grid-template-columns:1fr}
+}
+
+/* Seletor de idioma (i18n) — bandeiras + nome, realçado no topo */
+.langsw{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin:2px 0 12px}
+.langsw-a{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel-2);color:var(--muted);text-decoration:none;
+  font-family:"Chakra Petch",sans-serif;font-size:12px;font-weight:600;letter-spacing:.03em;
+  transition:.15s;line-height:1}
+.langsw-a .fl{font-size:14px;line-height:1}
+.langsw-a:hover{border-color:var(--cyan);color:var(--ink)}
+.langsw-a.on{border-color:var(--cyan);color:#04222a;background:var(--cyan);
+  box-shadow:0 0 0 2px rgba(31,216,230,.18)}
+@media (max-width:420px){.langsw{justify-content:center}.langsw-a{font-size:11px;padding:5px 9px}}

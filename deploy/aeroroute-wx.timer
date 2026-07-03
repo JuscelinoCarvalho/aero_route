@@ -1,0 +1,10 @@
+[Unit]
+Description=Captura METAR do Jussa Aero a cada 30 min (climatologia)
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

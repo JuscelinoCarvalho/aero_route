@@ -1,0 +1,25 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Bytecode / cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Dados de runtime (regravados pelos crons — não versionar)
+app/data/wx_history.db
+app/data/*.db-journal
+app/data/*.db-wal
+app/data/*.db-shm
+
+# Segredos (nunca versionar; o real fica em /etc/aeroroute.env)
+*.env
+!deploy/*.env.example
+
+# Sistema operacional / editores
+.DS_Store
+*.swp
+*~

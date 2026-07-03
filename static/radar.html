@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{rdr_title}}</title>
+  <meta name="description" content="{{rdr_desc}}" />
+  {{hreflang}}
+  <meta property="og:title" content="Radar Meteorológico em tempo real | Jussa Aero" />
+  <meta property="og:description" content="Células de chuva em tempo real, animação do radar, satélite e nowcasting. No mesmo estilo do Jussa Aero." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aero.jussa.com.br/radar" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- MONETIZAÇÃO · Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body class="page-wide">
+  <div class="wrap">
+    <!-- Header -->
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
+        </svg>
+      </div>
+      <h1>Jussa Aero<small>radar meteorológico · jussa.com.br</small></h1>
+    </div>
+
+    <div class="tag">
+      <span>{{rb_tag}}</span>
+      <span>STATUS <b>{{rb_live}}</b></span>
+    </div>
+
+    <!-- Navegação -->
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/tempo">{{nav_tempo}}</a>
+      <a href="/radar" class="active">{{nav_radar}}</a>
+      <a href="/cartas">{{nav_cartas}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 8px">{{rb_h2}}</h2>
+
+    <!-- Layout: texto/legenda em cima, mapa grande centralizado embaixo -->
+    <div class="calc-main">
+     <div class="calc-controls">
+      <p style="font-size:14px;color:#c3d3e6;margin-bottom:14px">
+        {{rb_intro}}
+      </p>
+
+      <div class="note">
+        {{rb_note}}
+      </div>
+     </div>
+
+     <div class="calc-side">
+    <!-- Painel: mapa + controles -->
+    <div class="panel" id="radar-panel">
+      <div id="map" class="plot"></div>
+
+      <!-- Barra de controles -->
+      <div class="r-bar">
+        <button class="r-btn" id="r-play" aria-label="{{rb_play}}">▶</button>
+        <button class="r-btn" id="r-prev" aria-label="{{rb_prevf}}">⏮</button>
+        <button class="r-btn" id="r-next" aria-label="{{rb_nextf}}">⏭</button>
+        <input type="range" id="r-slider" class="r-slider" min="0" max="0" value="0" aria-label="{{rb_timeline}}" />
+        <span class="r-pill obs" id="r-tag">OBSERVADO</span>
+      </div>
+      <div class="r-bar2">
+        <div class="r-modes">
+          <button class="r-mode on" data-mode="radar">{{rb_mode_radar}}</button>
+          <button class="r-mode" data-mode="satellite">{{rb_mode_sat}}</button>
+        </div>
+        <span class="r-clock" id="r-time">—</span>
+        <div class="r-tools">
+          <button class="r-btn sm" id="r-loc" title="{{rb_loc}}">⌖</button>
+          <button class="r-btn sm" id="r-refresh" title="{{rb_refresh}}">⟳</button>
+          <button class="r-btn sm" id="r-full" title="{{rb_full}}">⛶</button>
+        </div>
+      </div>
+
+      <!-- Legenda -->
+      <div class="r-legend" id="legend-radar">
+        <span class="r-leg-t">{{rb_leg_rain}}</span>
+        <div class="r-scale">
+          <i style="background:#3a78ff"></i><i style="background:#22c1d6"></i>
+          <i style="background:#46e06a"></i><i style="background:#d8e23a"></i>
+          <i style="background:#ffb23e"></i><i style="background:#ff5a3a"></i>
+          <i style="background:#e23ad8"></i>
+        </div>
+        <div class="r-scale-lab"><span>{{rb_weak}}</span><span>{{rb_strong}}</span><span>{{rb_extreme}}</span></div>
+      </div>
+      <div class="r-legend" id="legend-sat" style="display:none">
+        <span class="r-leg-t">{{rb_leg_sat}}</span>
+        <div class="r-scale">
+          <i style="background:#10203a"></i><i style="background:#33455f"></i>
+          <i style="background:#5d6e86"></i><i style="background:#8a99ad"></i>
+          <i style="background:#bcc7d6"></i><i style="background:#eef3f9"></i>
+        </div>
+        <div class="r-scale-lab"><span>{{rb_clearsky}}</span><span>{{rb_highcloud}}</span></div>
+      </div>
+
+      <div class="r-status" id="r-status"></div>
+    </div>
+     </div>
+    </div>
+
+    <!-- MONETIZAÇÃO · afiliados -->
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot">
+      Jussa Aero · Python + FastAPI · radar © RainViewer · base © OpenStreetMap/CARTO<br />
+      <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
+      <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{nav_rotas}}</a> ·
+      <a href="/curiosidades" style="color:var(--cyan);text-decoration:none">{{nav_curio}}</a> ·
+      <a href="/sobre" style="color:var(--cyan);text-decoration:none">{{foot_about}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <style>
+    /* Altura do mapa do radar (id vence a regra genérica .calc-main .plot) */
+    #radar-panel .plot{height:420px}
+    @media (min-width:1024px){ #radar-panel .plot{height:min(74vh,640px)} }
+    /* Controles do radar — usam as variáveis do tema avionics */
+    .r-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:#0b1626}
+    .r-bar2{display:flex;align-items:center;gap:10px;padding:0 12px 10px;background:#0b1626;flex-wrap:wrap}
+    .r-btn{
+      flex:none;width:38px;height:38px;border:1px solid var(--line);background:var(--panel-2);
+      color:var(--cyan);border-radius:9px;cursor:pointer;font-size:15px;display:flex;
+      align-items:center;justify-content:center;transition:.15s;font-family:"Inter",sans-serif;
+    }
+    .r-btn:hover{background:#16335a}
+    .r-btn.sm{width:34px;height:34px;font-size:14px}
+    .r-slider{flex:1;min-width:120px;accent-color:var(--cyan);height:4px;cursor:pointer}
+    .r-pill{
+      flex:none;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.12em;
+      text-transform:uppercase;padding:5px 9px;border-radius:30px;border:1px solid var(--line);
+    }
+    .r-pill.obs{color:var(--green);border-color:rgba(94,240,138,.4)}
+    .r-pill.fc{color:var(--amber);border-color:rgba(255,178,62,.4)}
+    .r-pill.sat{color:var(--cyan);border-color:rgba(31,216,230,.4)}
+    .r-modes{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+    .r-mode{
+      background:var(--panel-2);color:var(--muted);border:none;padding:8px 14px;cursor:pointer;
+      font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:12px;letter-spacing:.06em;
+      text-transform:uppercase;transition:.15s;
+    }
+    .r-mode:hover{color:var(--ink)}
+    .r-mode.on{background:rgba(31,216,230,.14);color:var(--cyan)}
+    .r-clock{
+      font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:15px;color:var(--ink);
+      letter-spacing:.04em;font-variant-numeric:tabular-nums;margin-right:auto;
+    }
+    .r-tools{display:flex;gap:7px}
+    .r-legend{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);background:#0b1626;flex-wrap:wrap}
+    .r-leg-t{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .r-scale{display:flex;flex:1;min-width:140px;height:11px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+    .r-scale i{flex:1}
+    .r-scale-lab{display:flex;justify-content:space-between;width:100%;font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--muted);letter-spacing:.04em}
+    .r-status{padding:0 12px 12px;background:#0b1626;color:var(--amber);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.03em}
+    .r-status:empty{display:none}
+    /* Tela cheia: o mapa ocupa quase tudo, controles ficam embaixo */
+    #radar-panel:fullscreen{background:var(--panel);display:flex;flex-direction:column}
+    #radar-panel:fullscreen #map{flex:1;height:auto}
+    @media (max-width:420px){
+      .r-clock{font-size:13px;width:100%;order:5;margin:0}
+      .r-bar2{gap:8px}
+    }
+  </style>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/radar.js"></script>
+</body>
+</html>

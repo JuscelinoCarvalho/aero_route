@@ -1,0 +1,13 @@
+[Unit]
+Description=Jussa Aero - captura de METAR (histórico/climatologia)
+After=network.target
+
+[Service]
+Type=oneshot
+User=jussa
+Group=jussa
+WorkingDirectory=/home/jussa/FileShare/development/aero_route
+# Reusa a mesma chave REDEMET do serviço web.
+EnvironmentFile=/etc/aeroroute.env
+# capture-br: descobre e captura TODAS as estações brasileiras em lote (~5 reqs).
+ExecStart=/home/jussa/FileShare/development/aero_route/.venv/bin/python -m app.history capture-br

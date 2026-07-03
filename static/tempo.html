@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS1B98VCXF');
+  </script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{wx_title}}</title>
+  <meta name="description" content="{{wx_desc}}" />
+  {{hreflang}}
+  <meta property="og:title" content="METAR decodificado e condição VFR/IFR | Jussa Aero" />
+  <meta property="og:description" content="METAR em português claro com semáforo VFR/IFR. Dados oficiais da REDEMET/DECEA." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aero.jussa.com.br/tempo" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- MONETIZAÇÃO · Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
+      </div>
+      <h1>Jussa Aero<small>{{tb_sub}}</small></h1>
+    </div>
+
+    <div class="tag"><span>METAR · VFR/IFR</span><span>{{src}} <b>REDEMET / DECEA</b></span></div>
+
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/tempo" class="active">{{nav_tempo}}</a>
+      <a href="/radar">{{nav_radar}}</a>
+      <a href="/cartas">{{nav_cartas}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 8px">{{tb_h2}}</h2>
+    <p style="font-size:14px;color:#c3d3e6;margin-bottom:14px">
+      {{tb_intro}}
+    </p>
+
+    <div class="ac-row">
+      <label>{{tb_lbl_aero}}</label>
+      <div class="field">
+        <input id="wx-airport" placeholder="GRU, SBGR ou cidade…" autocomplete="off" spellcheck="false" />
+        <div class="ac" id="wx-ac"></div>
+      </div>
+    </div>
+
+    <div id="wx-alert"></div>
+
+    <div id="wx-out"></div>
+
+    <div id="wx-nowcast"></div>
+
+    <div id="wx-taf"></div>
+
+    <div id="wx-clima"></div>
+
+    <h3 style="font-family:'Chakra Petch',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:22px 0 10px">{{tb_related}}</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <a class="rel" href="/tempo/SBGR">Guarulhos (SBGR)</a>
+      <a class="rel" href="/tempo/SBSP">Congonhas (SBSP)</a>
+      <a class="rel" href="/tempo/SBBR">Brasília (SBBR)</a>
+      <a class="rel" href="/tempo/SBGL">Galeão (SBGL)</a>
+      <a class="rel" href="/tempo/SBRJ">Santos Dumont (SBRJ)</a>
+      <a class="rel" href="/tempo/SBCF">Confins (SBCF)</a>
+      <a class="rel" href="/tempo/SBSV">Salvador (SBSV)</a>
+      <a class="rel" href="/tempo/SBPA">Porto Alegre (SBPA)</a>
+      <a class="rel" href="/tempo/SBCT">Curitiba (SBCT)</a>
+      <a class="rel" href="/tempo/SBRF">Recife (SBRF)</a>
+      <a class="rel" href="/tempo/SBEG">Manaus (SBEG)</a>
+      <a class="rel" href="/tempo/SBFL">Florianópolis (SBFL)</a>
+    </div>
+
+    <div class="note">
+      Dados oficiais da <strong>REDEMET/DECEA</strong>. As categorias VFR/MVFR/IFR/LIFR são uma classificação
+      automática por teto e visibilidade, de apoio à consciência situacional — <strong>não substituem o
+      briefing oficial</strong> (METAR/TAF/SIGMET, NOTAM e os mínimos da sua operação).
+    </div>
+
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot">
+      Jussa Aero · METAR © REDEMET/DECEA<br />
+      <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
+      <a href="/radar" style="color:var(--cyan);text-decoration:none">{{nav_radar}}</a> ·
+      <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{nav_rotas}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <style>
+    .wx-card{background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:14px;padding:0;overflow:hidden;margin-top:6px}
+    .wx-flag{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .wx-dot{width:46px;height:46px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px}
+    .wx-cat{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;line-height:1}
+    .wx-cat small{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:12px;letter-spacing:0;color:var(--muted);margin-top:3px}
+    .wx-when{margin-left:auto;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+    .wx-sum{padding:14px 18px;font-size:14px;color:#dce6f3;line-height:1.6}
+    .wx-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:var(--line)}
+    .wx-cell{background:#0b1626;padding:12px 14px}
+    .wx-cell .k{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+    .wx-cell .v{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-top:4px;font-variant-numeric:tabular-nums}
+    .wx-cell .v small{font-size:11px;color:var(--cyan);font-weight:500}
+    .wx-raw{padding:12px 18px;border-top:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:12px;color:#9fb3cc;word-break:break-word;background:#070f1d}
+    .wx-msg{padding:18px;border:1px dashed var(--line);border-radius:12px;color:#c3d3e6;font-size:13.5px;margin-top:6px}
+    @media (max-width:520px){.wx-grid{grid-template-columns:1fr 1fr}}
+
+    /* TAF (previsão) */
+    .taf{margin-top:16px;background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .taf-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+    .taf-h .t{font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan)}
+    .taf-h .v{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .taf-p{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+    .taf-p:last-of-type{border-bottom:none}
+    .taf-bar{width:4px;border-radius:3px;flex:none}
+    .taf-when{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12.5px;color:var(--ink)}
+    .taf-when .badge2{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:20px;margin-right:7px;vertical-align:middle}
+    .taf-desc{font-size:13px;color:#c3d3e6;margin-top:3px;line-height:1.5}
+    .taf-raw{padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#9fb3cc;word-break:break-word;background:#070f1d;border-top:1px solid var(--line)}
+    /* Janela de voo (linha do tempo da previsão) */
+    .tl-wrap{padding:14px 18px;border-bottom:1px solid var(--line)}
+    .tl-sum{font-size:13.5px;color:#dce6f3;margin-bottom:10px;line-height:1.5}
+    .tl-strip{display:flex;gap:3px;overflow-x:auto;padding-bottom:3px}
+    .tl-cell{flex:none;width:36px;text-align:center}
+    .tl-bar{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .tl-hr{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:3px}
+    .tl-hist{height:5px;border-radius:3px;background:#16263f;margin-top:3px;overflow:hidden}
+    .tl-hist > i{display:block;height:100%;background:#2fbf71}
+    .tl-legend{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:8px}
+    .nowcast{margin-top:14px;padding:11px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:13.5px;color:#dce6f3;display:flex;gap:9px;align-items:center}
+    .nowcast .ic{font-size:17px;flex:none}
+    .alert-btn{margin-top:12px;background:rgba(31,216,230,.12);border:1px solid var(--cyan);color:var(--cyan);font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.04em;font-size:13px;padding:10px 16px;border-radius:9px;cursor:pointer}
+    .alert-btn:hover{background:rgba(31,216,230,.2)}
+    .alert-btn.on{border-color:#2fbf71;color:#bdf0d2;background:rgba(47,191,113,.12)}
+    .alert-note{font-size:11px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+    /* Climatologia: melhores horários para voar */
+    .clima{margin-top:20px;background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+    .clima-h{font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin-bottom:4px}
+    .clima-sub{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:12px}
+    .clima-best{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .clima-pill{display:inline-flex;align-items:center;gap:7px;border-radius:30px;padding:7px 13px;font-size:12.5px;font-family:'Chakra Petch',sans-serif;font-weight:600}
+    .clima-pill.good{background:rgba(47,191,113,.14);border:1px solid #2fbf71;color:#bdf0d2}
+    .clima-pill.bad{background:rgba(224,49,49,.12);border:1px solid #e03131;color:#f3bdbd}
+    .clima-chart{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px;border-bottom:1px solid var(--line)}
+    .clima-bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;cursor:default}
+    .clima-bar .fill{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:.2s}
+    .clima-bar.empty .fill{background:#16263f}
+    .clima-axis{display:flex;gap:3px;margin-top:4px}
+    .clima-axis span{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted)}
+    .clima-leg{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .clima-leg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  </style>
+
+  <script src="/static/tempo.js"></script>
+</body>
+</html>
