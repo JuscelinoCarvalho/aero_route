@@ -1,6 +1,10 @@
 [Unit]
 Description=AeroRoute - calculadora de rotas/combustivel de voo (FastAPI)
 After=network.target
+# StartLimitIntervalSec=0 desativa o "rate limit" de reinicios do systemd: sem
+# isso, se o socket antigo demora a liberar (bind: address already in use), o
+# systemd desiste apos algumas tentativas e deixa o servico morto (dead).
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -10,9 +14,17 @@ WorkingDirectory=/home/jussa/FileShare/development/aero_route
 # Carrega segredos (REDEMET, AISWEB) deste arquivo. O "-" torna-o opcional:
 # se o arquivo não existir, o serviço sobe mesmo assim (endpoints respondem 503).
 EnvironmentFile=-/etc/aeroroute.env
-ExecStart=/home/jussa/FileShare/development/aero_route/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8090
-Restart=on-failure
-RestartSec=3
+# --proxy-headers + --forwarded-allow-ips: confia no X-Forwarded-Proto do Apache
+# local (precisa do RequestHeader no vhost :443), para os redirects (ex.: barra
+# final) usarem https e não cair em http. Sincronize este arquivo com
+# /etc/systemd/system/aeroroute.service após editar.
+ExecStart=/home/jussa/FileShare/development/aero_route/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8090 --proxy-headers --forwarded-allow-ips 127.0.0.1
+# Restart=always: reinicia mesmo apos shutdown limpo. Combinado com
+# StartLimitIntervalSec=0, o servico nunca "desiste" de subir.
+Restart=always
+# RestartSec=10: espera o socket antigo sair do TIME_WAIT antes do proximo bind,
+# evitando a corrida "address already in use" num restart.
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
