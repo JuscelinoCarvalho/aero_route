@@ -4,19 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7C0B22Z8EC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-GS1B98VCXF');
+    gtag('config', 'G-7C0B22Z8EC', {
+      content_group: 'app-cartas',
+      page_language: (document.documentElement.lang || 'pt').slice(0, 2)
+    });
   </script>
+  <script defer src="/static/track.js"></script>
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#070d18" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <meta name="apple-mobile-web-app-title" content="Aero Jussa" />
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
@@ -25,8 +29,8 @@
   <title>{{chr_title}}</title>
   <meta name="description" content="{{chr_desc}}" />
   {{hreflang}}
-  <meta property="og:title" content="Cartas de Aproximação dos aeródromos do Brasil | Jussa Aero" />
-  <meta property="og:description" content="Cartas IAC e aeronáuticas oficiais (DECEA/AISWEB): ver, imprimir, baixar e compartilhar em PDF." />
+  <meta property="og:title" content="Cartas de Aproximação · Brasil, EUA e Europa | Aero Jussa" />
+  <meta property="og:description" content="Cartas IAC e aeronáuticas oficiais do Brasil (DECEA/AISWEB) e dos EUA (FAA d-TPP), mais o eAIP oficial de vários países da Europa: ver, imprimir, baixar e compartilhar em PDF." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://aero.jussa.com.br/cartas" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,12 +49,12 @@
           <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
         </svg>
       </div>
-      <h1>Jussa Aero<small>{{cb_sub}}</small></h1>
+      <h1>Aero Jussa<small>{{cb_sub}}</small></h1>
     </div>
 
     <div class="tag">
       <span>{{cb_tag}}</span>
-      <span>{{src}} <b>DECEA / AISWEB</b></span>
+      <span>{{src}} <b>DECEA / AISWEB · FAA d-TPP · eAIP (Europa)</b></span>
     </div>
 
     <!-- Navegação -->
@@ -75,7 +79,7 @@
     <div class="route" style="grid-template-columns:1fr 1fr">
       <div class="field">
         <label>{{cb_lbl_aero}}</label>
-        <input id="aero" placeholder="SBGR, SBSP, Congonhas…" autocomplete="off" spellcheck="false" />
+        <input id="aero" placeholder="SBGR, KJFK, EGLL, Congonhas…" autocomplete="off" spellcheck="false" />
         <div class="ac" id="acAero"></div>
       </div>
       <div class="field">
@@ -135,7 +139,7 @@
     </div>
 
     <footer class="foot">
-      Jussa Aero · Python + FastAPI · cartas © DECEA/AISWEB (fonte oficial)<br />
+      Aero Jussa · Python + FastAPI · cartas © DECEA/AISWEB, FAA e eAIP nacionais (fontes oficiais)<br />
       <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
       <a href="/radar" style="color:var(--cyan);text-decoration:none">{{nav_radar}}</a> ·
       <a href="/rotas" style="color:var(--cyan);text-decoration:none">{{nav_rotas}}</a> ·
@@ -165,6 +169,21 @@
       flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--cyan);
       border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase;
     }
+    /* Card de deep-link para o eAIP oficial (Europa) */
+    .c-eaip{
+      background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);
+      border:1px solid var(--line);border-radius:11px;padding:16px;margin-top:6px;
+    }
+    .c-eaip-h{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:14px;color:var(--ink);letter-spacing:.02em}
+    .c-eaip-h b{color:var(--cyan)}
+    .c-eaip-b{font-size:13px;color:#c3d3e6;line-height:1.6;margin:8px 0 14px}
+    .c-eaip-btn{
+      display:inline-block;font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13.5px;letter-spacing:.02em;
+      background:var(--cyan);color:#04222a;text-decoration:none;padding:11px 18px;border-radius:9px;transition:.15s;
+    }
+    .c-eaip-btn:hover{filter:brightness(1.08)}
+    .c-stale{margin-top:14px;padding:11px 14px;border-radius:10px;font-size:13px;line-height:1.5;
+      background:rgba(255,178,62,.10);border:1px solid rgba(255,178,62,.45);color:var(--amber)}
     .c-toolbar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0b1626}
     .c-title{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13.5px;color:var(--ink);flex:1;
       overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em}

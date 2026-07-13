@@ -89,7 +89,15 @@
     c_found: { pt: "{0} carta(s) encontrada(s) para {1}. Toque em uma para visualizar.", en: "{0} chart(s) found for {1}. Tap one to view.", es: "{0} carta(s) encontrada(s) para {1}. Toca una para ver." },
     c_conn_fail: { pt: "Erro de conexão ao buscar as cartas.", en: "Connection error while fetching the charts.", es: "Error de conexión al buscar las cartas." },
     c_render_fail: { pt: "Não foi possível renderizar a carta aqui. Use “Abrir em nova aba”.", en: "Could not render the chart here. Use “Open in new tab”.", es: "No se pudo renderizar la carta aquí. Usa “Abrir en pestaña nueva”." },
+    c_stale: { pt: "⚠ Fonte oficial indisponível agora. Exibindo a última cópia salva em {0} ({1}) — pode estar desatualizada. Confirme na fonte oficial antes de usar.", en: "⚠ Official source unavailable right now. Showing the last saved copy from {0} ({1}) — it may be outdated. Verify against the official source before use.", es: "⚠ Fuente oficial no disponible ahora. Mostrando la última copia guardada del {0} ({1}) — puede estar desactualizada. Verifica en la fuente oficial antes de usar." },
+    c_stale_age_days: { pt: "há {0} dia(s)", en: "{0} day(s) ago", es: "hace {0} día(s)" },
+    c_stale_age_today: { pt: "hoje", en: "today", es: "hoy" },
     c_copied: { pt: "Link da carta copiado para a área de transferência.", en: "Chart link copied to clipboard.", es: "Enlace de la carta copiado al portapapeles." },
+    c_eaip_title: { pt: "Cartas oficiais no eAIP", en: "Official charts on the eAIP", es: "Cartas oficiales en el eAIP" },
+    c_eaip_body: { pt: "Na Europa as cartas são publicadas por cada país e não podem ser reservidas aqui. Abra o eAIP oficial de <strong>{0}</strong> — o portal mostra a emenda (AIRAC) vigente do aeroporto.", en: "In Europe charts are published by each country and cannot be re-served here. Open the official <strong>{0}</strong> eAIP — the portal shows the airport's current (AIRAC) amendment.", es: "En Europa las cartas las publica cada país y no pueden reservirse aquí. Abre el eAIP oficial de <strong>{0}</strong> — el portal muestra la enmienda (AIRAC) vigente del aeropuerto." },
+    c_eaip_btn: { pt: "Abrir eAIP oficial ↗", en: "Open official eAIP ↗", es: "Abrir eAIP oficial ↗" },
+    c_eaip_status: { pt: "Cartas de {0} disponíveis no eAIP oficial ({1}).", en: "Charts for {0} available on the official eAIP ({1}).", es: "Cartas de {0} disponibles en el eAIP oficial ({1})." },
+    c_nosource: { pt: "Ainda não há fonte de cartas para este país ({0}). Cobrimos Brasil, EUA e o eAIP oficial de vários países da Europa.", en: "No chart source for this country yet ({0}). We cover Brazil, the USA and the official eAIP of several European countries.", es: "Aún no hay fuente de cartas para este país ({0}). Cubrimos Brasil, EE. UU. y el eAIP oficial de varios países de Europa." },
 
     // ---- Tempo (tempo.js) — rótulos de UI (o texto decodificado vem do servidor em pt) ----
     wx_querying: { pt: "Consultando METAR de <strong>{0}</strong>…", en: "Querying METAR for <strong>{0}</strong>…", es: "Consultando METAR de <strong>{0}</strong>…" },
@@ -176,5 +184,17 @@
       var v = args[(+i) + 1];
       return v != null ? v : "";
     });
+  };
+
+  // Rola APENAS o dropdown do autocomplete (nunca a página) para manter a opção
+  // destacada (.hl) visível ao navegar com as setas até o limite do combo.
+  // Usado por todos os autocompletes (app, comparar, tempo, cartas).
+  window.acScroll = function (acEl) {
+    var el = acEl && acEl.querySelector(".hl");
+    if (!el) return;
+    var top = el.offsetTop;
+    var bottom = top + el.offsetHeight;
+    if (top < acEl.scrollTop) acEl.scrollTop = top;
+    else if (bottom > acEl.scrollTop + acEl.clientHeight) acEl.scrollTop = bottom - acEl.clientHeight;
   };
 })();

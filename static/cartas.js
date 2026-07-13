@@ -1,4 +1,4 @@
-/* Jussa Aero · Cartas Aeronáuticas (DECEA/AISWEB)
+/* Aero Jussa · Cartas Aeronáuticas (DECEA/AISWEB)
  * Busca um aeródromo do Brasil, lista as cartas (IAC etc.) e permite
  * visualizar, imprimir, baixar e compartilhar o PDF oficial.
  *
@@ -24,13 +24,24 @@ $("#aff-grid").innerHTML = AFFILIATES.map(
 let icao = "";
 let current = null; // carta selecionada
 
+// Países com alguma fonte de cartas (embutida BR/US ou deep-link eAIP no resto do mundo).
+// Carregado do backend para manter o autocomplete em sincronia com o servidor.
+let COVERED = { BR: 1, US: 1 };
+fetch("/api/cartas/countries")
+  .then((r) => r.json())
+  .then((d) => {
+    COVERED = {};
+    [...(d.embed || []), ...(d.link || [])].forEach((c) => (COVERED[c] = 1));
+  })
+  .catch(() => {});
+
 const status = $("#c-status");
 function setStatus(msg, err) {
   status.textContent = msg;
   status.classList.toggle("err", !!err);
 }
 
-// ===== Autocomplete de aeródromo (somente Brasil) =====
+// ===== Autocomplete de aeródromo (Brasil + EUA) =====
 (function buildAeroAC() {
   const inputEl = $("#aero");
   const acEl = $("#acAero");
@@ -53,6 +64,7 @@ function setStatus(msg, err) {
       )
       .join("");
     acEl.classList.toggle("open", list.length > 0);
+    acScroll(acEl); // mantém a opção destacada visível ao navegar com as setas
   }
   function pick(a) {
     inputEl.value = a.icao;
@@ -70,8 +82,9 @@ function setStatus(msg, err) {
       try {
         const res = await fetch(`/api/airports/search?q=${encodeURIComponent(q)}`);
         const all = (await res.json()).results || [];
-        // DECEA cobre o Brasil: filtra aeródromos BR com ICAO de 4 letras
-        list = all.filter((a) => a.country === "BR" && a.icao && a.icao.length === 4).slice(0, 10);
+        // Filtra aeródromos com ICAO de 4 letras dos países cobertos
+        // (Brasil, EUA e os demais países com eAIP oficial).
+        list = all.filter((a) => COVERED[a.country] && a.icao && a.icao.length === 4).slice(0, 10);
         hl = -1;
         render();
       } catch (_) {
@@ -114,7 +127,15 @@ async function loadCartas() {
     }
     const cartas = data.cartas || [];
     if (!cartas.length) {
-      setStatus(TF("c_none", icao), false);
+      // Sem cartas embutidas: pode ser deep-link (eAIP) ou país sem fonte.
+      if (data.link) {
+        renderEaipLink(data.link);
+        setStatus(TF("c_eaip_status", icao, data.link.provider), false);
+      } else if (data.country && !COVERED[data.country]) {
+        setStatus(TF("c_nosource", data.country), false);
+      } else {
+        setStatus(TF("c_none", icao), false);
+      }
       return;
     }
     renderList(cartas);
@@ -138,6 +159,18 @@ function renderList(cartas) {
     el.addEventListener("click", () => openCarta(c, el));
     list.appendChild(el);
   });
+}
+
+// Card de deep-link para o eAIP oficial — não embutimos o PDF.
+function renderEaipLink(link) {
+  const list = $("#c-list");
+  const el = document.createElement("div");
+  el.className = "c-eaip";
+  el.innerHTML =
+    `<div class="c-eaip-h">${T("c_eaip_title")} · <b>${link.provider}</b></div>` +
+    `<div class="c-eaip-b">${TF("c_eaip_body", link.provider)}</div>` +
+    `<a class="c-eaip-btn" href="${link.url}" target="_blank" rel="nofollow noopener">${T("c_eaip_btn")}</a>`;
+  list.appendChild(el);
 }
 
 // ===== Visualizar (PDF.js) / imprimir / baixar / compartilhar =====
@@ -190,6 +223,7 @@ async function renderPage() {
 
 async function openCarta(c, el) {
   current = c;
+  if (window.track) window.track("chart_open", { icao: icao, chart_type: c.tipo || undefined, chart_name: c.nome });
   document.querySelectorAll(".c-card").forEach((x) => x.classList.remove("on"));
   if (el) el.classList.add("on");
   $("#c-title").textContent = `${c.tipo ? c.tipo + " · " : ""}${c.nome}`;
@@ -198,9 +232,18 @@ async function openCarta(c, el) {
   zoom = 1;
   pageNum = 1;
   showLoad(true);
+  showStale(null);
   try {
     if (loadTask) { try { await loadTask.destroy(); } catch (_) {} }
-    loadTask = pdfjsLib.getDocument({ url: pdfUrl(c, false) });
+    // Busca os bytes por fetch (em vez de dar a URL ao PDF.js) para poder ler o
+    // header de defasagem: se a fonte caiu, o proxy serve a última cópia salva.
+    const resp = await fetch(pdfUrl(c, false));
+    if (!resp.ok) throw new Error("http " + resp.status);
+    if (resp.headers.get("X-Chart-Stale") === "1") {
+      showStale(resp.headers.get("X-Chart-Cached-At"));
+    }
+    const buf = await resp.arrayBuffer();
+    loadTask = pdfjsLib.getDocument({ data: new Uint8Array(buf) });
     pdfDoc = await loadTask.promise;
     pageCount = pdfDoc.numPages;
     await renderPage();
@@ -209,6 +252,25 @@ async function openCarta(c, el) {
   } finally {
     showLoad(false);
   }
+}
+
+// Aviso de defasagem: fonte oficial fora do ar, exibindo cópia local de {isoDate}.
+function showStale(cachedAtIso) {
+  let box = $("#c-stale");
+  if (!cachedAtIso) { if (box) box.style.display = "none"; return; }
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "c-stale";
+    box.className = "c-stale";
+    const viewer = $("#c-viewer");
+    viewer.parentNode.insertBefore(box, viewer);
+  }
+  const d = new Date(cachedAtIso);
+  const dateStr = isNaN(d) ? cachedAtIso : d.toLocaleDateString();
+  const days = isNaN(d) ? null : Math.floor((Date.now() - d.getTime()) / 86400000);
+  const age = days == null ? "" : days <= 0 ? T("c_stale_age_today") : TF("c_stale_age_days", days);
+  box.textContent = TF("c_stale", dateStr, age);
+  box.style.display = "";
 }
 
 // Navegação de páginas

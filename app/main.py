@@ -7,6 +7,8 @@ fusos, vento, etc.
 
 from __future__ import annotations
 
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import Body, FastAPI, HTTPException, Query
@@ -14,8 +16,11 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 
 from . import aircraft as aircraft_mod
+from . import aip_japan as japan_mod
 from . import calc
 from . import cartas as cartas_mod
+from . import eaip as eaip_mod
+from . import faa_charts as faa_mod
 from . import history as history_mod
 from . import i18n
 from . import metar as metar_mod
@@ -78,13 +83,57 @@ def api_cartas(
     icao: str = Query(..., min_length=4, max_length=4, description="Código ICAO do aeródromo"),
     tipo: str = Query("IAC", description="Tipo de carta (IAC, VAC, ADC, SID, STAR, AOC, ALL)"),
 ) -> dict:
-    if not cartas_mod.configured():
-        raise HTTPException(503, "Consulta de cartas indisponível: credenciais do AISWEB não configuradas.")
+    # Roteia pela fonte do país do aeroporto:
+    #  - EUA  -> FAA d-TPP (embutido, com visualizador)
+    #  - Brasil -> DECEA/AISWEB (embutido, com visualizador)
+    #  - Japão -> espelho NagoDede (embutido; portal oficial exige login). Se o
+    #             ICAO não estiver no espelho, cai no deep-link do portal oficial.
+    #  - Europa/demais -> deep-link para o eAIP oficial (não redistribuível; o
+    #             portal resolve o AIRAC vigente)
+    #  - sem fonte -> nada
+    ap = store.resolve(icao)
+    country = ap.country.upper() if ap else ""
+    cartas: list[dict] = []
+    link: dict | None = None
+    source = ""
     try:
-        cartas = cartas_mod.fetch_cartas(icao, tipo)
+        if country == "US":
+            cartas = faa_mod.fetch_cartas(icao, tipo)
+            source = "FAA d-TPP · EUA"
+        elif country == "BR":
+            cartas = cartas_mod.fetch_cartas(icao, tipo)
+            source = "DECEA / AISWEB · Brasil"
+        elif country == "JP":
+            cartas = japan_mod.fetch_cartas(icao, tipo)
+            if cartas:
+                _vig = japan_mod.effective_date()
+                source = "AIP Japan · NagoDede (não oficial)" + (
+                    f" · vig. {_vig}" if _vig else ""
+                )
+            else:  # ICAO fora do espelho -> portal oficial (deep-link)
+                link = eaip_mod.link_for(country)
+                if link:
+                    source = f"eAIP · {link['provider']}"
+        else:
+            link = eaip_mod.link_for(country)
+            if link:
+                source = f"eAIP · {link['provider']}"
     except RuntimeError as exc:
         raise HTTPException(502, str(exc))
-    return {"icao": icao.upper(), "tipo": tipo.upper(), "cartas": cartas}
+    return {
+        "icao": icao.upper(),
+        "tipo": tipo.upper(),
+        "country": country,
+        "source": source,
+        "cartas": cartas,
+        "link": link,
+    }
+
+
+@app.get("/api/cartas/countries")
+def api_cartas_countries() -> dict:
+    """Países com alguma fonte de cartas (para o autocomplete filtrar)."""
+    return {"embed": ["BR", "US"], "link": eaip_mod.covered_countries()}
 
 
 @app.get("/api/carta")
@@ -97,7 +146,7 @@ def api_carta(
     if url is None:
         raise HTTPException(404, "Carta não encontrada ou sessão expirada. Refaça a busca.")
     try:
-        data, ctype = cartas_mod.fetch_pdf(url)
+        data, ctype, stale_epoch = cartas_mod.fetch_pdf(url)
     except RuntimeError as exc:
         raise HTTPException(502, str(exc))
     safe = "".join(c for c in nome if c.isalnum() or c in " -_.").strip() or "carta"
@@ -106,6 +155,14 @@ def api_carta(
         "Content-Disposition": f'{disp}; filename="{safe}.pdf"',
         "Cache-Control": "public, max-age=900",
     }
+    if stale_epoch is not None:
+        # Fonte fora do ar: servindo cópia local. Sinaliza a defasagem ao front e
+        # não deixa o navegador cachear (para retentar a fonte na próxima).
+        cached_at = datetime.fromtimestamp(stale_epoch, timezone.utc)
+        headers["X-Chart-Stale"] = "1"
+        headers["X-Chart-Cached-At"] = cached_at.isoformat()
+        headers["X-Chart-Age-Seconds"] = str(max(0, int(time.time()) - stale_epoch))
+        headers["Cache-Control"] = "no-store"
     return Response(content=data, media_type=ctype, headers=headers)
 
 

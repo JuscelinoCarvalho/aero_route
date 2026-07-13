@@ -13,8 +13,10 @@ Fallback: se o scraping falhar e as credenciais da API oficial estiverem
 configuradas (env AISWEB_API_KEY/AISWEB_API_PASS), consulta a API XML.
 
 Princípios:
-- NÃO re-hospedamos cartas: o PDF é sempre buscado ao vivo do DECEA (sempre na
-  emenda/AIRAC vigente). O proxy só faz passthrough do arquivo atual.
+- **Fonte-primeiro**: o PDF é sempre buscado ao vivo da fonte (sempre na
+  emenda/AIRAC vigente). Guardamos uma cópia local só como *fallback de
+  resiliência* (``chart_cache``): se a fonte cair, servimos a última cópia e
+  avisamos a defasagem. Nunca servimos cache quando a fonte responde.
 - O cliente nunca vê a URL/credenciais do DECEA — referencia cada carta por um
   token opaco.
 """
@@ -30,12 +32,22 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
+from . import chart_cache
+
 # Página pública de cartas (fonte primária, via scraping).
 PUBLIC_PAGE = "https://aisweb.decea.mil.br/?i=cartas"
 # API oficial credenciada (fallback).
 API_BASE = "https://aisweb.decea.mil.br/api/"
 # Hosts permitidos no proxy de PDF (evita uso como proxy aberto / SSRF).
-ALLOWED_HOSTS = ("aisweb.decea.mil.br", "aisweb.decea.gov.br", "geoaisweb.decea.mil.br")
+# Inclui o DECEA (Brasil), a FAA (EUA, d-TPP) e o espelho NagoDede/AIPJapan
+# (Japão) — o proxy /api/carta serve os três.
+ALLOWED_HOSTS = (
+    "aisweb.decea.mil.br",
+    "aisweb.decea.gov.br",
+    "geoaisweb.decea.mil.br",
+    "aeronav.faa.gov",
+    "nagodede.github.io",
+)
 _UA = "Mozilla/5.0 (JussaAero/1.0; +https://aero.jussa.com.br)"
 
 # Tipos de carta mais comuns (rótulo amigável -> código AISWEB).
@@ -70,6 +82,15 @@ def _remember(url: str) -> str:
         if len(_CHART_URLS) > _CACHE_MAX:
             _CHART_URLS.popitem(last=False)  # descarta o mais antigo
     return token
+
+
+def remember_url(url: str) -> str:
+    """Registra uma URL de PDF no cofre e devolve seu token opaco.
+
+    API pública do cofre de tokens — usada também pelo módulo da FAA
+    (``faa_charts``), para que o proxy ``/api/carta`` sirva os dois países.
+    """
+    return _remember(url)
 
 
 def url_for_token(token: str) -> str | None:
@@ -264,12 +285,33 @@ def fetch_cartas(icao: str, tipo: str = "") -> list[dict]:
     return rows
 
 
-def fetch_pdf(url: str) -> tuple[bytes, str]:
-    """Baixa o PDF da carta direto do DECEA (passthrough). Retorna (bytes, content_type)."""
+def fetch_pdf(url: str) -> tuple[bytes, str, int | None]:
+    """Serve o PDF da carta, **fonte-primeiro com fallback em cache local**.
+
+    Baixa ao vivo da fonte (DECEA/FAA/NagoDede — passthrough) e guarda uma cópia
+    no cache de resiliência (``chart_cache``). Se a fonte cair, serve a última
+    cópia local. Retorna ``(bytes, content_type, stale_epoch)``: ``stale_epoch`` é
+    ``None`` quando o PDF veio fresco da fonte, ou o epoch de captura da cópia
+    quando estamos servindo do cache (o chamador usa isso para avisar a defasagem).
+    """
     if not host_allowed(url):
         raise RuntimeError("URL de carta não permitida.")
-    req = urllib.request.Request(url, headers={"User-Agent": _UA})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        data = resp.read()
-        ctype = resp.headers.get("Content-Type", "application/pdf")
-    return data, ctype
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": _UA})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = resp.read()
+            ctype = resp.headers.get("Content-Type", "application/pdf")
+    except Exception as exc:  # noqa: BLE001 — fonte fora do ar: tenta a cópia local
+        cached = chart_cache.get(url)
+        if cached:
+            data, ctype, cached_epoch = cached
+            return data, ctype, cached_epoch
+        raise RuntimeError(f"Falha ao obter a carta e sem cópia em cache: {exc}") from exc
+
+    # Cache é benefício lateral: uma falha ao gravar (disco/lock) NUNCA pode
+    # derrubar o atendimento de um PDF já baixado com sucesso.
+    try:
+        chart_cache.store(url, data, ctype)
+    except Exception:  # noqa: BLE001 — melhor servir sem cachear do que falhar
+        pass
+    return data, ctype, None

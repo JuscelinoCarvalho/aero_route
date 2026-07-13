@@ -15,6 +15,10 @@ app/data/*.db-journal
 app/data/*.db-wal
 app/data/*.db-shm
 
+# Cache de resiliência das cartas (cópias locais dos PDFs + índice — não versionar)
+app/data/chart_cache.db
+app/data/chart_cache/
+
 # Segredos (nunca versionar; o real fica em /etc/aeroroute.env)
 *.env
 !deploy/*.env.example
