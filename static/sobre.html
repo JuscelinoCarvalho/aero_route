@@ -4,19 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7C0B22Z8EC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-GS1B98VCXF');
+    gtag('config', 'G-7C0B22Z8EC', {
+      content_group: 'app-sobre',
+      page_language: (document.documentElement.lang || 'pt').slice(0, 2)
+    });
   </script>
+  <script defer src="/static/track.js"></script>
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#070d18" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <meta name="apple-mobile-web-app-title" content="Aero Jussa" />
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
@@ -46,7 +50,7 @@
       <div class="badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
       </div>
-      <h1>Jussa Aero<small>{{ab_sub}}</small></h1>
+      <h1>Aero Jussa<small>{{ab_sub}}</small></h1>
     </div>
 
     {{lang_switcher}}

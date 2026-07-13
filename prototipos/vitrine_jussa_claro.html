@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jussa · Estúdio de produtos de dados</title>
+<meta name="description" content="Aviação, mercados e inteligência de dados. Três ferramentas construídas para quem quer sair na frente.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#f7f7f5;
+    --ink:#14161a;
+    --muted:#6b7280;
+    --line:#e7e7e2;
+    --line-2:#d8d8d0;
+    --aero:#0e8ea4;
+    --trade:#b7791f;
+    --pulse:#7c53c9;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;letter-spacing:-.01em;font-weight:500}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .brand{font-family:'Fraunces';font-weight:600;font-size:23px;display:flex;align-items:center;gap:9px}
+  .brand .mk{width:9px;height:9px;border-radius:50%;background:var(--ink)}
+  .brand span{color:var(--muted);font-weight:400}
+  .nav-links{display:flex;gap:30px;font-size:14.5px;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  @media(max-width:680px){.nav-links{display:none}}
+
+  header{padding:110px 0 84px;border-bottom:1px solid var(--line)}
+  header .eyebrow{display:block;margin-bottom:26px}
+  h1{font-size:clamp(38px,6.4vw,72px);line-height:1.04;font-weight:400;max-width:14ch;margin-bottom:26px}
+  h1 em{font-style:italic;color:var(--aero)}
+  .sub{font-size:clamp(17px,2.3vw,21px);color:var(--muted);max-width:56ch;margin-bottom:40px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:13px 24px;border-radius:11px;transition:.18s}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-primary:hover{transform:translateY(-1px);opacity:.9}
+  .btn-text{color:var(--muted)}
+  .btn-text:hover{color:var(--ink)}
+
+  .stats{display:flex;gap:56px;flex-wrap:wrap;margin-top:64px}
+  .stats div{font-size:13.5px;color:var(--muted)}
+  .stats b{display:block;font-family:'Fraunces';font-size:30px;font-weight:500;color:var(--ink);line-height:1.1;margin-bottom:2px}
+
+  section{padding:90px 0}
+  .sec-head{margin-bottom:56px;max-width:60ch}
+  .sec-head .eyebrow{display:block;margin-bottom:16px}
+  .sec-head h2{font-size:clamp(28px,4.2vw,42px);font-weight:400;line-height:1.1}
+  .sec-head p{color:var(--muted);margin-top:14px;font-size:17px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .card{background:var(--bg);padding:36px 32px 32px;display:flex;flex-direction:column;transition:.2s;position:relative}
+  .card:hover{background:var(--bg-soft)}
+  .card .top{display:flex;align-items:center;gap:9px;margin-bottom:22px}
+  .card .lv{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .card .sub-domain{font-size:13px;color:var(--muted);font-weight:500}
+  .card h3{font-size:26px;font-weight:500;margin-bottom:8px}
+  .card .tagline{font-family:'Fraunces';font-style:italic;font-size:18px;color:var(--accent);margin-bottom:16px}
+  .card .desc{color:var(--muted);font-size:14.5px;margin-bottom:24px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:30px}
+  .chip{font-size:12px;color:var(--ink);background:var(--bg-soft);border:1px solid var(--line);padding:5px 10px;border-radius:7px}
+  .card:hover .chip{background:#fff}
+  .go{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:14.5px;color:var(--accent);transition:.18s}
+  .go:hover{gap:11px}
+
+  .card.aero{--accent:var(--aero)}
+  .card.trade{--accent:var(--trade)}
+  .card.pulse{--accent:var(--pulse)}
+
+  .manifesto{border-top:1px solid var(--line);background:var(--bg-soft)}
+  .manifesto .wrap{padding-top:90px;padding-bottom:90px}
+  .manifesto .eyebrow{display:block;margin-bottom:18px}
+  .manifesto h2{font-size:clamp(26px,3.8vw,38px);font-weight:400;max-width:20ch;line-height:1.12;margin-bottom:18px}
+  .manifesto p{color:var(--muted);max-width:60ch;font-size:17px}
+
+  footer{border-top:1px solid var(--line);padding:38px 0;color:var(--muted);font-size:14px}
+  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;align-items:center}
+  .foot-links{display:flex;gap:24px}
+  .foot-links a:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#"><span class="mk"></span>jussa<span>.com.br</span></a>
+    <div class="nav-links">
+      <a href="#projetos">Projetos</a>
+      <a href="https://aero.jussa.com.br">Aero</a>
+      <a href="https://trade.jussa.com.br">Trade</a>
+      <a href="#pulse">ML Pulse</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">Um criador · três universos de dados</span>
+    <h1>Onde <em>dados viram decisão</em>. Do céu ao mercado.</h1>
+    <p class="sub">Ferramentas que tornam simples o que era complexo — para pilotos, investidores e curiosos que querem sair na frente.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#projetos">Explorar os projetos →</a>
+      <a class="btn btn-text" href="#manifesto">O que é a Jussa?</a>
+    </div>
+    <div class="stats">
+      <div><b>3</b>produtos no ar</div>
+      <div><b>195</b>aeronaves no Aero</div>
+      <div><b>72k+</b>aeroportos mapeados</div>
+      <div><b>pt · en · es</b>multilíngue</div>
+    </div>
+  </div>
+</header>
+
+<section id="projetos">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Os projetos</span>
+      <h2>Três ferramentas. Um propósito.</h2>
+      <p>Cada projeto vive no seu próprio endereço, com foco total no seu público.</p>
+    </div>
+
+    <div class="cards">
+
+      <article class="card aero">
+        <div class="top"><span class="lv"></span><span class="sub-domain">aero.jussa.com.br ↗</span></div>
+        <h3>Jussa Aero</h3>
+        <div class="tagline">O copiloto digital de quem voa.</div>
+        <p class="desc">Planeje qualquer voo do mundo em segundos: rota, tempo de bloco, combustível e o tempo lá em cima — tudo decodificado em português, no mapa.</p>
+        <div class="chips">
+          <span class="chip">Rota great-circle</span>
+          <span class="chip">195 aeronaves</span>
+          <span class="chip">METAR/TAF traduzido</span>
+          <span class="chip">Radar ao vivo</span>
+          <span class="chip">VFR/IFR</span>
+          <span class="chip">Escalas</span>
+          <span class="chip">Cartas</span>
+          <span class="chip">PWA</span>
+        </div>
+        <a class="go" href="https://aero.jussa.com.br">Decolar agora →</a>
+      </article>
+
+      <article class="card trade">
+        <div class="top"><span class="lv"></span><span class="sub-domain">trade.jussa.com.br ↗</span></div>
+        <h3>Robotrader</h3>
+        <div class="tagline">Deixe o robô operar. Você dorme tranquilo.</div>
+        <p class="desc">Um sistema que lê o mercado de cripto 24 horas por dia, testa a estratégia no passado e executa sozinho — do backtest ao paper trading, sem emoção e sem palpite.</p>
+        <div class="chips">
+          <span class="chip">Coleta 24/7</span>
+          <span class="chip">Backtesting</span>
+          <span class="chip">Paper trading</span>
+          <span class="chip">Estratégias de grid</span>
+          <span class="chip">Alertas push</span>
+          <span class="chip">Relatório diário</span>
+        </div>
+        <a class="go" href="https://trade.jussa.com.br">Ligar o robô →</a>
+      </article>
+
+      <article class="card pulse" id="pulse">
+        <div class="top"><span class="lv"></span><span class="sub-domain">jussa.com.br ↗</span></div>
+        <h3>ML Pulse</h3>
+        <div class="tagline">O raio-x do Mercado Livre para vendedores.</div>
+        <p class="desc">Descubra o que vende antes de anunciar: pesquise produtos, compare preços, espie a concorrência e veja onde estão as oportunidades — com um dashboard das suas vendas e reputação. Grátis, é só entrar com o e-mail.</p>
+        <div class="chips">
+          <span class="chip">Opportunity score</span>
+          <span class="chip">Pesquisa de produtos</span>
+          <span class="chip">Preço x concorrência</span>
+          <span class="chip">Dashboard de vendas</span>
+          <span class="chip">Reputação</span>
+          <span class="chip">Login por e-mail</span>
+        </div>
+        <a class="go" href="https://jussa.com.br">Analisar meu mercado →</a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="manifesto" id="manifesto">
+  <div class="wrap">
+    <span class="eyebrow">O manifesto</span>
+    <h2>Software não precisa ser complicado para ser poderoso.</h2>
+    <p>A Jussa nasce de uma ideia simples: pegar problemas cheios de dados — voar, investir, acompanhar mercados — e devolvê-los às pessoas em forma de ferramentas rápidas, bonitas e que qualquer um entende. Sem cadastro obrigatório, sem enrolação. Só o que importa, no ar.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>© 2026 Jussa · feito no Brasil 🇧🇷</div>
+    <div class="foot-links">
+      <a href="https://aero.jussa.com.br">Aero</a>
+      <a href="https://trade.jussa.com.br">Trade</a>
+      <a href="https://jussa.com.br">ML Pulse</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

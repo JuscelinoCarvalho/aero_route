@@ -107,7 +107,7 @@ TR: dict[str, dict[str, str]] = {
     "vo_h3_other": {"pt": "Tempo de voo de {0} para outros destinos", "en": "Flight time from {0} to other destinations", "es": "Tiempo de vuelo de {0} a otros destinos"},
 
     # ---- índice de rotas (/rotas) ----
-    "ix_title": {"pt": "Distâncias e tempos de voo entre cidades | Jussa Aero", "en": "Distances and flight times between cities | Jussa Aero", "es": "Distancias y tiempos de vuelo entre ciudades | Jussa Aero"},
+    "ix_title": {"pt": "Distâncias e tempos de voo entre cidades | Aero Jussa", "en": "Distances and flight times between cities | Aero Jussa", "es": "Distancias y tiempos de vuelo entre ciudades | Aero Jussa"},
     "ix_desc": {
         "pt": "Veja a distância, o tempo de voo e o consumo de combustível entre as principais cidades do Brasil e do mundo. Escolha origem e destino por estado e aeródromo.",
         "en": "See the distance, flight time and fuel burn between major cities in Brazil and worldwide. Pick origin and destination by state and airport.",
@@ -137,13 +137,13 @@ TR: dict[str, dict[str, str]] = {
     "pk_msg_diff": {"pt": "Origem e destino devem ser diferentes.", "en": "Origin and destination must be different.", "es": "El origen y el destino deben ser diferentes."},
 
     # ---- curiosidades (/curiosidades) ----
-    "cu_title": {"pt": "Curiosidades de rotas aéreas: a mais longa, a mais curta e mais | Jussa Aero", "en": "Air route facts: the longest, the shortest and more | Jussa Aero", "es": "Curiosidades de rutas aéreas: la más larga, la más corta y más | Jussa Aero"},
+    "cu_title": {"pt": "Curiosidades de rotas aéreas: a mais longa, a mais curta e mais | Aero Jussa", "en": "Air route facts: the longest, the shortest and more | Aero Jussa", "es": "Curiosidades de rutas aéreas: la más larga, la más corta y más | Aero Jussa"},
     "cu_desc": {
         "pt": "Curiosidades sobre rotas aéreas calculadas com dados reais: a rota mais longa, a mais curta, a que mais consome combustível e rankings de distância e tempo de voo.",
         "en": "Facts about air routes computed from real data: the longest route, the shortest, the most fuel-hungry and rankings of distance and flight time.",
         "es": "Curiosidades sobre rutas aéreas calculadas con datos reales: la ruta más larga, la más corta, la que más combustible consume y rankings de distancia y tiempo de vuelo.",
     },
-    "cu_og_title": {"pt": "Curiosidades de rotas aéreas | Jussa Aero", "en": "Air route facts | Jussa Aero", "es": "Curiosidades de rutas aéreas | Jussa Aero"},
+    "cu_og_title": {"pt": "Curiosidades de rotas aéreas | Aero Jussa", "en": "Air route facts | Aero Jussa", "es": "Curiosidades de rutas aéreas | Aero Jussa"},
     "cu_og_desc": {"pt": "A rota mais longa, a mais curta e a que mais consome combustível — com dados reais.", "en": "The longest route, the shortest and the most fuel-hungry — with real data.", "es": "La ruta más larga, la más corta y la que más combustible consume — con datos reales."},
     "cu_brand": {"pt": "curiosidades de rotas", "en": "route facts", "es": "curiosidades de rutas"},
     "cu_tag": {"pt": "CURIOSIDADES DE ROTAS", "en": "ROUTE FACTS", "es": "CURIOSIDADES DE RUTAS"},
@@ -242,7 +242,7 @@ def _localize_links(html: str, lang: str) -> str:
         attr, url = m.group(1), m.group(2)
         path = re.split(r"[?#]", url, 1)[0]
         if path in _PREFIX_EXACT or path.startswith(("/rota/", "/voo/", "/tempo/")):
-            return f'{attr}="{pre}{url}"'
+            return f'{attr}="{i18n.loc_url(pre, url)}"'
         return m.group(0)
 
     html = _LINK_RE.sub(rep, html)
@@ -251,15 +251,31 @@ def _localize_links(html: str, lang: str) -> str:
     return html
 
 # Google tag (gtag.js) — inserido no <head> de toda página gerada.
-GTAG = (
-    '<script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>\n'
-    "<script>\n"
-    "  window.dataLayer = window.dataLayer || [];\n"
-    "  function gtag(){dataLayer.push(arguments);}\n"
-    "  gtag('js', new Date());\n"
-    "  gtag('config', 'G-GS1B98VCXF');\n"
-    "</script>"
-)
+# Emite dimensões para segmentar receita por idioma e rota no GA4:
+#   content_group -> dimensão NATIVA "Grupo de conteúdo" (seção da página).
+#   page_language -> dimensão personalizada: idioma do CONTEÚDO (pt/en/es),
+#                    distinto do idioma do navegador que o GA4 já coleta.
+#   page_route    -> dimensão personalizada: slug da rota / ICAO, unificando
+#                    as versões pt/en/es da mesma página num único valor.
+GTAG_ID = "G-7C0B22Z8EC"
+
+def gtag_block(lang: str = "pt", content_group: str = "", route: str = "") -> str:
+    params = {"page_language": lang}
+    if content_group:
+        params["content_group"] = content_group
+    if route:
+        params["page_route"] = route
+    cfg = json.dumps(params, ensure_ascii=False)
+    return (
+        f'<script async src="https://www.googletagmanager.com/gtag/js?id={GTAG_ID}"></script>\n'
+        "<script>\n"
+        "  window.dataLayer = window.dataLayer || [];\n"
+        "  function gtag(){dataLayer.push(arguments);}\n"
+        "  gtag('js', new Date());\n"
+        f"  gtag('config', '{GTAG_ID}', {cfg});\n"
+        "</script>\n"
+        '<script defer src="/static/track.js"></script>'
+    )
 
 # PWA — manifest, ícones e registro do service worker. Inserido em todo <head>.
 PWA_HEAD = (
@@ -268,7 +284,7 @@ PWA_HEAD = (
     '<meta name="mobile-web-app-capable" content="yes" />\n'
     '<meta name="apple-mobile-web-app-capable" content="yes" />\n'
     '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />\n'
-    '<meta name="apple-mobile-web-app-title" content="Jussa Aero" />\n'
+    '<meta name="apple-mobile-web-app-title" content="Aero Jussa" />\n'
     '<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />\n'
     '<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />\n'
     '<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />\n'
@@ -682,10 +698,10 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
 <html lang="{i18n.html_lang(lang)}">
 <head>
 <meta charset="UTF-8" />
-{GTAG}
+{gtag_block(lang, "rota", f"{origin.slug}-{dest.slug}")}
 {PWA_HEAD}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title} | Jussa Aero</title>
+<title>{title} | Aero Jussa</title>
 <meta name="description" content="{desc}" />
 {i18n.hreflang_block(base_path, lang)}
 <meta property="og:title" content="{title}" />
@@ -704,7 +720,7 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
     <div class="badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
     </div>
-    <h1 style="font-size:18px">Jussa Aero<small>{_t("brand_planning", lang)}</small></h1>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("brand_planning", lang)}</small></h1>
   </div>
 
   <div class="tag"><span>{_t("rt_tag", lang, a.code, b.code)}</span><span><a href="/rotas" style="color:var(--muted);text-decoration:none">{_t("all_routes", lang)}</a></span></div>
@@ -800,10 +816,10 @@ def render_time_page(store: AirportStore, origin: City, dest: City, lang: str = 
 <html lang="{i18n.html_lang(lang)}">
 <head>
 <meta charset="UTF-8" />
-{GTAG}
+{gtag_block(lang, "voo", f"{origin.slug}-{dest.slug}")}
 {PWA_HEAD}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title} | Jussa Aero</title>
+<title>{title} | Aero Jussa</title>
 <meta name="description" content="{desc}" />
 {i18n.hreflang_block(base_path, lang)}
 <meta property="og:title" content="{title}" />
@@ -820,7 +836,7 @@ def render_time_page(store: AirportStore, origin: City, dest: City, lang: str = 
 <div class="wrap">
   <div class="top">
     <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
-    <h1 style="font-size:18px">Jussa Aero<small>{_t("brand_planning", lang)}</small></h1>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("brand_planning", lang)}</small></h1>
   </div>
 
   <div class="tag"><span>{_t("vo_tag", lang, a.code, b.code)}</span><span><a href="/rotas" style="color:var(--muted);text-decoration:none">{_t("all_routes", lang)}</a></span></div>
@@ -923,7 +939,7 @@ def render_routes_index(lang: str = "pt") -> str:
 <html lang="{i18n.html_lang(lang)}">
 <head>
 <meta charset="UTF-8" />
-{GTAG}
+{gtag_block(lang, "rotas-index")}
 {PWA_HEAD}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{_t("ix_title", lang)}</title>
@@ -938,7 +954,7 @@ def render_routes_index(lang: str = "pt") -> str:
 <div class="wrap">
   <div class="top">
     <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
-    <h1 style="font-size:18px">Jussa Aero<small>{_t("ix_brand", lang)}</small></h1>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("ix_brand", lang)}</small></h1>
   </div>
   {_nav("/rotas", lang)}
   {i18n.switcher_block("/rotas", lang)}
@@ -1065,7 +1081,7 @@ def render_curiosidades(store: AirportStore, lang: str = "pt") -> str:
 <html lang="{i18n.html_lang(lang)}">
 <head>
 <meta charset="UTF-8" />
-{GTAG}
+{gtag_block(lang, "curiosidades")}
 {PWA_HEAD}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{_t("cu_title", lang)}</title>
@@ -1085,7 +1101,7 @@ def render_curiosidades(store: AirportStore, lang: str = "pt") -> str:
 <div class="wrap">
   <div class="top">
     <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
-    <h1 style="font-size:18px">Jussa Aero<small>{_t("cu_brand", lang)}</small></h1>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("cu_brand", lang)}</small></h1>
   </div>
 
   <div class="tag"><span>{_t("cu_tag", lang)}</span><span><a href="/rotas" style="color:var(--muted);text-decoration:none">{_t("all_routes", lang)}</a></span></div>
@@ -1205,10 +1221,10 @@ def render_tempo_page(ap: Airport, raw: str | None, observed_epoch: int | None,
 <html lang="{i18n.html_lang(lang)}">
 <head>
 <meta charset="UTF-8" />
-{GTAG}
+{gtag_block(lang, "tempo", icao)}
 {PWA_HEAD}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title} | Jussa Aero</title>
+<title>{title} | Aero Jussa</title>
 <meta name="description" content="{desc}" />
 {i18n.hreflang_block(base_path, lang)}
 <meta property="og:title" content="{title}" />
@@ -1225,7 +1241,7 @@ def render_tempo_page(ap: Airport, raw: str | None, observed_epoch: int | None,
 <div class="wrap">
   <div class="top">
     <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
-    <h1 style="font-size:18px">Jussa Aero<small>{_t("tp_brand", lang)}</small></h1>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("tp_brand", lang)}</small></h1>
   </div>
   <div class="tag"><span>METAR {icao}</span><span><a href="/tempo" style="color:var(--muted);text-decoration:none">{_t("tp_live", lang)}</a></span></div>
   {_nav("/tempo", lang)}
@@ -1273,12 +1289,12 @@ def _url_i18n(path: str) -> str:
     """Bloco <url> para cada idioma de um caminho traduzido, com alternates hreflang."""
     alts = "".join(
         f'<xhtml:link rel="alternate" hreflang="{i18n.HREFLANG[lg]}" '
-        f'href="{BASE_URL}{i18n.prefix(lg)}{path}"/>'
+        f'href="{BASE_URL}{i18n.loc(lg, path)}"/>'
         for lg in i18n.LANGS
     )
     alts += f'<xhtml:link rel="alternate" hreflang="x-default" href="{BASE_URL}{path}"/>'
     return "".join(
-        f"<url><loc>{BASE_URL}{i18n.prefix(lg)}{path}</loc>{alts}</url>"
+        f"<url><loc>{BASE_URL}{i18n.loc(lg, path)}</loc>{alts}</url>"
         for lg in i18n.LANGS
     )
 

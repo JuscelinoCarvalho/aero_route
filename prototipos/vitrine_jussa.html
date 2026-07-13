@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jussa · Estúdio de produtos de dados</title>
+<meta name="description" content="Aviação, mercados e inteligência de dados. Três ferramentas construídas para quem quer sair na frente.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07090f;
+    --bg-2:#0c1018;
+    --card:#0e131d;
+    --line:rgba(255,255,255,.08);
+    --txt:#e8ecf3;
+    --muted:#9aa4b6;
+    --aero:#22d3ee;   /* ciano */
+    --trade:#f5b544;  /* âmbar/ouro */
+    --pulse:#c084fc;  /* violeta */
+    --radius:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.brand{font-family:'Sora',sans-serif;letter-spacing:-.02em}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+  /* fundo com brilhos suaves */
+  .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .glow::before,.glow::after{content:"";position:absolute;width:640px;height:640px;border-radius:50%;filter:blur(120px);opacity:.22}
+  .glow::before{background:var(--aero);top:-220px;left:-160px}
+  .glow::after{background:var(--pulse);bottom:-260px;right:-180px}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,9,15,.6);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{font-weight:800;font-size:22px;display:flex;align-items:center;gap:10px}
+  .dot{width:11px;height:11px;border-radius:50%;background:conic-gradient(from 0deg,var(--aero),var(--trade),var(--pulse),var(--aero));box-shadow:0 0 16px var(--aero)}
+  .nav-links{display:flex;gap:26px;font-size:14px;color:var(--muted)}
+  .nav-links a:hover{color:var(--txt)}
+  @media(max-width:680px){.nav-links{display:none}}
+
+  /* hero */
+  header{padding:96px 0 64px;text-align:center;position:relative}
+  .eyebrow{display:inline-block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--line);padding:7px 15px;border-radius:999px;margin-bottom:26px}
+  .eyebrow b{color:var(--aero);font-weight:600}
+  h1{font-size:clamp(34px,6vw,68px);line-height:1.05;font-weight:800;margin-bottom:22px}
+  h1 .grad{background:linear-gradient(100deg,var(--aero),var(--pulse) 60%,var(--trade));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:clamp(16px,2.4vw,21px);color:var(--muted);max-width:640px;margin:0 auto 38px}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:13px 24px;border-radius:12px;transition:.2s;border:1px solid transparent}
+  .btn-primary{background:var(--txt);color:#0a0d13}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,255,255,.14)}
+  .btn-ghost{border-color:var(--line);color:var(--muted)}
+  .btn-ghost:hover{color:var(--txt);border-color:var(--muted)}
+
+  .stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:56px;color:var(--muted);font-size:14px}
+  .stats b{display:block;font-family:'Sora';font-size:26px;color:var(--txt);font-weight:700}
+
+  /* seção projetos */
+  section{padding:70px 0}
+  .sec-head{text-align:center;margin-bottom:52px}
+  .sec-head h2{font-size:clamp(26px,4vw,40px);font-weight:700;margin-bottom:12px}
+  .sec-head p{color:var(--muted);max-width:560px;margin:0 auto}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:26px}
+  .card{position:relative;background:linear-gradient(180deg,var(--card),var(--bg-2));border:1px solid var(--line);
+    border-radius:var(--radius);padding:32px 30px 30px;overflow:hidden;transition:.25s;display:flex;flex-direction:column}
+  .card::before{content:"";position:absolute;inset:0;border-radius:var(--radius);padding:1px;
+    background:linear-gradient(180deg,var(--accent),transparent 55%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.5;transition:.25s}
+  .card::after{content:"";position:absolute;top:-90px;right:-90px;width:220px;height:220px;border-radius:50%;
+    background:var(--accent);filter:blur(90px);opacity:.14;transition:.25s}
+  .card:hover{transform:translateY(-6px);border-color:transparent}
+  .card:hover::before{opacity:1}
+  .card:hover::after{opacity:.26}
+  .card .sub-domain{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:.02em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
+  .card .sub-domain .lv{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+  .card h3{font-size:27px;font-weight:700;margin-bottom:6px}
+  .card .tagline{color:var(--accent);font-weight:600;font-size:16px;margin-bottom:14px;font-family:'Sora'}
+  .card .desc{color:var(--muted);font-size:15px;margin-bottom:22px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .chip{font-size:12.5px;color:var(--txt);background:rgba(255,255,255,.04);border:1px solid var(--line);padding:6px 11px;border-radius:8px}
+  .card .go{margin-top:auto;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:var(--txt);
+    align-self:flex-start;padding:11px 18px;border-radius:11px;border:1px solid var(--accent);transition:.2s}
+  .card .go:hover{background:var(--accent);color:#0a0d13}
+  .draft{position:absolute;top:16px;right:16px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#0a0d13;
+    background:var(--accent);padding:3px 9px;border-radius:6px;font-weight:700;opacity:.9}
+
+  .card.aero{--accent:var(--aero)}
+  .card.trade{--accent:var(--trade)}
+  .card.pulse{--accent:var(--pulse)}
+
+  /* manifesto */
+  .manifesto{border:1px solid var(--line);border-radius:var(--radius);padding:48px 40px;text-align:center;
+    background:radial-gradient(120% 140% at 50% 0%,rgba(34,211,238,.07),transparent 60%)}
+  .manifesto h2{font-size:clamp(24px,3.5vw,34px);font-weight:700;margin-bottom:16px;max-width:760px;margin-inline:auto}
+  .manifesto p{color:var(--muted);max-width:600px;margin:0 auto}
+
+  footer{border-top:1px solid var(--line);padding:40px 0;margin-top:60px;color:var(--muted);font-size:14px}
+  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;align-items:center}
+  .foot-links{display:flex;gap:22px}
+  .foot-links a:hover{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#"><span class="dot"></span>jussa<span style="color:var(--muted);font-weight:600">.com.br</span></a>
+    <div class="nav-links">
+      <a href="#projetos">Projetos</a>
+      <a href="https://aero.jussa.com.br">Aero</a>
+      <a href="https://trade.jussa.com.br">Trade</a>
+      <a href="#pulse">ML Pulse</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">Um criador · <b>três universos de dados</b></span>
+    <h1>Onde <span class="grad">dados viram decisão</span>.<br>Do céu ao mercado.</h1>
+    <p class="sub">Ferramentas que tornam simples o que era complexo — para pilotos, investidores e curiosos que querem sair na frente.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#projetos">Explorar os projetos →</a>
+      <a class="btn btn-ghost" href="#manifesto">O que é a Jussa?</a>
+    </div>
+    <div class="stats">
+      <div><b>3</b>produtos no ar</div>
+      <div><b>195</b>aeronaves no Aero</div>
+      <div><b>72k+</b>aeroportos mapeados</div>
+      <div><b>pt · en · es</b>multilíngue</div>
+    </div>
+  </div>
+</header>
+
+<section id="projetos">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Três ferramentas. Um propósito.</h2>
+      <p>Cada projeto vive no seu próprio endereço, com foco total no seu público.</p>
+    </div>
+
+    <div class="cards">
+
+      <!-- AERO -->
+      <article class="card aero">
+        <div class="sub-domain"><span class="lv"></span>aero.jussa.com.br ↗</div>
+        <h3>Jussa Aero</h3>
+        <div class="tagline">O copiloto digital de quem voa.</div>
+        <p class="desc">Planeje qualquer voo do mundo em segundos: rota, tempo de bloco, combustível e o tempo lá em cima — tudo decodificado em português, no mapa.</p>
+        <div class="chips">
+          <span class="chip">Rota great-circle</span>
+          <span class="chip">195 aeronaves</span>
+          <span class="chip">METAR/TAF traduzido</span>
+          <span class="chip">Radar de chuva ao vivo</span>
+          <span class="chip">Semáforo VFR/IFR</span>
+          <span class="chip">Escalas de reabastecimento</span>
+          <span class="chip">Cartas de aproximação</span>
+          <span class="chip">Instalável (PWA)</span>
+        </div>
+        <a class="go" href="https://aero.jussa.com.br">Decolar agora →</a>
+      </article>
+
+      <!-- TRADE -->
+      <article class="card trade">
+        <div class="sub-domain"><span class="lv"></span>trade.jussa.com.br ↗</div>
+        <h3>Robotrader</h3>
+        <div class="tagline">Deixe o robô operar. Você dorme tranquilo.</div>
+        <p class="desc">Um sistema que lê o mercado de cripto 24 horas por dia, testa a estratégia no passado e executa sozinho — do backtest ao paper trading, sem emoção e sem palpite.</p>
+        <div class="chips">
+          <span class="chip">Coleta de mercado 24/7</span>
+          <span class="chip">Backtesting</span>
+          <span class="chip">Paper trading</span>
+          <span class="chip">Estratégias de grid</span>
+          <span class="chip">Alertas push</span>
+          <span class="chip">Relatório diário</span>
+        </div>
+        <a class="go" href="https://trade.jussa.com.br">Ligar o robô →</a>
+      </article>
+
+      <!-- ML PULSE -->
+      <article class="card pulse" id="pulse">
+        <div class="sub-domain"><span class="lv"></span>jussa.com.br ↗</div>
+        <h3>ML Pulse</h3>
+        <div class="tagline">O raio-x do Mercado Livre para vendedores.</div>
+        <p class="desc">Descubra o que vende antes de anunciar: pesquise produtos, compare preços, espie a concorrência e veja onde estão as oportunidades — com um dashboard das suas vendas e reputação. Grátis, é só entrar com o e-mail.</p>
+        <div class="chips">
+          <span class="chip">Opportunity score</span>
+          <span class="chip">Pesquisa de produtos</span>
+          <span class="chip">Preço x concorrência</span>
+          <span class="chip">Dashboard de vendas</span>
+          <span class="chip">Reputação do seller</span>
+          <span class="chip">Login por e-mail</span>
+        </div>
+        <a class="go" href="https://jussa.com.br">Analisar meu mercado →</a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="manifesto">
+  <div class="wrap">
+    <div class="manifesto">
+      <span class="eyebrow">O manifesto</span>
+      <h2>Software não precisa ser complicado para ser poderoso.</h2>
+      <p>A Jussa nasce de uma ideia simples: pegar problemas cheios de dados — voar, investir, acompanhar mercados — e devolvê-los às pessoas em forma de ferramentas rápidas, bonitas e que qualquer um entende. Sem cadastro obrigatório, sem enrolação. Só o que importa, no ar.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>© 2026 Jussa · feito no Brasil 🇧🇷</div>
+    <div class="foot-links">
+      <a href="https://aero.jussa.com.br">Aero</a>
+      <a href="https://trade.jussa.com.br">Trade</a>
+      <a href="https://jussa.com.br">ML Pulse</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

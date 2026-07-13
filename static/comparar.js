@@ -31,7 +31,7 @@ const deg = (r) => (r * 180) / Math.PI;
 
 // ===== Mapa (claro, oceanos azuis) =======================================
 const map = L.map("map", { worldCopyJump: true }).setView([-15, -50], 3);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   attribution: "© OpenStreetMap, © CARTO",
   maxZoom: 19,
 }).addTo(map);
@@ -76,11 +76,12 @@ function buildAircraftAC() {
         `<div class="cat">${TCAT(a.category)} · ${a.cruise_kt != null ? a.cruise_kt + " kt" : T("ac_speed_nd")} · ${a.range_nm != null ? T("ac_range") + " " + a.range_nm.toLocaleString(window.I18N_LOCALE) + " nm" : T("ac_range_nd")}</div></div>`)
       .join("");
     acEl.classList.toggle("open", list.length > 0);
-    const _hl = acEl.querySelector(".hl"); if (_hl) _hl.scrollIntoView({ block: "nearest" });
+    acScroll(acEl);
   }
   function pick(a) {
     if (selected.length >= 4) { alert(T("max4")); return; }
     selected.push(a);
+    if (window.track) window.track("aircraft_compare", { aircraft: a.key || a.name, count: selected.length });
     inputEl.value = "";
     close();
     renderChips();
@@ -131,7 +132,7 @@ function buildAirportAC() {
         `<div class="nm">${a.city ? a.city + " · " : ""}${a.name} (${a.country})</div></div>`)
       .join("");
     acEl.classList.toggle("open", list.length > 0);
-    const _hl = acEl.querySelector(".hl"); if (_hl) _hl.scrollIntoView({ block: "nearest" });
+    acScroll(acEl);
   }
   function pick(a) { inputEl.value = `${a.code} · ${a.city || a.name}`; airport = a; close(); redraw(); }
   inputEl.addEventListener("input", () => {

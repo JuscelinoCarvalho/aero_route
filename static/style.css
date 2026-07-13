@@ -48,15 +48,44 @@ h1 small{display:block;font-size:10.5px;letter-spacing:.34em;color:var(--cyan);f
 }
 .tag b{color:var(--green);font-weight:500}
 
-/* Navegação */
-.nav{display:flex;gap:10px 22px;flex-wrap:wrap;justify-content:center;margin:0 0 18px}
-.nav a{
-  font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13px;
-  letter-spacing:.06em;text-transform:uppercase;
-  color:var(--ink);text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent;transition:.15s;
+/* Navegação — botões/abas para leitura imediata como menu */
+.nav{
+  display:flex;gap:8px 10px;flex-wrap:wrap;justify-content:center;
+  position:sticky;top:0;z-index:2000;
+  margin:0 0 22px;padding:10px 0 12px;
+  background:rgba(7,13,24,.88);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
 }
-.nav a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
-.nav a.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.nav a{
+  font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:12.5px;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;
+  padding:9px 15px;border-radius:9px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  transition:.15s;line-height:1;
+}
+.nav a:hover{
+  color:var(--cyan);border-color:var(--cyan);
+  box-shadow:0 0 0 1px rgba(31,216,230,.25),inset 0 0 14px rgba(31,216,230,.12);
+}
+.nav a.active{
+  color:#06121f;border-color:var(--cyan);
+  background:linear-gradient(180deg,var(--cyan),var(--cyan-dim));
+  box-shadow:0 3px 12px rgba(31,216,230,.28);
+}
+/* Mobile: barra vira faixa de rolagem horizontal (uma linha só) */
+@media (max-width:640px){
+  .nav{
+    flex-wrap:nowrap;justify-content:flex-start;
+    gap:8px;margin:0 -16px 20px;padding:10px 16px 12px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;scroll-snap-type:x proximity;
+  }
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none;white-space:nowrap;scroll-snap-align:start}
+}
 
 /* Campo de aeronave (texto normal, não-caixa-alta) */
 .ac-field input{text-transform:none;font-family:"Inter",sans-serif;font-size:15px;font-weight:500;letter-spacing:0}

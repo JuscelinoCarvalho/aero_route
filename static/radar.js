@@ -1,4 +1,4 @@
-/* Jussa Aero · Radar Meteorológico
+/* Aero Jussa · Radar Meteorológico
  * Replica as funcionalidades de um radar de precipitação (estilo IPMET):
  * imagem de radar (células de chuva), animação (loop passado + nowcast),
  * zoom/pan, tela cheia, troca de camada (radar/satélite) e legenda de intensidade.
@@ -33,7 +33,14 @@ const SPEED_MS = 600;   // intervalo entre quadros na animação
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;      // aproximar até nível de bairro/rua
-const RADAR_NATIVE_ZOOM = 12; // resolução do mosaico do RainViewer; acima disso é upscale
+// Zoom nativo máximo de cada camada do RainViewer: acima dele o Leaflet ESTICA o
+// último tile (maxNativeZoom) em vez de pedir um que o provedor não tem — senão o
+// servidor devolve o tile-placeholder "Zoom Level Not Supported" (fundo cinza com
+// texto), que é o que aparecia ao aproximar. Medido empiricamente: o mosaico de
+// radar do RainViewer só existe até z=7 (z≥8 já vem placeholder); o satélite
+// (infravermelho global) é ainda mais grosseiro.
+const RADAR_NATIVE_ZOOM = 7;
+const SAT_NATIVE_ZOOM = 6;
 const map = L.map("map", {
   zoomControl: true,
   attributionControl: true,
@@ -41,7 +48,7 @@ const map = L.map("map", {
   maxZoom: MAX_ZOOM,
 }).setView([-22.3, -49.0], 6);
 
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a> · radar © <a href="https://www.rainviewer.com/">RainViewer</a>',
   maxZoom: MAX_ZOOM,
@@ -89,9 +96,10 @@ function ensureLayer(i) {
       tileSize: 256,
       zIndex: 300,
       maxZoom: MAX_ZOOM,
-      // o mosaico do RainViewer é de baixa resolução; acima do nativo o Leaflet
-      // amplia o último tile (mantém o radar visível ao aproximar, menos requisições)
-      maxNativeZoom: RADAR_NATIVE_ZOOM,
+      // acima do zoom nativo o Leaflet amplia o último tile (mantém a camada visível
+      // ao aproximar e evita o placeholder "ZOOM LEVEL NOT SUPPORTED"); o satélite é
+      // bem mais grosseiro que o radar, então usa um nativo menor.
+      maxNativeZoom: mode === "satellite" ? SAT_NATIVE_ZOOM : RADAR_NATIVE_ZOOM,
     });
     frameLayers[i].addTo(map);
   }

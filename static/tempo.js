@@ -25,7 +25,7 @@ function buildAirportAC() {
         `<div class="nm">${a.city ? a.city + " · " : ""}${a.name} (${a.country})</div></div>`)
       .join("");
     acEl.classList.toggle("open", list.length > 0);
-    const _hl = acEl.querySelector(".hl"); if (_hl) _hl.scrollIntoView({ block: "nearest" });
+    acScroll(acEl);
   }
   function pick(a) {
     inputEl.value = `${a.code} · ${a.city || a.name}`;
@@ -78,6 +78,10 @@ async function loadMetar(icao, ap) {
     return msg(TF("wx_get_fail", icao, data.detail ? `: ${data.detail}` : "."));
   }
   render(data, ap);
+  if (window.track) window.track("metar_lookup", {
+    icao: icao,
+    meteo_category: (data.category_info && data.category_info.code) || undefined,
+  });
 }
 
 function cell(k, v) {
@@ -155,6 +159,7 @@ async function subscribeAlerts(code) {
       body: JSON.stringify({ subscription: sub.toJSON(), station: code }),
     });
     if (!r.ok) return alert(T("wx_sub_fail"));
+    if (window.track) window.track("push_subscribe", { station: code });
     if (btn) { btn.textContent = TF("wx_alerts_on", code); btn.classList.add("on"); btn.disabled = true; }
   } catch (e) {
     alert(T("wx_alerts_err") + (e && e.message ? e.message : e));

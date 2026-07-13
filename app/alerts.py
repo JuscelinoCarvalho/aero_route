@@ -77,7 +77,7 @@ def test_all(*, path: str | os.PathLike | None = None) -> dict:
     subs = push.list_subs(path=path)
     sent = 0
     for s in subs:
-        if push.send(s, {"title": "🔔 Jussa Aero",
+        if push.send(s, {"title": "🔔 Aero Jussa",
                          "body": f"Alertas ativados para {s['station']}. "
                                  f"Você será avisado quando a previsão ficar abaixo de VFR.",
                          "url": "/tempo"}):

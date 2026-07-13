@@ -1,4 +1,4 @@
-"""Internacionalização (i18n) do Jussa Aero — pt (padrão), en, es.
+"""Internacionalização (i18n) do Aero Jussa — pt (padrão), en, es.
 
 Estratégia: páginas estáticas são renderizadas server-side por idioma para SEO.
 - URLs por subpasta: pt na raiz (/, /cartas…), en em /en/…, es em /es/…
@@ -49,9 +49,9 @@ STRINGS: dict[str, dict[str, str]] = {
     "status_online": {"pt": "● ONLINE", "en": "● ONLINE", "es": "● ONLINE"},
     # ---- Home / Calculadora ----
     "home_title": {
-        "pt": "Jussa Aero · Calculadora de Rotas, Tempo e Combustível de Voo",
-        "en": "Jussa Aero · Flight Route, Time and Fuel Calculator",
-        "es": "Jussa Aero · Calculadora de Rutas, Tiempo y Combustible de Vuelo",
+        "pt": "Aero Jussa · Calculadora de Rotas, Tempo e Combustível de Voo",
+        "en": "Aero Jussa · Flight Route, Time and Fuel Calculator",
+        "es": "Aero Jussa · Calculadora de Rutas, Tiempo y Combustible de Vuelo",
     },
     "home_desc": {
         "pt": "Calcule distância, proa, tempo de voo e consumo de combustível entre aeroportos de todo o mundo. Rota great-circle no mapa.",
@@ -83,9 +83,9 @@ STRINGS: dict[str, dict[str, str]] = {
     },
     # ---- Títulos/descrições por página (Leva 1) ----
     "cmp_title": {
-        "pt": "Comparar aeronaves e alcance no mapa | Jussa Aero",
-        "en": "Compare aircraft and range on the map | Jussa Aero",
-        "es": "Comparar aeronaves y alcance en el mapa | Jussa Aero",
+        "pt": "Comparar aeronaves e alcance no mapa | Aero Jussa",
+        "en": "Compare aircraft and range on the map | Aero Jussa",
+        "es": "Comparar aeronaves y alcance en el mapa | Aero Jussa",
     },
     "cmp_desc": {
         "pt": "Compare de 2 a 4 aeronaves lado a lado e veja o raio de alcance de cada uma a partir de um aeroporto, com cores diferentes no mapa.",
@@ -93,9 +93,9 @@ STRINGS: dict[str, dict[str, str]] = {
         "es": "Compara de 2 a 4 aeronaves lado a lado y ve el radio de alcance de cada una desde un aeropuerto, con colores distintos en el mapa.",
     },
     "wx_title": {
-        "pt": "METAR decodificado e condição VFR/IFR por aeródromo | Jussa Aero",
-        "en": "Decoded METAR and VFR/IFR conditions by airport | Jussa Aero",
-        "es": "METAR decodificado y condición VFR/IFR por aeródromo | Jussa Aero",
+        "pt": "METAR decodificado e condição VFR/IFR por aeródromo | Aero Jussa",
+        "en": "Decoded METAR and VFR/IFR conditions by airport | Aero Jussa",
+        "es": "METAR decodificado y condición VFR/IFR por aeródromo | Aero Jussa",
     },
     "wx_desc": {
         "pt": "Consulte o METAR mais recente de qualquer aeródromo do Brasil decodificado em português, com semáforo VFR/IFR (visual ou por instrumentos). Dados oficiais da REDEMET/DECEA.",
@@ -103,9 +103,9 @@ STRINGS: dict[str, dict[str, str]] = {
         "es": "Consulta el METAR más reciente de cualquier aeródromo de Brasil, decodificado, con semáforo VFR/IFR (visual o por instrumentos). Datos oficiales de REDEMET/DECEA.",
     },
     "rdr_title": {
-        "pt": "Radar Meteorológico · Chuva em tempo real | Jussa Aero",
-        "en": "Weather Radar · Real-time rain | Jussa Aero",
-        "es": "Radar Meteorológico · Lluvia en tiempo real | Jussa Aero",
+        "pt": "Radar Meteorológico · Chuva em tempo real | Aero Jussa",
+        "en": "Weather Radar · Real-time rain | Aero Jussa",
+        "es": "Radar Meteorológico · Lluvia en tiempo real | Aero Jussa",
     },
     "rdr_desc": {
         "pt": "Radar meteorológico em tempo real: veja as células de chuva, anime o radar (passado e previsão), camada de satélite, zoom, tela cheia e sua localização. Útil para pilotos e aviação.",
@@ -113,24 +113,24 @@ STRINGS: dict[str, dict[str, str]] = {
         "es": "Radar meteorológico en tiempo real: mira las celdas de lluvia, anima el radar (pasado y pronóstico), capa de satélite, zoom, pantalla completa y tu ubicación. Útil para pilotos y aviación.",
     },
     "chr_title": {
-        "pt": "Cartas de Aproximação · Aeródromos do Brasil | Jussa Aero",
-        "en": "Approach Charts · Brazilian Airports | Jussa Aero",
-        "es": "Cartas de Aproximación · Aeródromos de Brasil | Jussa Aero",
+        "pt": "Cartas de Aproximação · Brasil, EUA e Europa | Aero Jussa",
+        "en": "Approach Charts · Brazil, USA and Europe | Aero Jussa",
+        "es": "Cartas de Aproximación · Brasil, EE. UU. y Europa | Aero Jussa",
     },
     "chr_desc": {
-        "pt": "Consulte as cartas de aproximação (IAC) e demais cartas aeronáuticas dos aeródromos do Brasil, direto da fonte oficial DECEA/AISWEB. Visualize, imprima, baixe e compartilhe em PDF.",
-        "en": "Look up approach charts (IAC) and other aeronautical charts for Brazilian airports, straight from the official DECEA/AISWEB source. View, print, download and share as PDF.",
-        "es": "Consulta las cartas de aproximación (IAC) y otras cartas aeronáuticas de los aeródromos de Brasil, directo de la fuente oficial DECEA/AISWEB. Visualiza, imprime, descarga y comparte en PDF.",
+        "pt": "Consulte as cartas de aproximação (IAC) e demais cartas aeronáuticas dos aeródromos do Brasil (DECEA/AISWEB) e dos EUA (FAA d-TPP) — e acesse o eAIP oficial de vários países da Europa. Visualize, imprima, baixe e compartilhe em PDF.",
+        "en": "Look up approach charts (IAC) and other aeronautical charts for airports in Brazil (DECEA/AISWEB) and the USA (FAA d-TPP) — and reach the official eAIP of several European countries. View, print, download and share as PDF.",
+        "es": "Consulta las cartas de aproximación (IAC) y otras cartas aeronáuticas de los aeródromos de Brasil (DECEA/AISWEB) y EE. UU. (FAA d-TPP) — y accede al eAIP oficial de varios países de Europa. Visualiza, imprime, descarga y comparte en PDF.",
     },
     "abt_title": {
-        "pt": "Sobre · Jussa Aero",
-        "en": "About · Jussa Aero",
-        "es": "Acerca de · Jussa Aero",
+        "pt": "Sobre · Aero Jussa",
+        "en": "About · Aero Jussa",
+        "es": "Acerca de · Aero Jussa",
     },
     "abt_desc": {
-        "pt": "O que é o Jussa Aero, como os cálculos de rota, tempo e combustível de voo são feitos, e quem está por trás do projeto.",
-        "en": "What Jussa Aero is, how the route, time and fuel of flight calculations are made, and who is behind the project.",
-        "es": "Qué es Jussa Aero, cómo se hacen los cálculos de ruta, tiempo y combustible de vuelo, y quién está detrás del proyecto.",
+        "pt": "O que é o Aero Jussa, como os cálculos de rota, tempo e combustível de voo são feitos, e quem está por trás do projeto.",
+        "en": "What Aero Jussa is, how the route, time and fuel of flight calculations are made, and who is behind the project.",
+        "es": "Qué es Aero Jussa, cómo se hacen los cálculos de ruta, tiempo y combustible de vuelo, y quién está detrás del proyecto.",
     },
     "src": {"pt": "FONTE", "en": "SOURCE", "es": "FUENTE"},
 
@@ -139,11 +139,11 @@ STRINGS: dict[str, dict[str, str]] = {
     "cb_sub": {"pt": "cartas aeronáuticas · jussa.com.br", "en": "aeronautical charts · jussa.com.br", "es": "cartas aeronáuticas · jussa.com.br"},
     "cb_h2": {"pt": "Cartas de aproximação por aeródromo", "en": "Approach charts by airport", "es": "Cartas de aproximación por aeródromo"},
     "cb_intro": {
-        "pt": "Escolha um <strong>aeródromo do Brasil</strong> e veja as cartas oficiais do DECEA. Você pode <strong>visualizar</strong>, <strong>imprimir</strong>, <strong>baixar</strong> e <strong>compartilhar em PDF</strong>. As cartas vêm direto do <strong>AISWEB</strong>, sempre na emenda (AIRAC) vigente.",
-        "en": "Pick a <strong>Brazilian airport</strong> and see the official DECEA charts. You can <strong>view</strong>, <strong>print</strong>, <strong>download</strong> and <strong>share as PDF</strong>. Charts come straight from <strong>AISWEB</strong>, always on the current (AIRAC) amendment.",
-        "es": "Elige un <strong>aeródromo de Brasil</strong> y consulta las cartas oficiales del DECEA. Puedes <strong>ver</strong>, <strong>imprimir</strong>, <strong>descargar</strong> y <strong>compartir en PDF</strong>. Las cartas vienen directo de <strong>AISWEB</strong>, siempre en la enmienda (AIRAC) vigente.",
+        "pt": "Escolha um <strong>aeródromo do Brasil ou dos EUA</strong> e veja as cartas oficiais aqui mesmo — <strong>visualizar</strong>, <strong>imprimir</strong>, <strong>baixar</strong> e <strong>compartilhar em PDF</strong>, sempre na emenda (AIRAC) vigente do <strong>AISWEB (DECEA)</strong> e do <strong>d-TPP (FAA)</strong>. Para a <strong>Europa</strong>, levamos você ao <strong>eAIP oficial</strong> do país.",
+        "en": "Pick a <strong>Brazilian or U.S. airport</strong> and see the official charts right here — <strong>view</strong>, <strong>print</strong>, <strong>download</strong> and <strong>share as PDF</strong>, always on the current (AIRAC) amendment from <strong>AISWEB (DECEA)</strong> and <strong>d-TPP (FAA)</strong>. For <strong>Europe</strong>, we take you to the country's <strong>official eAIP</strong>.",
+        "es": "Elige un <strong>aeródromo de Brasil o EE. UU.</strong> y consulta las cartas oficiales aquí mismo — <strong>ver</strong>, <strong>imprimir</strong>, <strong>descargar</strong> y <strong>compartir en PDF</strong>, siempre en la enmienda (AIRAC) vigente de <strong>AISWEB (DECEA)</strong> y <strong>d-TPP (FAA)</strong>. Para <strong>Europa</strong>, te llevamos al <strong>eAIP oficial</strong> del país.",
     },
-    "cb_lbl_aero": {"pt": "Aeródromo (Brasil)", "en": "Airport (Brazil)", "es": "Aeródromo (Brasil)"},
+    "cb_lbl_aero": {"pt": "Aeródromo (Brasil / EUA / Europa)", "en": "Airport (Brazil / USA / Europe)", "es": "Aeródromo (Brasil / EE. UU. / Europa)"},
     "cb_lbl_type": {"pt": "Tipo de carta", "en": "Chart type", "es": "Tipo de carta"},
     "cb_opt_iac": {"pt": "Aproximação por instrumentos (IAC)", "en": "Instrument approach (IAC)", "es": "Aproximación por instrumentos (IAC)"},
     "cb_opt_vac": {"pt": "Aproximação visual (VAC)", "en": "Visual approach (VAC)", "es": "Aproximación visual (VAC)"},
@@ -163,9 +163,9 @@ STRINGS: dict[str, dict[str, str]] = {
     "cb_fit": {"pt": "Ajustar à largura", "en": "Fit width", "es": "Ajustar al ancho"},
     "cb_status0": {"pt": "Selecione um aeródromo para listar as cartas.", "en": "Select an airport to list the charts.", "es": "Selecciona un aeródromo para listar las cartas."},
     "cb_note": {
-        "pt": "Cartas oficiais publicadas pelo <strong>DECEA</strong> via <strong>AISWEB</strong>, na emenda vigente. São documentos públicos servidos ao vivo da fonte — este site não armazena nem altera as cartas. Use sempre a publicação oficial e o briefing (ROTAER/NOTAM) para planejamento de voo real.",
-        "en": "Official charts published by <strong>DECEA</strong> via <strong>AISWEB</strong>, on the current amendment. They are public documents served live from the source — this site does not store or alter the charts. Always use the official publication and briefing (ROTAER/NOTAM) for real flight planning.",
-        "es": "Cartas oficiales publicadas por <strong>DECEA</strong> vía <strong>AISWEB</strong>, en la enmienda vigente. Son documentos públicos servidos en vivo desde la fuente — este sitio no almacena ni altera las cartas. Usa siempre la publicación oficial y el briefing (ROTAER/NOTAM) para planificación de vuelo real.",
+        "pt": "Cartas oficiais do <strong>DECEA</strong> (Brasil, via AISWEB) e da <strong>FAA</strong> (EUA, d-TPP), servidas ao vivo na emenda vigente — este site não armazena nem altera as cartas. Na <strong>Europa</strong>, cada país publica seu eAIP com direitos próprios, então apenas encaminhamos ao portal oficial. Use sempre a publicação oficial e o briefing (NOTAM) para planejamento de voo real.",
+        "en": "Official charts from <strong>DECEA</strong> (Brazil, via AISWEB) and the <strong>FAA</strong> (USA, d-TPP), served live on the current amendment — this site does not store or alter the charts. In <strong>Europe</strong>, each country publishes its own eAIP under its own rights, so we only forward you to the official portal. Always use the official publication and briefing (NOTAM) for real flight planning.",
+        "es": "Cartas oficiales de <strong>DECEA</strong> (Brasil, vía AISWEB) y la <strong>FAA</strong> (EE. UU., d-TPP), servidas en vivo en la enmienda vigente — este sitio no almacena ni altera las cartas. En <strong>Europa</strong>, cada país publica su eAIP con derechos propios, así que solo te reenviamos al portal oficial. Usa siempre la publicación oficial y el briefing (NOTAM) para planificación de vuelo real.",
     },
 
     # ---- Tempo (corpo) ----
@@ -226,11 +226,11 @@ STRINGS: dict[str, dict[str, str]] = {
     # ---- Sobre (corpo) ----
     "ab_back": {"pt": "← voltar para a calculadora", "en": "← back to the calculator", "es": "← volver a la calculadora"},
     "ab_sub": {"pt": "sobre o projeto", "en": "about the project", "es": "sobre el proyecto"},
-    "ab_h_what": {"pt": "O que é o Jussa Aero", "en": "What Jussa Aero is", "es": "Qué es Jussa Aero"},
+    "ab_h_what": {"pt": "O que é o Aero Jussa", "en": "What Aero Jussa is", "es": "Qué es Aero Jussa"},
     "ab_p_what1": {
-        "pt": "O Jussa Aero é uma ferramenta gratuita de planejamento de voo que calcula, entre dois aeroportos quaisquer do mundo, a <strong>distância great-circle</strong> (a rota mais curta sobre a esfera terrestre), a <strong>proa inicial</strong>, o <strong>tempo de bloco estimado</strong> e o <strong>consumo de combustível</strong> de acordo com a aeronave escolhida. Tudo aparece também desenhado no mapa.",
-        "en": "Jussa Aero is a free flight-planning tool that calculates, between any two airports in the world, the <strong>great-circle distance</strong> (the shortest route over the Earth's sphere), the <strong>initial heading</strong>, the <strong>estimated block time</strong> and the <strong>fuel burn</strong> for the chosen aircraft. Everything is also drawn on the map.",
-        "es": "Jussa Aero es una herramienta gratuita de planificación de vuelo que calcula, entre dos aeropuertos cualesquiera del mundo, la <strong>distancia ortodrómica</strong> (la ruta más corta sobre la esfera terrestre), el <strong>rumbo inicial</strong>, el <strong>tiempo de bloque estimado</strong> y el <strong>consumo de combustible</strong> según la aeronave elegida. Todo aparece también dibujado en el mapa.",
+        "pt": "O Aero Jussa é uma ferramenta gratuita de planejamento de voo que calcula, entre dois aeroportos quaisquer do mundo, a <strong>distância great-circle</strong> (a rota mais curta sobre a esfera terrestre), a <strong>proa inicial</strong>, o <strong>tempo de bloco estimado</strong> e o <strong>consumo de combustível</strong> de acordo com a aeronave escolhida. Tudo aparece também desenhado no mapa.",
+        "en": "Aero Jussa is a free flight-planning tool that calculates, between any two airports in the world, the <strong>great-circle distance</strong> (the shortest route over the Earth's sphere), the <strong>initial heading</strong>, the <strong>estimated block time</strong> and the <strong>fuel burn</strong> for the chosen aircraft. Everything is also drawn on the map.",
+        "es": "Aero Jussa es una herramienta gratuita de planificación de vuelo que calcula, entre dos aeropuertos cualesquiera del mundo, la <strong>distancia ortodrómica</strong> (la ruta más corta sobre la esfera terrestre), el <strong>rumbo inicial</strong>, el <strong>tiempo de bloque estimado</strong> y el <strong>consumo de combustible</strong> según la aeronave elegida. Todo aparece también dibujado en el mapa.",
     },
     "ab_p_what2": {
         "pt": "Foi pensado para estudantes de aviação, pilotos em formação, entusiastas e usuários de simuladores de voo (MSFS, X-Plane) que querem uma estimativa rápida sem abrir um software complexo.",
@@ -289,6 +289,34 @@ def prefix(lang: str) -> str:
     return "" if lang == DEFAULT else f"/{lang}"
 
 
+def loc(lang: str, base_path: str) -> str:
+    """URL root-relative localizada de um caminho.
+
+    A home (base_path == "/") no idioma não-padrão fica SEM barra final
+    ("/en", "/es"): a rota servida é "/en", e "/en/" devolve 307. Emitir
+    "/en/" em canonical/hreflang/sitemap fazia o Google ver um redirecionamento
+    e descartar a canônica ("Cópia sem página canônica selecionada").
+    """
+    pre = prefix(lang)
+    if not pre:
+        return base_path
+    if base_path == "/":
+        return pre
+    return pre + base_path
+
+
+def loc_url(pre: str, url: str) -> str:
+    """Prefixa um href/action interno com `pre` (ex.: '/en') sem gerar '/en/'.
+
+    `url` começa com '/'. Preserva query/hash: '/?x=1' -> '/en?x=1'.
+    """
+    if url == "/":
+        return pre or "/"
+    if url.startswith(("/?", "/#")):
+        return pre + url[1:]
+    return pre + url
+
+
 # --- reescrita de links internos para o prefixo do idioma --------------------
 _LINK_RE = re.compile(r'(href|action)="(/[^":]*)"')
 _LANGSW_RE = re.compile(r'<div class="langsw".*?</div>', re.S)
@@ -314,7 +342,7 @@ def _rewrite_links(html: str, lang: str) -> str:
         # separa path de query/hash
         pathpart = re.split(r"[?#]", url, 1)[0]
         if pathpart in _TRANSLATED_PATHS:
-            return f'{attr}="{pre}{url}"'
+            return f'{attr}="{loc_url(pre, url)}"'
         return m.group(0)
 
     html = _LINK_RE.sub(rep, html)
@@ -336,7 +364,7 @@ def switcher_block(base_path: str, current: str) -> str:
     """
     parts = []
     for lang in LANGS:
-        href = (prefix(lang) + base_path) if lang != DEFAULT else base_path
+        href = loc(lang, base_path)
         on = " on" if lang == current else ""
         parts.append(
             f'<a class="langsw-a{on}" href="{href}" hreflang="{HREFLANG[lang]}" '
@@ -349,10 +377,10 @@ def hreflang_block(base_path: str, current: str) -> str:
     """Tags <link hreflang> (pt/en/es + x-default) e o canonical do idioma atual."""
     lines = []
     for lang in LANGS:
-        href = BASE + ((prefix(lang) + base_path) if lang != DEFAULT else base_path)
+        href = BASE + loc(lang, base_path)
         lines.append(f'<link rel="alternate" hreflang="{HREFLANG[lang]}" href="{href}" />')
     lines.append(f'<link rel="alternate" hreflang="x-default" href="{BASE}{base_path}" />')
-    canonical = BASE + ((prefix(current) + base_path) if current != DEFAULT else base_path)
+    canonical = BASE + loc(current, base_path)
     lines.append(f'<link rel="canonical" href="{canonical}" />')
     return "\n  ".join(lines)
 

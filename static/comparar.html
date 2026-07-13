@@ -4,19 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS1B98VCXF"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7C0B22Z8EC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-GS1B98VCXF');
+    gtag('config', 'G-7C0B22Z8EC', {
+      content_group: 'app-comparar',
+      page_language: (document.documentElement.lang || 'pt').slice(0, 2)
+    });
   </script>
+  <script defer src="/static/track.js"></script>
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#070d18" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Jussa Aero" />
+  <meta name="apple-mobile-web-app-title" content="Aero Jussa" />
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
@@ -28,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css" />
   <link rel="stylesheet" href="/static/style.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
 </head>
@@ -38,7 +42,7 @@
       <div class="badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg>
       </div>
-      <h1 style="font-size:18px">Jussa Aero<small>{{mb_sub}}</small></h1>
+      <h1 style="font-size:18px">Aero Jussa<small>{{mb_sub}}</small></h1>
     </div>
 
     <div class="tag"><span>{{mb_tag}}</span><span>{{mb_tag2}}</span></div>
@@ -104,7 +108,7 @@
     </footer>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/vendor/leaflet/leaflet.js"></script>
   <script src="/static/comparar.js"></script>
 </body>
 </html>

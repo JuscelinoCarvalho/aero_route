@@ -1,4 +1,4 @@
-/* Service worker do Jussa Aero — cache offline básico.
+/* Service worker do Aero Jussa — cache offline básico.
  *
  * Estratégia:
  *  - Navegações (páginas HTML): network-first, com fallback ao cache e, por fim,
@@ -7,7 +7,7 @@
  *  - /api/* e métodos não-GET: sempre rede, nunca cacheados.
  *  - Recursos cross-origin (fontes, Leaflet, tiles): deixados para o navegador.
  */
-const VERSION = "v9";
+const VERSION = "v10";
 const STATIC_CACHE = "jussa-static-" + VERSION;
 const PAGES_CACHE = "jussa-pages-" + VERSION;
 
@@ -15,6 +15,7 @@ const PRECACHE = [
   "/static/style.css",
   "/static/app.js",
   "/static/i18n.js",
+  "/static/track.js",
   "/static/offline.html",
   "/static/icons/icon-192.png",
   "/static/icons/icon-512.png",
@@ -80,7 +81,7 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
   let d = {};
   try { d = event.data ? event.data.json() : {}; } catch (e) { d = { body: event.data && event.data.text() }; }
-  const title = d.title || "Jussa Aero";
+  const title = d.title || "Aero Jussa";
   event.waitUntil(
     self.registration.showNotification(title, {
       body: d.body || "",

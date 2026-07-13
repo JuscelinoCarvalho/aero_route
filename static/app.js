@@ -10,7 +10,7 @@ const AFFILIATES = [
 
 // ===== Mapa (Leaflet, tema claro com oceanos azuis) ======================
 const map = L.map("map", { worldCopyJump: true, zoomControl: true }).setView([5, -30], 2);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   attribution: "© OpenStreetMap, © CARTO",
   maxZoom: 19,
 }).addTo(map);
@@ -53,7 +53,7 @@ function buildAirportAC(inputEl, acEl, setCode) {
         `<div class="nm">${a.city ? a.city + " · " : ""}${a.name} (${a.country})</div></div>`)
       .join("");
     acEl.classList.toggle("open", list.length > 0);
-    const _hl = acEl.querySelector(".hl"); if (_hl) _hl.scrollIntoView({ block: "nearest" });
+    acScroll(acEl);
   }
   function pick(a) { inputEl.value = a.code; setCode(a.icao || a.iata || a.code); close(); compute(); }
 
@@ -116,7 +116,7 @@ function buildAircraftAC() {
         `<div class="cat">${TCAT(a.category)} · ${a.cruise_kt != null ? a.cruise_kt + " kt" : T("ac_speed_nd")} · ${a.range_nm != null ? T("ac_range") + " " + a.range_nm.toLocaleString(window.I18N_LOCALE) + " nm" : T("ac_range_nd")}</div></div>`)
       .join("");
     acEl.classList.toggle("open", list.length > 0);
-    const _hl = acEl.querySelector(".hl"); if (_hl) _hl.scrollIntoView({ block: "nearest" });
+    acScroll(acEl);
   }
   function pick(a) { selAircraft = a.key; inputEl.value = a.name; close(); renderAircraftCard(); compute(); }
 
@@ -203,6 +203,14 @@ async function compute() {
     const d = await arr[0].json();
     const m = hasAc && arr[1] && arr[1].ok ? await arr[1].json() : null;
     render(d, m, hasAc);
+    if (window.track) window.track("route_calculated", {
+      origin: fromCode,
+      dest: toCode,
+      aircraft: hasAc ? selAircraft : "(nenhuma)",
+      distance_nm: d.distance ? Math.round(d.distance.nm) : undefined,
+      stops: m && m.reachable && !m.direct ? m.num_stops : 0,
+      reachable: m ? !!m.reachable : true,
+    });
   } catch (_) { emptyOut(T("conn_fail")); }
 }
 
