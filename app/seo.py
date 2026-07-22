@@ -80,6 +80,32 @@ TR: dict[str, dict[str, str]] = {
     "rt_th_block": {"pt": "Tempo de bloco", "en": "Block time", "es": "Tiempo de bloque"},
     "rt_th_fuel": {"pt": "Combustível", "en": "Fuel", "es": "Combustible"},
     "rt_h3_other": {"pt": "Outras rotas saindo de {0}", "en": "Other routes from {0}", "es": "Otras rutas desde {0}"},
+    # resposta direta (topo) — otimizada para o featured snippet
+    "rt_answer": {
+        "pt": "A distância de {0} para {1} é de <strong>{2} km</strong> ({3} milhas náuticas). Um voo direto leva cerca de <strong>{4}</strong> num {5}, com proa inicial de <strong>{6}°</strong>.",
+        "en": "The distance from {0} to {1} is <strong>{2} km</strong> ({3} nautical miles). A direct flight takes about <strong>{4}</strong> in a {5}, with an initial heading of <strong>{6}°</strong>.",
+        "es": "La distancia de {0} a {1} es de <strong>{2} km</strong> ({3} millas náuticas). Un vuelo directo dura cerca de <strong>{4}</strong> en un {5}, con rumbo inicial de <strong>{6}°</strong>.",
+    },
+    # FAQ (visível + JSON-LD FAQPage). Respostas em texto puro (sem HTML).
+    "faq_h": {"pt": "Perguntas frequentes", "en": "Frequently asked questions", "es": "Preguntas frecuentes"},
+    "faq_q_dist": {"pt": "Qual é a distância de {0} para {1}?", "en": "What is the distance from {0} to {1}?", "es": "¿Cuál es la distancia de {0} a {1}?"},
+    "faq_a_dist": {
+        "pt": "A distância em linha reta (great-circle) de {0} para {1} é de {2} km, o equivalente a {3} milhas náuticas.",
+        "en": "The straight-line (great-circle) distance from {0} to {1} is {2} km, equivalent to {3} nautical miles.",
+        "es": "La distancia en línea recta (ortodrómica) de {0} a {1} es de {2} km, equivalente a {3} millas náuticas.",
+    },
+    "faq_q_time": {"pt": "Quantas horas de voo de {0} para {1}?", "en": "How many hours is the flight from {0} to {1}?", "es": "¿Cuántas horas de vuelo de {0} a {1}?"},
+    "faq_a_time": {
+        "pt": "Um voo direto de {0} para {1} leva cerca de {2} num {3}, já incluindo o tempo de táxi, subida e descida.",
+        "en": "A direct flight from {0} to {1} takes about {2} in a {3}, already including taxi, climb and descent time.",
+        "es": "Un vuelo directo de {0} a {1} dura cerca de {2} en un {3}, incluyendo el tiempo de rodaje, ascenso y descenso.",
+    },
+    "faq_q_bearing": {"pt": "Qual é a direção (proa) de {0} para {1}?", "en": "What is the heading from {0} to {1}?", "es": "¿Cuál es la dirección (rumbo) de {0} a {1}?"},
+    "faq_a_bearing": {
+        "pt": "A proa inicial de {0} para {1} é de {2}° (rumo verdadeiro), medida no ponto de partida da rota great-circle.",
+        "en": "The initial heading from {0} to {1} is {2}° (true bearing), measured at the departure point of the great-circle route.",
+        "es": "El rumbo inicial de {0} a {1} es de {2}° (rumbo verdadero), medido en el punto de salida de la ruta ortodrómica.",
+    },
 
     # ---- página de tempo de voo (/voo) ----
     "vo_tag": {"pt": "TEMPO DE VOO {0} → {1}", "en": "FLIGHT TIME {0} → {1}", "es": "TIEMPO DE VUELO {0} → {1}"},
@@ -724,6 +750,39 @@ def _svg_map(a: Point, b: Point, code_a: str, code_b: str) -> str:
 
 # --------------------------------------------------------------------------- #
 # Página de rota
+def _route_jsonld(origin: City, dest: City, faq_pairs: list[tuple[str, str]],
+                  canonical: str, lang: str) -> str:
+    """Dados estruturados schema.org da página de rota: FAQPage + BreadcrumbList.
+
+    Reforça para o Google a intenção 'distância/tempo de voo entre X e Y'. As
+    perguntas/respostas são as MESMAS exibidas na FAQ visível (fonte única).
+    """
+    graph = [
+        {
+            "@type": "FAQPage",
+            "mainEntity": [
+                {"@type": "Question", "name": q,
+                 "acceptedAnswer": {"@type": "Answer", "text": ans}}
+                for q, ans in faq_pairs
+            ],
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": _t("nav_calc", lang),
+                 "item": f"{BASE_URL}{i18n.loc(lang, '/')}"},
+                {"@type": "ListItem", "position": 2, "name": _t("nav_rotas", lang),
+                 "item": f"{BASE_URL}{i18n.loc(lang, '/rotas')}"},
+                {"@type": "ListItem", "position": 3,
+                 "name": f"{origin.name} → {dest.name}", "item": canonical},
+            ],
+        },
+    ]
+    payload = json.dumps({"@context": "https://schema.org", "@graph": graph},
+                         ensure_ascii=False)
+    return f'<script type="application/ld+json">{payload}</script>'
+
+
 # --------------------------------------------------------------------------- #
 def render_route_page(store: AirportStore, origin: City, dest: City, lang: str = "pt") -> str | None:
     a = store.resolve(origin.code)
@@ -761,6 +820,23 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
     base_path = f"/rota/{origin.slug}/{dest.slug}"
     canonical = f"{BASE_URL}{i18n.prefix(lang)}{base_path}"
 
+    # Resposta direta (topo) + FAQ (visível e JSON-LD) para o featured snippet.
+    bearing_s = f"{bearing:03d}"
+    answer = _t("rt_answer", lang, origin.name, dest.name, _fmt(dist_km, lang),
+                _fmt(dist_nm, lang), calc.format_hm(default_h), default.name, bearing_s)
+    faq_pairs = [
+        (_t("faq_q_dist", lang, origin.name, dest.name),
+         _t("faq_a_dist", lang, origin.name, dest.name, _fmt(dist_km, lang), _fmt(dist_nm, lang))),
+        (_t("faq_q_time", lang, origin.name, dest.name),
+         _t("faq_a_time", lang, origin.name, dest.name, calc.format_hm(default_h), default.name)),
+        (_t("faq_q_bearing", lang, origin.name, dest.name),
+         _t("faq_a_bearing", lang, origin.name, dest.name, bearing_s)),
+    ]
+    faq_html = "".join(
+        f'<div class="faq-q">{q}</div><p class="faq-a">{ans}</p>' for q, ans in faq_pairs
+    )
+    jsonld = _route_jsonld(origin, dest, faq_pairs, canonical, lang)
+
     title = _t("rt_title", lang, origin.name, dest.name, _fmt(dist_km, lang))
     desc = _t("rt_desc", lang, origin.name, a.code, dest.name, b.code,
               _fmt(dist_km, lang), _fmt(dist_nm, lang), calc.format_hm(default_h))
@@ -779,6 +855,7 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
 <meta property="og:description" content="{desc}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="{canonical}" />
+{jsonld}
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -799,6 +876,7 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
   {i18n.switcher_block(base_path, lang)}
 
   <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 10px">{_t("rt_h2", lang, origin.name, dest.name)}</h2>
+  <div class="answer">{answer}</div>
   <p style="font-size:14px;color:#c3d3e6;margin-bottom:16px">
     {_t("rt_intro", lang, origin.name, a.name, a.code, dest.name, b.name, b.code,
         _fmt(dist_km, lang), _fmt(dist_nm, lang), f"{bearing:03d}", default.name, calc.format_hm(default_h))}
@@ -831,6 +909,9 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
   </table>
   <p style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">{_t("note_est", lang)}</p>
 
+  <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:24px 0 8px">{_t("faq_h", lang)}</h3>
+  <div class="faq">{faq_html}</div>
+
   <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:24px 0 10px">{_t("rt_h3_other", lang, origin.name)}</h3>
   <div style="display:flex;flex-wrap:wrap;gap:8px">{rel_links}</div>
 
@@ -841,7 +922,10 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
     <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{_t("foot_privacy", lang)}</a>
   </footer>
 </div>
-<style>.rel{{background:var(--panel-2);border:1px solid var(--line);border-radius:30px;padding:7px 13px;font-size:12.5px;color:var(--cyan);text-decoration:none}}.rel:hover{{background:#16335a}}table td{{padding:9px 6px;border-bottom:1px solid var(--line)}}</style>
+<style>.rel{{background:var(--panel-2);border:1px solid var(--line);border-radius:30px;padding:7px 13px;font-size:12.5px;color:var(--cyan);text-decoration:none}}.rel:hover{{background:#16335a}}table td{{padding:9px 6px;border-bottom:1px solid var(--line)}}
+.answer{{background:rgba(31,216,230,.08);border-left:3px solid var(--cyan);border-radius:8px;padding:12px 14px;font-size:14.5px;color:#dce6f3;line-height:1.55;margin:0 0 16px}}
+.faq-q{{font-family:'Chakra Petch',sans-serif;font-weight:600;color:var(--ink);font-size:15px;margin-top:14px}}
+.faq-a{{font-size:13.5px;color:#c3d3e6;line-height:1.55;margin:5px 0 0}}</style>
 </body>
 </html>"""
     return _localize_links(html, lang)
