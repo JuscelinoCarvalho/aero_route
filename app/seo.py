@@ -241,7 +241,7 @@ def _localize_links(html: str, lang: str) -> str:
     def rep(m: "re.Match[str]") -> str:
         attr, url = m.group(1), m.group(2)
         path = re.split(r"[?#]", url, 1)[0]
-        if path in _PREFIX_EXACT or path.startswith(("/rota/", "/voo/", "/tempo/")):
+        if path in _PREFIX_EXACT or path.startswith(("/rota/", "/tempo/")):
             return f'{attr}="{i18n.loc_url(pre, url)}"'
         return m.group(0)
 
@@ -296,9 +296,7 @@ PWA_HEAD = (
     '<script defer src="/static/install.js"></script>'
 )
 
-# Aeronaves comparadas em cada página de rota (boa amplitude de portes).
-COMPARE_KEYS = ["a320neo", "b738", "e195e2", "b77w"]
-# Na página "quantas horas de voo", foca no tempo com mais portes.
+# Aeronaves da tabela consolidada de cada página de rota (boa amplitude de portes).
 TIME_COMPARE = ["phenom300", "e195e2", "a320neo", "b738", "b77w"]
 DEFAULT_AC = "a320neo"
 
@@ -446,6 +444,80 @@ REGIONS: dict[str, tuple[str, str]] = {
     "pequim": ("Internacional", "China"),
     "sydney": ("Internacional", "Austrália"),
 }
+
+# --------------------------------------------------------------------------- #
+# Curadoria dos pares /rota (poda + direção canônica).
+#
+# O produto cartesiano (60×59, em duas variantes /rota e /voo) gerava ~7 mil
+# páginas quase-duplicadas que o Google detectava mas se recusava a indexar
+# ("thin content"). Aqui restringimos a um conjunto com demanda de busca
+# plausível do público BR e mantemos UMA direção canônica por par (a ordem de
+# aparição em CITIES). A direção reversa e os pares fora do conjunto são
+# tratados em main.py (301 para a canônica / 404).
+# --------------------------------------------------------------------------- #
+_BR_SLUGS: set[str] = {slug for slug, (grupo, _) in REGIONS.items() if grupo == "Brasil"}
+
+# Hubs brasileiros de maior tráfego (âncoras das rotas domésticas fortes).
+BR_HUBS: set[str] = {
+    "sao-paulo", "rio-de-janeiro", "brasilia", "belo-horizonte", "salvador",
+    "recife", "fortaleza", "porto-alegre", "curitiba", "campinas",
+}
+# Destinos internacionais de alta busca do público brasileiro.
+INTL_TOP: set[str] = {
+    "lisboa", "porto", "madri", "barcelona", "londres", "paris", "frankfurt",
+    "roma", "nova-york", "miami", "orlando", "buenos-aires", "santiago",
+    "montevideu", "cancun", "toronto", "dubai",
+}
+
+
+def _keep_pair(a: City, b: City) -> bool:
+    """Regra de poda (agressiva): mantém só pares com demanda plausível."""
+    abr, bbr = a.slug in _BR_SLUGS, b.slug in _BR_SLUGS
+    if abr and bbr:                       # doméstico: exige ao menos um hub
+        return a.slug in BR_HUBS or b.slug in BR_HUBS
+    if abr != bbr:                        # BR ↔ internacional
+        br, intl = (a, b) if abr else (b, a)
+        return br.slug in BR_HUBS and intl.slug in INTL_TOP
+    return False                          # internacional ↔ internacional: fora
+
+
+def route_pairs() -> list[tuple[City, City]]:
+    """Pares canônicos mantidos (não-ordenados; origem = a 1ª em CITIES)."""
+    out: list[tuple[City, City]] = []
+    for i, a in enumerate(CITIES):
+        for b in CITIES[i + 1:]:
+            if _keep_pair(a, b):
+                out.append((a, b))
+    return out
+
+
+ROUTE_PAIRS: list[tuple[City, City]] = route_pairs()
+ROUTE_PAIR_SET: set[tuple[str, str]] = {(o.slug, d.slug) for o, d in ROUTE_PAIRS}
+
+
+def canonical_pair(o_slug: str, d_slug: str) -> tuple[str, str] | None:
+    """Direção canônica de um par mantido, ou None se o par foi podado."""
+    if (o_slug, d_slug) in ROUTE_PAIR_SET:
+        return (o_slug, d_slug)
+    if (d_slug, o_slug) in ROUTE_PAIR_SET:
+        return (d_slug, o_slug)
+    return None
+
+
+def related_pairs(origin: City, dest: City, limit: int = 8) -> list[tuple[City, City]]:
+    """Até `limit` pares canônicos envolvendo `origin` (preferência) ou `dest`,
+    excluindo o par atual — para os links de 'rotas relacionadas'."""
+    cur = (origin.slug, dest.slug)
+    out = [p for p in ROUTE_PAIRS
+           if origin.slug in (p[0].slug, p[1].slug) and (p[0].slug, p[1].slug) != cur]
+    if len(out) < limit:
+        seen = {(p[0].slug, p[1].slug) for p in out}
+        for p in ROUTE_PAIRS:
+            key = (p[0].slug, p[1].slug)
+            if dest.slug in key and key != cur and key not in seen:
+                out.append(p)
+    return out[:limit]
+
 
 # Estados do Brasil (iso_region do OurAirports). Primeiro combo da origem/destino.
 BR_STATES: list[tuple[str, str]] = [
@@ -667,23 +739,22 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
     default = aircraft_mod.get(DEFAULT_AC)
     default_h = calc.flight_time_hours(dist_nm, default.cruise_kt)
 
-    # tabela comparativa por aeronave
+    # tabela consolidada: cruzeiro, tempo de bloco e combustível por aeronave
     rows = []
-    for key in COMPARE_KEYS:
+    for key in TIME_COMPARE:
         ac = aircraft_mod.get(key)
         h = calc.flight_time_hours(dist_nm, ac.cruise_kt)
         fuel = calc.fuel_estimate(h, ac.burn_kg_h)
         rows.append(
-            f"<tr><td>{ac.name}</td><td>{calc.format_hm(h)}</td>"
-            f"<td>{_fmt(fuel['total_kg'], lang)} kg</td></tr>"
+            f"<tr><td>{ac.name}</td><td>{ac.cruise_kt} kt</td>"
+            f"<td>{calc.format_hm(h)}</td><td>{_fmt(fuel['total_kg'], lang)} kg</td></tr>"
         )
     table = "".join(rows)
 
-    # rotas relacionadas (mesma origem -> outros destinos)
-    related = [c for c in CITIES if c.slug not in (origin.slug, dest.slug)][:8]
+    # rotas relacionadas — apenas pares canônicos que existem
     rel_links = "".join(
-        f'<a class="rel" href="/rota/{origin.slug}/{c.slug}">{origin.name} → {c.name}</a>'
-        for c in related
+        f'<a class="rel" href="/rota/{o.slug}/{d.slug}">{o.name} → {d.name}</a>'
+        for o, d in related_pairs(origin, dest)
     )
 
     svg = _svg_map(pa, pb, a.code, b.code)
@@ -747,12 +818,12 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
      style="display:inline-block;margin:16px 0;background:rgba(31,216,230,.12);border:1px solid var(--cyan);color:var(--cyan);padding:12px 20px;border-radius:9px;text-decoration:none;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.04em">
     {_t("rt_cta", lang)}
   </a>
-  <p style="font-size:13px;margin:0 0 8px"><a href="/voo/{origin.slug}/{dest.slug}" style="color:var(--cyan)">{_t("rt_link_time", lang, origin.name, dest.name)}</a></p>
 
   <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:20px 0 8px">{_t("rt_h3_fuel", lang)}</h3>
   <table style="width:100%;border-collapse:collapse;font-size:13.5px;color:#c3d3e6">
     <thead><tr style="color:var(--muted);text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px">
       <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("rt_th_ac", lang)}</th>
+      <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("vo_th_cruise", lang)}</th>
       <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("rt_th_block", lang)}</th>
       <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("rt_th_fuel", lang)}</th>
     </tr></thead>
@@ -761,120 +832,6 @@ def render_route_page(store: AirportStore, origin: City, dest: City, lang: str =
   <p style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">{_t("note_est", lang)}</p>
 
   <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:24px 0 10px">{_t("rt_h3_other", lang, origin.name)}</h3>
-  <div style="display:flex;flex-wrap:wrap;gap:8px">{rel_links}</div>
-
-  <footer class="foot" style="margin-top:28px">
-    <a href="/" style="color:var(--cyan);text-decoration:none">{_t("foot_calc", lang)}</a> ·
-    <a href="/rotas" style="color:var(--cyan);text-decoration:none">{_t("foot_routes", lang)}</a> ·
-    <a href="/sobre" style="color:var(--cyan);text-decoration:none">{_t("foot_about", lang)}</a> ·
-    <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{_t("foot_privacy", lang)}</a>
-  </footer>
-</div>
-<style>.rel{{background:var(--panel-2);border:1px solid var(--line);border-radius:30px;padding:7px 13px;font-size:12.5px;color:var(--cyan);text-decoration:none}}.rel:hover{{background:#16335a}}table td{{padding:9px 6px;border-bottom:1px solid var(--line)}}</style>
-</body>
-</html>"""
-    return _localize_links(html, lang)
-
-
-def render_time_page(store: AirportStore, origin: City, dest: City, lang: str = "pt") -> str | None:
-    """Página focada em TEMPO de voo (intenção de busca 'quantas horas')."""
-    a = store.resolve(origin.code)
-    b = store.resolve(dest.code)
-    if a is None or b is None or origin.slug == dest.slug:
-        return None
-
-    pa, pb = Point(a.lat, a.lon), Point(b.lat, b.lon)
-    dist_nm = calc.great_circle_distance_nm(pa, pb)
-    dist_km = dist_nm * calc.NM_TO_KM
-
-    default = aircraft_mod.get(DEFAULT_AC)
-    default_h = calc.flight_time_hours(dist_nm, default.cruise_kt)
-
-    rows = []
-    for key in TIME_COMPARE:
-        ac = aircraft_mod.get(key)
-        h = calc.flight_time_hours(dist_nm, ac.cruise_kt)
-        rows.append(
-            f"<tr><td>{ac.name}</td><td>{ac.cruise_kt} kt</td><td>{calc.format_hm(h)}</td></tr>"
-        )
-    table = "".join(rows)
-
-    related = [c for c in CITIES if c.slug not in (origin.slug, dest.slug)][:8]
-    rel_links = "".join(
-        f'<a class="rel" href="/voo/{origin.slug}/{c.slug}">{origin.name} → {c.name}</a>'
-        for c in related
-    )
-    svg = _svg_map(pa, pb, a.code, b.code)
-    base_path = f"/voo/{origin.slug}/{dest.slug}"
-    canonical = f"{BASE_URL}{i18n.prefix(lang)}{base_path}"
-
-    title = _t("vo_title", lang, origin.name, dest.name)
-    desc = _t("vo_desc", lang, origin.name, a.code, dest.name, b.code,
-              calc.format_hm(default_h), default.name, _fmt(dist_km, lang))
-
-    html = f"""<!DOCTYPE html>
-<html lang="{i18n.html_lang(lang)}">
-<head>
-<meta charset="UTF-8" />
-{gtag_block(lang, "voo", f"{origin.slug}-{dest.slug}")}
-{PWA_HEAD}
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{title} | Aero Jussa</title>
-<meta name="description" content="{desc}" />
-{i18n.hreflang_block(base_path, lang)}
-<meta property="og:title" content="{title}" />
-<meta property="og:description" content="{desc}" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="{canonical}" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/static/style.css" />
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
-</head>
-<body>
-<div class="wrap">
-  <div class="top">
-    <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
-    <h1 style="font-size:18px">Aero Jussa<small>{_t("brand_planning", lang)}</small></h1>
-  </div>
-
-  <div class="tag"><span>{_t("vo_tag", lang, a.code, b.code)}</span><span><a href="/rotas" style="color:var(--muted);text-decoration:none">{_t("all_routes", lang)}</a></span></div>
-  {_nav("/rotas", lang)}
-  {i18n.switcher_block(base_path, lang)}
-
-  <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 10px">{_t("vo_title", lang, origin.name, dest.name)}</h2>
-  <p style="font-size:14px;color:#c3d3e6;margin-bottom:16px">
-    {_t("vo_intro", lang, origin.name, a.code, dest.name, b.code,
-        calc.format_hm(default_h), default.name, _fmt(dist_km, lang), _fmt(dist_nm, lang))}
-  </p>
-
-  <div class="panel">
-    {svg}
-    <div class="readouts">
-      <div class="cell green"><div class="k">{_t("rt_ro_time", lang, default.name)}</div><div class="v">{calc.format_hm(default_h)}</div></div>
-      <div class="cell cyan"><div class="k">{_t("rt_ro_dist", lang)}</div><div class="v">{_fmt(dist_km, lang)}<span class="u">km</span></div></div>
-    </div>
-  </div>
-
-  <a class="cta-link" href="/?origin={a.code}&dest={b.code}"
-     style="display:inline-block;margin:16px 0;background:rgba(31,216,230,.12);border:1px solid var(--cyan);color:var(--cyan);padding:12px 20px;border-radius:9px;text-decoration:none;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.04em">
-    {_t("vo_cta", lang)}
-  </a>
-  <p style="font-size:13px;margin:0 0 8px"><a href="/rota/{origin.slug}/{dest.slug}" style="color:var(--cyan)">{_t("vo_link_dist", lang, origin.name, dest.name)}</a></p>
-
-  <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:20px 0 8px">{_t("vo_h3_ac", lang)}</h3>
-  <table style="width:100%;border-collapse:collapse;font-size:13.5px;color:#c3d3e6">
-    <thead><tr style="color:var(--muted);text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px">
-      <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("rt_th_ac", lang)}</th>
-      <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("vo_th_cruise", lang)}</th>
-      <th style="padding:8px 6px;border-bottom:1px solid var(--line)">{_t("vo_th_time", lang)}</th>
-    </tr></thead>
-    <tbody>{table}</tbody>
-  </table>
-  <p style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">{_t("vo_note", lang)}</p>
-
-  <h3 style="font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan);margin:24px 0 10px">{_t("vo_h3_other", lang, origin.name)}</h3>
   <div style="display:flex;flex-wrap:wrap;gap:8px">{rel_links}</div>
 
   <footer class="foot" style="margin-top:28px">
@@ -928,12 +885,20 @@ def render_routes_index(lang: str = "pt") -> str:
         ("porto-alegre", "sao-paulo"), ("salvador", "sao-paulo"), ("fortaleza", "lisboa"),
         ("manaus", "sao-paulo"),
     ]
-    pop_links = "".join(
-        f'<a class="rel" href="/rota/{o}/{d}">'
-        f"{CITY_BY_SLUG[o].name} → {CITY_BY_SLUG[d].name}</a>"
-        for o, d in popular
-        if o in CITY_BY_SLUG and d in CITY_BY_SLUG
-    )
+    # Canoniza a direção e descarta pares podados, para não linkar 404.
+    pop_seen: set[tuple[str, str]] = set()
+    pop_html: list[str] = []
+    for o, d in popular:
+        canon = canonical_pair(o, d)
+        if canon is None or canon in pop_seen:
+            continue
+        pop_seen.add(canon)
+        co, cd = canon
+        pop_html.append(
+            f'<a class="rel" href="/rota/{co}/{cd}">'
+            f"{CITY_BY_SLUG[co].name} → {CITY_BY_SLUG[cd].name}</a>"
+        )
+    pop_links = "".join(pop_html)
 
     html = f"""<!DOCTYPE html>
 <html lang="{i18n.html_lang(lang)}">
@@ -1020,18 +985,16 @@ def render_routes_index(lang: str = "pt") -> str:
 
 def render_curiosidades(store: AirportStore, lang: str = "pt") -> str:
     """Página de curiosidades, computada a partir dos dados reais das rotas."""
-    n = len(CITIES)
+    # Só pares que têm página real (mantidos e na direção canônica): todo link
+    # aponta para uma /rota que existe.
     pairs: list[tuple[City, City, float]] = []
-    for i in range(n):
-        a = store.resolve(CITIES[i].code)
-        if a is None:
+    for o, d in ROUTE_PAIRS:
+        a = store.resolve(o.code)
+        b = store.resolve(d.code)
+        if a is None or b is None:
             continue
-        for j in range(i + 1, n):
-            b = store.resolve(CITIES[j].code)
-            if b is None:
-                continue
-            nm = calc.great_circle_distance_nm(Point(a.lat, a.lon), Point(b.lat, b.lon))
-            pairs.append((CITIES[i], CITIES[j], nm))
+        nm = calc.great_circle_distance_nm(Point(a.lat, a.lon), Point(b.lat, b.lon))
+        pairs.append((o, d, nm))
     pairs.sort(key=lambda t: t[2])
 
     a320 = aircraft_mod.get("a320neo")
@@ -1281,10 +1244,6 @@ def render_tempo_page(ap: Airport, raw: str | None, observed_epoch: int | None,
     return _localize_links(html, lang)
 
 
-def all_pairs() -> list[tuple[City, City]]:
-    return [(o, d) for o in CITIES for d in CITIES if o.slug != d.slug]
-
-
 def _url_i18n(path: str) -> str:
     """Bloco <url> para cada idioma de um caminho traduzido, com alternates hreflang."""
     alts = "".join(
@@ -1303,8 +1262,7 @@ def build_sitemap(tempo_icaos: list[str] | None = None) -> str:
     # Páginas traduzidas (pt/en/es): cada idioma vira um <url> com alternates hreflang.
     translated = ["/", "/comparar", "/tempo", "/radar", "/cartas", "/rotas",
                   "/curiosidades", "/sobre"]
-    translated += [f"/rota/{o.slug}/{d.slug}" for o, d in all_pairs()]
-    translated += [f"/voo/{o.slug}/{d.slug}" for o, d in all_pairs()]
+    translated += [f"/rota/{o.slug}/{d.slug}" for o, d in ROUTE_PAIRS]
     translated += [f"/tempo/{ic}" for ic in (tempo_icaos or [])]
     body = "".join(_url_i18n(p) for p in translated)
     return (

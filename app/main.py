@@ -12,7 +12,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import Body, FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    PlainTextResponse,
+    RedirectResponse,
+    Response,
+)
 from fastapi.staticfiles import StaticFiles
 
 from . import aircraft as aircraft_mod
@@ -510,26 +516,33 @@ def _tempo_aerodromo(icao: str, lang: str) -> str:
     return seo.render_tempo_page(ap, raw, obs, related, lang)
 
 
-def _rota_page(origin: str, dest: str, lang: str) -> str:
+def _rota_page(origin: str, dest: str, lang: str) -> Response:
     o = seo.CITY_BY_SLUG.get(origin)
     d = seo.CITY_BY_SLUG.get(dest)
     if o is None or d is None:
         raise HTTPException(404, "Rota não encontrada.")
-    html = seo.render_route_page(store, o, d, lang)
-    if html is None:
-        raise HTTPException(404, "Rota não encontrada.")
-    return html
+    # Direção canônica: renderiza. Reversa: 301 para a canônica. Podada: 404.
+    if (origin, dest) in seo.ROUTE_PAIR_SET:
+        html = seo.render_route_page(store, o, d, lang)
+        if html is None:
+            raise HTTPException(404, "Rota não encontrada.")
+        return HTMLResponse(html)
+    if (dest, origin) in seo.ROUTE_PAIR_SET:
+        return RedirectResponse(f"{i18n.prefix(lang)}/rota/{dest}/{origin}", status_code=301)
+    raise HTTPException(404, "Rota não encontrada.")
 
 
-def _voo_page(origin: str, dest: str, lang: str) -> str:
+def _voo_page(origin: str, dest: str, lang: str) -> Response:
+    """A antiga página /voo foi consolidada em /rota — 301 para a canônica."""
     o = seo.CITY_BY_SLUG.get(origin)
     d = seo.CITY_BY_SLUG.get(dest)
     if o is None or d is None:
         raise HTTPException(404, "Rota não encontrada.")
-    html = seo.render_time_page(store, o, d, lang)
-    if html is None:
+    canon = seo.canonical_pair(origin, dest)
+    if canon is None:
         raise HTTPException(404, "Rota não encontrada.")
-    return html
+    co, cd = canon
+    return RedirectResponse(f"{i18n.prefix(lang)}/rota/{co}/{cd}", status_code=301)
 
 
 # Registra pt na raiz + en/es em subpasta para as 4 páginas SEO traduzidas.
