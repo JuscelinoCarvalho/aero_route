@@ -30,6 +30,18 @@ const COLOR = 4;        // esquema de cores do radar (4 = clássico azul→verme
 const OPACITY = 0.78;
 const SPEED_MS = 600;   // intervalo entre quadros na animação
 
+// Satélite: NASA GIBS (GOES-East, infravermelho Band 13 "Clean IR"). O RainViewer
+// tirou o satélite do tier gratuito (retorna satellite.infrared: []), então usamos
+// o GIBS — grátis, sem chave, cobertura global (inclui o Chile, onde o mosaico de
+// radar do RainViewer é vazio). É um único quadro "mais recente" (time=default),
+// não uma animação. Zoom nativo máximo do GOES IR: nível 6.
+const GIBS_SAT =
+  "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/" +
+  "GOES-East_ABI_Band13_Clean_Infrared/default/default/" +
+  "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
+const SAT_OPACITY_ALONE = 0.8;   // satélite sozinho (deixa a base aparecer p/ orientação)
+const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
+
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;      // aproximar até nível de bairro/rua
@@ -59,13 +71,13 @@ L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.pn
 let host = "";
 let radarPast = [];
 let radarNow = [];
-let satFrames = [];
-let animFrames = [];      // quadros ativos (depende do modo)
+let animFrames = [];      // quadros ativos de radar (passado + nowcast)
 let frameLayers = [];     // L.tileLayer por índice (lazy)
+let satLayer = null;      // camada única de satélite (GIBS), criada sob demanda
 let pos = 0;
 let playing = false;
 let timer = null;
-let mode = "radar";       // "radar" | "satellite"
+let mode = "radar";       // "radar" | "satellite" | "both"
 
 // Elementos da UI
 const $ = (id) => document.getElementById(id);
@@ -76,10 +88,6 @@ const elTag = $("r-tag");
 const elStatus = $("r-status");
 
 function buildUrl(frame) {
-  if (mode === "satellite") {
-    // satélite (infravermelho): esquema 0, cor sólida
-    return `${host}${frame.path}/${SIZE}/{z}/{x}/{y}/0/0_0.png`;
-  }
   // radar: esquema de cores + suavização + neve
   return `${host}${frame.path}/${SIZE}/{z}/{x}/{y}/${COLOR}/1_1.png`;
 }
@@ -87,6 +95,41 @@ function buildUrl(frame) {
 function clearLayers() {
   frameLayers.forEach((l) => l && map.removeLayer(l));
   frameLayers = [];
+}
+
+// ----- Camada de satélite (NASA GIBS), independente da animação de radar -----
+function ensureSat() {
+  if (!satLayer) {
+    satLayer = L.tileLayer(GIBS_SAT, {
+      opacity: 0,
+      tileSize: 256,
+      zIndex: 250, // abaixo dos quadros de radar (zIndex 300)
+      maxZoom: MAX_ZOOM,
+      maxNativeZoom: SAT_NATIVE_ZOOM,
+      attribution:
+        'satélite © <a href="https://www.earthdata.nasa.gov/">NASA GIBS</a> · GOES-East',
+    });
+  }
+  return satLayer;
+}
+
+function setSat(visible, opacity) {
+  if (visible) {
+    ensureSat();
+    if (!map.hasLayer(satLayer)) satLayer.addTo(map);
+    satLayer.setOpacity(opacity);
+  } else if (satLayer && map.hasLayer(satLayer)) {
+    map.removeLayer(satLayer);
+  }
+}
+
+// Desliga os controles de animação quando não há quadros de radar (modo satélite).
+function setControlsEnabled(on) {
+  [elPlay, $("r-prev"), $("r-next"), elSlider].forEach((el) => {
+    el.disabled = !on;
+    el.style.opacity = on ? "" : "0.4";
+    el.style.pointerEvents = on ? "" : "none";
+  });
 }
 
 function ensureLayer(i) {
@@ -97,9 +140,8 @@ function ensureLayer(i) {
       zIndex: 300,
       maxZoom: MAX_ZOOM,
       // acima do zoom nativo o Leaflet amplia o último tile (mantém a camada visível
-      // ao aproximar e evita o placeholder "ZOOM LEVEL NOT SUPPORTED"); o satélite é
-      // bem mais grosseiro que o radar, então usa um nativo menor.
-      maxNativeZoom: mode === "satellite" ? SAT_NATIVE_ZOOM : RADAR_NATIVE_ZOOM,
+      // ao aproximar e evita o placeholder "ZOOM LEVEL NOT SUPPORTED").
+      maxNativeZoom: RADAR_NATIVE_ZOOM,
     });
     frameLayers[i].addTo(map);
   }
@@ -116,8 +158,9 @@ function fmtTime(unix) {
 }
 
 function isForecast(i) {
-  // No modo radar, quadros após o "passado" são previsão (nowcast)
-  return mode === "radar" && i >= radarPast.length;
+  // Quadros de radar após o "passado" são previsão (nowcast); só há radar
+  // nos modos "radar" e "both".
+  return mode !== "satellite" && i >= radarPast.length;
 }
 
 function updateInfo() {
@@ -126,10 +169,7 @@ function updateInfo() {
   const t = fmtTime(f.time);
   elTime.textContent = t.full;
   elSlider.value = String(pos);
-  if (mode === "satellite") {
-    elTag.textContent = T("rdr_sat");
-    elTag.className = "r-pill sat";
-  } else if (isForecast(pos)) {
+  if (isForecast(pos)) {
     elTag.textContent = T("rdr_nowcast");
     elTag.className = "r-pill fc";
   } else {
@@ -149,16 +189,37 @@ function showFrame(i) {
 
 function loadMode() {
   clearLayers();
-  animFrames = mode === "satellite" ? satFrames : radarPast.concat(radarNow);
+
+  // Satélite (GIBS): visível sozinho ou por baixo do radar no modo "both".
+  setSat(
+    mode === "satellite" || mode === "both",
+    mode === "both" ? SAT_OPACITY_UNDER : SAT_OPACITY_ALONE
+  );
+
+  if (mode === "satellite") {
+    // Sem animação de radar: um único quadro de satélite (mais recente).
+    animFrames = [];
+    pause();
+    setControlsEnabled(false);
+    elTag.textContent = T("rdr_sat");
+    elTag.className = "r-pill sat";
+    elTime.textContent = "—";
+    elStatus.textContent = T("rdr_sat_static");
+    return;
+  }
+
+  // Radar e "both": anima os quadros de radar (por cima do satélite, se houver).
+  setControlsEnabled(true);
+  elStatus.textContent = "";
+  animFrames = radarPast.concat(radarNow);
   if (!animFrames.length) {
     elStatus.textContent = T("rdr_nodata");
     return;
   }
-  elStatus.textContent = "";
   frameLayers = new Array(animFrames.length).fill(null);
   elSlider.max = String(animFrames.length - 1);
   // começa no último quadro observado (mais recente real)
-  pos = mode === "satellite" ? animFrames.length - 1 : Math.max(0, radarPast.length - 1);
+  pos = Math.max(0, radarPast.length - 1);
   showFrame(pos);
 }
 
@@ -194,8 +255,8 @@ function setMode(m) {
   document.querySelectorAll(".r-mode").forEach((b) =>
     b.classList.toggle("on", b.dataset.mode === m)
   );
-  $("legend-radar").style.display = m === "radar" ? "" : "none";
-  $("legend-sat").style.display = m === "satellite" ? "" : "none";
+  $("legend-radar").style.display = m === "radar" || m === "both" ? "" : "none";
+  $("legend-sat").style.display = m === "satellite" || m === "both" ? "" : "none";
   loadMode();
 }
 
@@ -207,7 +268,11 @@ async function fetchData() {
     host = data.host;
     radarPast = (data.radar && data.radar.past) || [];
     radarNow = (data.radar && data.radar.nowcast) || [];
-    satFrames = (data.satellite && data.satellite.infrared) || [];
+    // Recria a camada de satélite p/ buscar o quadro GIBS mais recente (time=default).
+    if (satLayer) {
+      map.removeLayer(satLayer);
+      satLayer = null;
+    }
     loadMode();
   } catch (e) {
     elStatus.textContent =

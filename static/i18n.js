@@ -144,6 +144,7 @@
     rdr_load_fail: { pt: "Não foi possível carregar os dados de radar. Tente atualizar.", en: "Could not load radar data. Try refreshing.", es: "No se pudieron cargar los datos de radar. Intenta actualizar." },
     rdr_nodata: { pt: "Sem dados disponíveis no momento para esta camada.", en: "No data available for this layer right now.", es: "Sin datos disponibles para esta capa por ahora." },
     rdr_sat: { pt: "SATÉLITE · NUVENS", en: "SATELLITE · CLOUDS", es: "SATÉLITE · NUBES" },
+    rdr_sat_static: { pt: "Satélite (NASA GOES-East, infravermelho): imagem mais recente, sem animação.", en: "Satellite (NASA GOES-East, infrared): latest image, no animation.", es: "Satélite (NASA GOES-East, infrarrojo): imagen más reciente, sin animación." },
     rdr_nowcast: { pt: "PREVISÃO (NOWCAST)", en: "FORECAST (NOWCAST)", es: "PRONÓSTICO (NOWCAST)" },
     rdr_observed: { pt: "OBSERVADO", en: "OBSERVED", es: "OBSERVADO" },
     rdr_pause: { pt: "Pausar", en: "Pause", es: "Pausar" },

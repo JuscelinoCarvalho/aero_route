@@ -521,7 +521,7 @@ def _rota_page(origin: str, dest: str, lang: str) -> Response:
     d = seo.CITY_BY_SLUG.get(dest)
     if o is None or d is None:
         raise HTTPException(404, "Rota não encontrada.")
-    # Direção canônica: renderiza. Reversa: 301 para a canônica. Podada: 404.
+    # Direção canônica: renderiza. Reversa: 301 para a canônica.
     if (origin, dest) in seo.ROUTE_PAIR_SET:
         html = seo.render_route_page(store, o, d, lang)
         if html is None:
@@ -529,7 +529,13 @@ def _rota_page(origin: str, dest: str, lang: str) -> Response:
         return HTMLResponse(html)
     if (dest, origin) in seo.ROUTE_PAIR_SET:
         return RedirectResponse(f"{i18n.prefix(lang)}/rota/{dest}/{origin}", status_code=301)
-    raise HTTPException(404, "Rota não encontrada.")
+    # Par podado: 301 para a rota canônica relacionada mais próxima; senão, o índice.
+    # Preserva sinais de link das URLs antigas (pré-poda) em vez de servir 404.
+    target = seo.pruned_redirect(o, d)
+    if target is not None:
+        to, td = target
+        return RedirectResponse(f"{i18n.prefix(lang)}/rota/{to}/{td}", status_code=301)
+    return RedirectResponse(f"{i18n.prefix(lang)}/rotas", status_code=301)
 
 
 def _voo_page(origin: str, dest: str, lang: str) -> Response:

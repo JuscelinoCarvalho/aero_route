@@ -545,6 +545,17 @@ def related_pairs(origin: City, dest: City, limit: int = 8) -> list[tuple[City, 
     return out[:limit]
 
 
+def pruned_redirect(origin: City, dest: City) -> tuple[str, str] | None:
+    """Para um par podado (ambos os slugs são cidades válidas, mas o par não tem
+    página), o melhor alvo de 301: o par canônico relacionado mais próximo — mesma
+    origem, ou o destino. Retorna None quando não há relacionado (cai no /rotas)."""
+    rel = related_pairs(origin, dest, limit=1)
+    if rel:
+        o, d = rel[0]
+        return (o.slug, d.slug)
+    return None
+
+
 # Estados do Brasil (iso_region do OurAirports). Primeiro combo da origem/destino.
 BR_STATES: list[tuple[str, str]] = [
     ("BR-AC", "Acre"), ("BR-AL", "Alagoas"), ("BR-AP", "Amapá"), ("BR-AM", "Amazonas"),

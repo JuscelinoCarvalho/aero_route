@@ -199,6 +199,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "rb_timeline": {"pt": "Linha do tempo", "en": "Timeline", "es": "Línea de tiempo"},
     "rb_mode_radar": {"pt": "Radar", "en": "Radar", "es": "Radar"},
     "rb_mode_sat": {"pt": "Satélite", "en": "Satellite", "es": "Satélite"},
+    "rb_mode_both": {"pt": "Ambos", "en": "Both", "es": "Ambos"},
     "rb_loc": {"pt": "Minha localização", "en": "My location", "es": "Mi ubicación"},
     "rb_refresh": {"pt": "Atualizar dados", "en": "Refresh data", "es": "Actualizar datos"},
     "rb_full": {"pt": "Tela cheia", "en": "Fullscreen", "es": "Pantalla completa"},
