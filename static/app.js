@@ -198,6 +198,14 @@ async function compute() {
     const arr = await Promise.all(reqs);
     if (!arr[0].ok) {
       const err = await arr[0].json().catch(() => ({}));
+      if (window.track) window.track("route_failed", {
+        origin: fromCode,
+        dest: toCode,
+        aircraft: hasAc ? selAircraft : "(nenhuma)",
+        reason: "api_error",
+        status: arr[0].status,
+        detail: (err.detail || "").toString().slice(0, 100) || undefined,
+      });
       return emptyOut(err.detail || T("route_fail"));
     }
     const d = await arr[0].json();
@@ -211,7 +219,15 @@ async function compute() {
       stops: m && m.reachable && !m.direct ? m.num_stops : 0,
       reachable: m ? !!m.reachable : true,
     });
-  } catch (_) { emptyOut(T("conn_fail")); }
+  } catch (_) {
+    emptyOut(T("conn_fail"));
+    if (window.track) window.track("route_failed", {
+      origin: fromCode,
+      dest: toCode,
+      aircraft: hasAc ? selAircraft : "(nenhuma)",
+      reason: "connection",
+    });
+  }
 }
 
 const fmt = (n) => Number(n).toLocaleString(window.I18N_LOCALE);
