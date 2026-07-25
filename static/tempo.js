@@ -3,14 +3,11 @@
 const $ = (s) => document.querySelector(s);
 
 const AFFILIATES = [
-  { t: T("aff_headsets_t"), d: T("aff_headsets_d"), url: "#" },
   { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
   { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
   { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
 ];
-$("#aff-grid").innerHTML = AFFILIATES
-  .map((a) => `<a class="aff-card" href="${a.url}" rel="sponsored nofollow" target="_blank"><span class="t">${a.t}</span><span class="d">${a.d}</span></a>`)
-  .join("");
+renderAffiliates($("#aff-grid"), AFFILIATES);
 
 // ===== Autocomplete de aeroporto (mesmo padrão das outras páginas) ========
 function buildAirportAC() {

@@ -11,17 +11,13 @@
 // Afiliados (mesmo conteúdo do app.js; aqui app.js não é carregado para não
 // conflitar com a inicialização do mapa do radar no mesmo elemento #map).
 const AFFILIATES = [
-  { t: T("aff_headsets_t"), d: T("aff_headsets_d"), url: "#" },
   { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
   { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
   { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
 ];
 const affGrid = document.getElementById("aff-grid");
 if (affGrid) {
-  affGrid.innerHTML = AFFILIATES.map(
-    (a) =>
-      `<a class="aff-card" href="${a.url}" rel="sponsored nofollow" target="_blank"><span class="t">${a.t}</span><span class="d">${a.d}</span></a>`
-  ).join("");
+  renderAffiliates(affGrid, AFFILIATES);
 }
 
 const API = "https://api.rainviewer.com/public/weather-maps.json";
