@@ -11,8 +11,8 @@
     // ---- Afiliados (comuns a todas as páginas) ----
     aff_headsets_t: { pt: "Headsets de aviação", en: "Aviation headsets", es: "Auriculares de aviación" },
     aff_headsets_d: { pt: "Bose, David Clark e mais", en: "Bose, David Clark and more", es: "Bose, David Clark y más" },
-    aff_courses_t: { pt: "Cursos de pilotagem", en: "Pilot training", es: "Cursos de pilotaje" },
-    aff_courses_d: { pt: "Teoria PP/PC e simulados", en: "PPL/CPL theory and mock exams", es: "Teoría PP/PC y simulacros" },
+    aff_courses_t: { pt: "Curso Teórico de Piloto Privado", en: "Private Pilot Theory Course", es: "Curso Teórico de Piloto Privado" },
+    aff_courses_d: { pt: "PP e Aerodesportivo · Céu Livre · online", en: "PPL & sport pilot · Céu Livre · online", es: "PP y deportivo · Céu Livre · online" },
     aff_sims_t: { pt: "Simuladores de voo", en: "Flight simulators", es: "Simuladores de vuelo" },
     aff_sims_d: { pt: "MSFS, X-Plane e periféricos", en: "MSFS, X-Plane and peripherals", es: "MSFS, X-Plane y periféricos" },
     aff_books_t: { pt: "Livros e cartas", en: "Books and charts", es: "Libros y cartas" },

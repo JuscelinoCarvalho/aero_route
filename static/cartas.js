@@ -9,12 +9,7 @@
 const $ = (s) => document.querySelector(s);
 
 // Afiliados (mesmo conteúdo das outras páginas)
-const AFFILIATES = [
-  { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
-  { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
-  { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
-];
-renderAffiliates($("#aff-grid"), AFFILIATES);
+renderAffiliates($("#aff-grid"));
 
 // Estado
 let icao = "";

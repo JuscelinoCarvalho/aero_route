@@ -2,12 +2,7 @@
 
 const $ = (s) => document.querySelector(s);
 
-const AFFILIATES = [
-  { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
-  { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
-  { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
-];
-renderAffiliates($("#aff-grid"), AFFILIATES);
+renderAffiliates($("#aff-grid"));
 
 // ===== Autocomplete de aeroporto (mesmo padrão das outras páginas) ========
 function buildAirportAC() {

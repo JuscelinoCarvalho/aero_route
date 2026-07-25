@@ -1,10 +1,5 @@
 "use strict";
 
-const AFFILIATES = [
-  { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
-  { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
-  { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
-];
 
 // Cores dos raios/colunas, uma por aeronave (até 4).
 const COLORS = ["#1c7ed6", "#e8590c", "#2b8a3e", "#ae3ec9"];
@@ -237,7 +232,7 @@ function renderTable() {
 }
 
 // ===== Início ============================================================
-renderAffiliates($("#aff-grid"), AFFILIATES);
+renderAffiliates($("#aff-grid"));
 
 (async () => {
   AIRCRAFT = (await (await fetch("/api/aircraft")).json()).aircraft;

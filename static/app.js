@@ -1,11 +1,6 @@
 "use strict";
 
 // ===== Configuração de monetização (afiliados) ===========================
-const AFFILIATES = [
-  { t: T("aff_courses_t"), d: T("aff_courses_d"), url: "#" },
-  { t: T("aff_sims_t"), d: T("aff_sims_d"), url: "#" },
-  { t: T("aff_books_t"), d: T("aff_books_d"), url: "#" },
-];
 
 // ===== Mapa (Leaflet, tema claro com oceanos azuis) ======================
 const map = L.map("map", { worldCopyJump: true, zoomControl: true }).setView([5, -30], 2);
@@ -172,7 +167,7 @@ function renderAircraftCard() {
 }
 
 // ===== Afiliados =========================================================
-renderAffiliates($("#aff-grid"), AFFILIATES);
+renderAffiliates($("#aff-grid"));
 
 // ===== Cálculo da rota ===================================================
 function emptyOut(msg) {
