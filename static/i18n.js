@@ -219,6 +219,13 @@
       en: "Density altitude estimated from QNH, temperature and elevation. The higher it is, the longer the takeoff/landing roll and the lower the climb rate — check performance in the POH. For support.",
       es: "Altitud-densidad estimada de QNH, temperatura y elevación. Cuanto mayor, mayor la carrera de despegue/aterrizaje y menor el régimen de ascenso — verifica el desempeño en el POH. De apoyo.",
     },
+
+    // ---- Abas do aeródromo (aerodromo.js) ----
+    ad_tab_cond: { pt: "Condições", en: "Conditions", es: "Condiciones" },
+    ad_tab_tempo: { pt: "Tempo", en: "Weather", es: "Meteo" },
+    ad_tab_cartas: { pt: "Cartas", en: "Charts", es: "Cartas" },
+    ad_more_tempo: { pt: "Histórico, alertas e radar na página Tempo →", en: "History, alerts and radar on the Weather page →", es: "Histórico, alertas y radar en la página Meteo →" },
+    ad_more_cartas: { pt: "Cartas de outros países na página Cartas →", en: "Charts for other countries on the Charts page →", es: "Cartas de otros países en la página Cartas →" },
   };
 
   // Categorias de aeronave — vêm do servidor em pt (app/aircraft.py); traduz na UI.

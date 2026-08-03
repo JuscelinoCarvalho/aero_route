@@ -80,6 +80,15 @@
       </div>
     </div>
 
+    <!-- Abas: Condições · Tempo · Cartas -->
+    <div class="a-tabs" id="a-tabs" style="display:none">
+      <button class="a-tab active" data-tab="cond" data-i18n="ad_tab_cond">Condições</button>
+      <button class="a-tab" data-tab="tempo" data-i18n="ad_tab_tempo">Tempo</button>
+      <button class="a-tab" data-tab="cartas" data-i18n="ad_tab_cartas">Cartas</button>
+    </div>
+
+    <div class="a-pane" id="pane-cond">
+
     <!-- Ficha ROTAER -->
     <div class="panel a-head" id="a-head" style="display:none">
       <div class="a-hrow">
@@ -158,6 +167,56 @@
     </div>
 
     <div class="c-status" id="a-status">{{adb_status0}}</div>
+    </div><!-- /pane-cond -->
+
+    <!-- Aba Tempo (METAR + TAF) -->
+    <div class="a-pane" id="pane-tempo" hidden>
+      <div id="wx-out"></div>
+      <div id="wx-taf"></div>
+      <p class="a-more"><a href="/tempo" data-i18n="ad_more_tempo">Tempo →</a></p>
+    </div>
+
+    <!-- Aba Cartas (DECEA/AISWEB) -->
+    <div class="a-pane" id="pane-cartas" hidden>
+      <div class="field" style="margin-bottom:14px">
+        <label>{{cb_lbl_type}}</label>
+        <select id="adc-tipo" class="c-select">
+          <option value="IAC">{{cb_opt_iac}}</option>
+          <option value="VAC">{{cb_opt_vac}}</option>
+          <option value="ADC">{{cb_opt_adc}}</option>
+          <option value="SID">{{cb_opt_sid}}</option>
+          <option value="STAR">{{cb_opt_star}}</option>
+          <option value="AOC">{{cb_opt_aoc}}</option>
+          <option value="ALL">{{cb_opt_all}}</option>
+        </select>
+      </div>
+      <div id="adc-list" class="c-list"></div>
+      <div class="panel" id="adc-viewer" style="display:none;margin-top:14px">
+        <div class="c-toolbar">
+          <span class="c-title" id="adc-title">—</span>
+          <div class="c-actions">
+            <button class="r-btn sm" id="adc-down" title="{{cb_download}}">⬇</button>
+            <button class="r-btn sm" id="adc-open" title="{{cb_newtab}}">⛶</button>
+          </div>
+        </div>
+        <div class="c-view" id="adc-view">
+          <canvas id="adc-canvas" class="c-canvas" aria-label="Carta aeronáutica"></canvas>
+          <div class="c-load" id="adc-load" hidden><span class="spin"></span></div>
+        </div>
+        <div class="c-navbar">
+          <button class="r-btn sm" id="adc-prev" title="{{cb_prevp}}">‹</button>
+          <span class="c-page" id="adc-page">1 / 1</span>
+          <button class="r-btn sm" id="adc-next" title="{{cb_nextp}}">›</button>
+          <span class="c-sep"></span>
+          <button class="r-btn sm" id="adc-zout" title="{{cb_zoomout}}">−</button>
+          <span class="c-zoom" id="adc-zoom">100%</span>
+          <button class="r-btn sm" id="adc-zin" title="{{cb_zoomin}}">+</button>
+          <button class="r-btn sm" id="adc-zfit" title="{{cb_fit}}">⤢</button>
+        </div>
+      </div>
+      <div class="c-status" id="adc-status"></div>
+      <p class="a-more"><a href="/cartas" data-i18n="ad_more_cartas">Cartas →</a></p>
+    </div>
 
     <div class="note">
       {{adb_note}}
@@ -186,6 +245,79 @@
 
   <style>
     .a-block{margin-top:14px}
+    /* Abas do hub */
+    .a-tabs{display:flex;gap:4px;margin:0 0 16px;border-bottom:1px solid var(--line)}
+    .a-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);
+      font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:14px;letter-spacing:.03em;
+      padding:11px 6px;cursor:pointer;transition:.15s;margin-bottom:-1px}
+    .a-tab:hover{color:var(--label)}
+    .a-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+    .a-more{margin-top:16px;font-size:12.5px}
+    .a-more a{color:var(--cyan);text-decoration:none}
+    /* METAR/TAF (reuso da página Tempo) */
+    .wx-card{background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:14px;padding:0;overflow:hidden;margin-top:6px}
+    .wx-flag{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .wx-dot{width:46px;height:46px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px}
+    .wx-cat{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;line-height:1}
+    .wx-cat small{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:12px;letter-spacing:0;color:var(--muted);margin-top:3px}
+    .wx-when{margin-left:auto;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label)}
+    .wx-sum{padding:14px 18px;font-size:14px;color:#dce6f3;line-height:1.6}
+    .wx-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:var(--line)}
+    .wx-cell{background:#0b1626;padding:12px 14px}
+    .wx-cell .k{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--label);text-transform:uppercase}
+    .wx-cell .v{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-top:4px;font-variant-numeric:tabular-nums}
+    .wx-cell .v small{font-size:11px;color:var(--cyan);font-weight:500}
+    .wx-raw{padding:12px 18px;border-top:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:12px;color:#9fb3cc;word-break:break-word;background:#070f1d}
+    .wx-msg{padding:18px;border:1px dashed var(--line);border-radius:12px;color:#c3d3e6;font-size:13.5px;margin-top:6px}
+    @media (max-width:520px){.wx-grid{grid-template-columns:1fr 1fr}}
+    .taf{margin-top:16px;background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .taf-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+    .taf-h .t{font-family:'Chakra Petch',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--cyan)}
+    .taf-h .v{font-size:11.5px;color:var(--label);font-family:'JetBrains Mono',monospace}
+    .taf-p{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+    .taf-p:last-of-type{border-bottom:none}
+    .taf-bar{width:4px;border-radius:3px;flex:none}
+    .taf-when{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12.5px;color:var(--ink)}
+    .taf-when .badge2{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:20px;margin-right:7px;vertical-align:middle}
+    .taf-desc{font-size:13px;color:#c3d3e6;margin-top:3px;line-height:1.5}
+    .taf-raw{padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#9fb3cc;word-break:break-word;background:#070f1d;border-top:1px solid var(--line)}
+    .tl-wrap{padding:14px 18px;border-bottom:1px solid var(--line)}
+    .tl-sum{font-size:13.5px;color:#dce6f3;margin-bottom:10px;line-height:1.5}
+    .tl-strip{display:flex;gap:3px;overflow-x:auto;padding-bottom:3px}
+    .tl-cell{flex:none;width:36px;text-align:center}
+    .tl-bar{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .tl-hr{font-size:9px;color:var(--label);font-family:'JetBrains Mono',monospace;margin-top:3px}
+    .tl-hist{height:5px;border-radius:3px;background:#16263f;margin-top:3px;overflow:hidden}
+    .tl-hist > i{display:block;height:100%;background:#2fbf71}
+    .tl-legend{font-size:10px;color:var(--label);font-family:'JetBrains Mono',monospace;margin-top:8px}
+    /* Visor de cartas (reuso da página Cartas) */
+    .c-select{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);font-family:"Inter",sans-serif;font-size:14px;font-weight:500;padding:12px;border-radius:9px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+    .c-select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(31,216,230,.16)}
+    .c-list{display:flex;flex-direction:column;gap:8px}
+    .c-card{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:11px;padding:12px 14px;cursor:pointer;transition:.15s}
+    .c-card:hover{border-color:var(--cyan);background:#0e1c33}
+    .c-card.on{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(31,216,230,.18)}
+    .c-card .c-nm{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:14px;color:var(--ink);letter-spacing:.02em}
+    .c-card .c-meta{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--label);margin-top:3px;letter-spacing:.04em}
+    .c-card .c-type{flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--cyan);border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase}
+    .c-toolbar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#0b1626}
+    .c-title{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:13.5px;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em}
+    .c-actions{display:flex;gap:7px;flex:none}
+    .c-view{position:relative;width:100%;height:560px;overflow:auto;background:#0b1626;display:block;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior:contain}
+    .c-canvas{display:block;margin:0 auto;transform-origin:0 0;background:#fff}
+    .c-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,22,38,.55)}
+    .c-load[hidden]{display:none}
+    .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--cyan);border-radius:50%;animation:c-spin .8s linear infinite}
+    @keyframes c-spin{to{transform:rotate(360deg)}}
+    .c-navbar{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;padding:9px 12px;border-top:1px solid var(--line);background:#0b1626}
+    .c-page,.c-zoom{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--label);min-width:54px;text-align:center;letter-spacing:.04em}
+    .c-sep{width:1px;height:22px;background:var(--line);margin:0 3px}
+    .c-status{margin-top:12px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--label);letter-spacing:.03em;line-height:1.6;padding-left:12px;border-left:2px solid var(--cyan-dim)}
+    .c-status.err{color:var(--amber);border-left-color:var(--amber)}
+    .r-btn{flex:none;width:38px;height:38px;border:1px solid var(--line);background:var(--panel-2);color:var(--cyan);border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:"Inter",sans-serif}
+    .r-btn:hover{background:#16335a}
+    .r-btn.sm{width:36px;height:36px;font-size:15px}
+    @media (max-width:480px){.c-view{height:64vh}}
     .a-sec-h{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:16px;letter-spacing:.02em;color:var(--ink);margin:0 0 10px}
     /* Cabeçalho do aeródromo */
     .a-head{padding:16px}
@@ -260,6 +392,7 @@
     @media (max-width:420px){.a-icao{font-size:22px}.a-sun-t{font-size:24px}.a-dens-val{font-size:26px}}
   </style>
 
+  <script src="/static/vendor/pdfjs/pdf.min.js"></script>
   <script src="/static/affiliates.js"></script>
   <script src="/static/aerodromo.js"></script>
 </body>

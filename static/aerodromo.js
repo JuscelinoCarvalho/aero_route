@@ -115,6 +115,8 @@ function fmtDur(mins) {
 async function load() {
   if (!icao) return;
   ["a-head", "a-wind", "a-dens", "a-sun", "a-pistas", "a-nav", "a-notam"].forEach((id) => ($("#" + id).style.display = "none"));
+  $("#a-tabs").style.display = "";
+  Tabs.newAerodrome(); // recarrega a aba ativa (Tempo/Cartas) para o novo aeródromo
   setStatus(TF("ad_searching", icao), false);
   if (window.track) window.track("aerodromo_open", { icao });
 
@@ -400,12 +402,254 @@ function renderNotam(d) {
   $("#a-notam").style.display = "";
 }
 
-// Deep-link: /aerodromo?icao=SBGR abre direto.
+// ===== Abas (Condições · Tempo · Cartas) =====
+const Tabs = (function () {
+  let current = "cond";
+  let loaded = { tempo: false, cartas: false };
+  function paint() {
+    document.querySelectorAll(".a-tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === current));
+    ["cond", "tempo", "cartas"].forEach((t) => { const p = $("#pane-" + t); if (p) p.hidden = t !== current; });
+  }
+  function switchTo(tab) {
+    current = tab;
+    paint();
+    // hash p/ deep-link/compartilhamento — não toca no ?icao= (refresh preservado).
+    try { history.replaceState(null, "", location.pathname + location.search + (tab === "cond" ? "" : "#" + tab)); } catch (_) {}
+    if (icao) {
+      if (tab === "tempo" && !loaded.tempo) { loaded.tempo = true; loadTempo(); }
+      if (tab === "cartas" && !loaded.cartas) { loaded.cartas = true; loadCartas(); }
+    }
+  }
+  document.addEventListener("click", (e) => { const b = e.target.closest(".a-tab"); if (b) switchTo(b.dataset.tab); });
+  return {
+    setInitial(tab) { current = tab; paint(); },
+    newAerodrome() { // aeródromo novo: zera caches das abas e recarrega a ativa
+      loaded = { tempo: false, cartas: false };
+      $("#wx-out").innerHTML = ""; $("#wx-taf").innerHTML = "";
+      $("#adc-list").innerHTML = ""; $("#adc-viewer").style.display = "none"; $("#adc-status").textContent = "";
+      if (current === "tempo") { loaded.tempo = true; loadTempo(); }
+      else if (current === "cartas") { loaded.cartas = true; loadCartas(); }
+    },
+  };
+})();
+
+// ===== Aba Tempo: METAR + TAF (reuso da página Tempo) =====
+function wxCell(k, v) {
+  return v == null || v === "" ? "" : `<div class="wx-cell"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+}
+
+function renderMetar(d) {
+  const c = d.category_info || {};
+  const w = d.wind;
+  let wind = "—";
+  if (w) {
+    if (w.vrb) wind = `VRB <small>${w.speed_kt} kt</small>`;
+    else if (w.speed_kt === 0) wind = T("wx_calm");
+    else wind = `${String(w.dir).padStart(3, "0")}° <small>${w.speed_kt} kt${w.gust_kt ? " G" + w.gust_kt : ""}</small>`;
+  }
+  const vis = d.cavok ? "CAVOK" : (d.visibility_m == null ? "—" :
+    (d.visibility_m >= 9999 ? "≥10 <small>km</small>" :
+      (d.visibility_m >= 1000 ? `${Math.round(d.visibility_m / 1000)} <small>km</small>` : `${d.visibility_m} <small>m</small>`)));
+  const ceil = d.ceiling_ft == null ? T("wx_noceil") : `${d.ceiling_ft} <small>ft</small>`;
+  const temp = d.temp_c == null ? "—" : `${d.temp_c}° <small>/ ${d.dewpoint_c}°</small>`;
+  const qnh = d.qnh_hpa == null ? "—" : `${d.qnh_hpa} <small>hPa</small>`;
+  const name = (d.airport && (d.airport.name || d.airport.city)) || "";
+  const when = d.time_utc ? `${d.time_utc.slice(0, 2)}:${d.time_utc.slice(2, 4)} UTC` : "";
+  $("#wx-out").innerHTML =
+    `<div class="wx-card">
+      <div class="wx-flag" style="background:linear-gradient(90deg,${c.color}22,transparent)">
+        <div class="wx-dot" style="background:${c.color}22;border:1px solid ${c.color}">${c.emoji || ""}</div>
+        <div class="wx-cat" style="color:${c.color}">${c.label || d.category}<small>${c.desc || ""}</small></div>
+        <div class="wx-when">${d.station || ""}${name ? "<br>" + esc(name) : ""}${when ? "<br>" + when : ""}</div>
+      </div>
+      <div class="wx-sum">${d.summary_pt || "—"}</div>
+      <div class="wx-grid">
+        ${wxCell(T("wx_wind"), wind)}${wxCell(T("wx_vis"), vis)}${wxCell(T("wx_ceil"), ceil)}
+        ${wxCell(T("wx_temp"), temp)}${wxCell("QNH", qnh)}${wxCell(T("wx_cat"), `<span style="color:${c.color}">${c.label || d.category}</span>`)}
+      </div>
+      <div class="wx-raw">${d.raw || ""}</div>
+    </div>`;
+}
+
+function renderTaf(d) {
+  const temp = (d.temp_max_c != null || d.temp_min_c != null)
+    ? ` · temp ${d.temp_max_c != null ? T("wx_temp_max") + " " + d.temp_max_c + "°" : ""}${d.temp_min_c != null ? " " + T("wx_temp_min") + " " + d.temp_min_c + "°" : ""}`
+    : "";
+  const periods = d.periods.map((p) => {
+    const c = p.category_info || {};
+    const known = p.category && p.category !== "UNKNOWN";
+    const badge = p.prob != null
+      ? `<span class="badge2" style="background:rgba(224,178,32,.18);color:#e0b020">PROB${p.prob}${p.tempo ? " TEMPO" : ""}</span>`
+      : (p.type !== "base" && p.type !== "FM" ? `<span class="badge2" style="background:rgba(111,135,168,.18);color:var(--muted)">${p.type}</span>` : "");
+    const catChip = known ? `<span class="badge2" style="background:${c.color}22;color:${c.color}">${c.emoji} ${c.label}</span>` : "";
+    return `<div class="taf-p">
+      <div class="taf-bar" style="background:${known ? c.color : "#1c3151"}"></div>
+      <div><div class="taf-when">${catChip}${badge}${p.type_label}${p.when ? " " + p.when : ""}</div>
+      <div class="taf-desc">${p.summary_pt}</div></div>
+    </div>`;
+  }).join("");
+  let tl = "";
+  const TL = d.timeline;
+  if (TL && TL.hours && TL.hours.length) {
+    let anyHist = false;
+    const cells = TL.hours.map((h) => {
+      const c = h.category_info || {};
+      const risk = h.risk ? `<span title="${h.risk.prob ? h.risk.prob + "% " : ""}${TF("wx_risk", h.risk.category_info.label)}">⚠️</span>` : "";
+      let hist;
+      if (h.hist_vfr != null) { anyHist = true; hist = `<div class="tl-hist" title="${TF("wx_hist", h.hist_vfr, h.hist_n)}"><i style="width:${h.hist_vfr}%"></i></div>`; }
+      else { hist = `<div class="tl-hist" title="${T("wx_hist_nodata")}"></div>`; }
+      return `<div class="tl-cell"><div class="tl-bar" style="background:${c.color}">${risk}</div><div class="tl-hr">${h.label}</div>${hist}</div>`;
+    }).join("");
+    const legend = anyHist ? `<div class="tl-legend">${TF("wx_legend_hist", TL.clim_samples)}</div>` : `<div class="tl-legend">${T("wx_legend_nohist")}</div>`;
+    tl = `<div class="tl-wrap"><div class="tl-sum">${TF("wx_flightwin", TL.summary_pt)}</div><div class="tl-strip">${cells}</div>${legend}</div>`;
+  }
+  $("#wx-taf").innerHTML =
+    `<div class="taf">
+      <div class="taf-h"><span class="t">${T("wx_taf_title")}</span>
+        <span class="v">${TF("wx_taf_meta", d.station || "", d.issued_utc || "?", d.valid_from || "", d.valid_to || "", temp)}</span></div>
+      ${tl}${periods}
+      <div class="taf-raw">${d.raw || ""}</div>
+    </div>`;
+}
+
+async function loadTempo() {
+  const lang = window.APP_LANG || "pt";
+  $("#wx-out").innerHTML = `<div class="wx-msg">${TF("wx_querying", icao)}</div>`;
+  $("#wx-taf").innerHTML = "";
+  let r, d;
+  try {
+    r = await fetch(`/api/metar?icao=${encodeURIComponent(icao)}&lang=${lang}`);
+    d = await r.json().catch(() => ({}));
+  } catch (_) { $("#wx-out").innerHTML = `<div class="wx-msg">${T("wx_conn_fail")}</div>`; return; }
+  if (r.status === 503) { $("#wx-out").innerHTML = `<div class="wx-msg">${T("wx_503")}</div>`; return; }
+  if (!r.ok) { $("#wx-out").innerHTML = `<div class="wx-msg">${TF("wx_get_fail", icao, d.detail ? ": " + d.detail : ".")}</div>`; return; }
+  renderMetar(d);
+  try {
+    const rt = await fetch(`/api/taf?icao=${encodeURIComponent(icao)}&lang=${lang}`);
+    const dt = await rt.json().catch(() => ({}));
+    if (rt.ok && dt.periods && dt.periods.length) renderTaf(dt);
+  } catch (_) { /* sem TAF: só o METAR */ }
+}
+
+// ===== Aba Cartas: lista + visor PDF (reuso da página Cartas) =====
+let _pdfDoc = null, _loadTask = null, _pageNum = 1, _pageCount = 1, _zoom = 1;
+let _rendering = false, _pendingRender = false, _curCarta = null, _pdfWorkerSet = false;
+const _DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function cStatus(msg, err) { const s = $("#adc-status"); s.textContent = msg; s.classList.toggle("err", !!err); }
+
+function cartaUrl(c, dl) {
+  const nome = encodeURIComponent(`${icao}-${c.nome}`.replace(/\s+/g, "_"));
+  return `/api/carta?t=${encodeURIComponent(c.token)}&nome=${nome}${dl ? "&dl=1" : ""}`;
+}
+
+async function loadCartas() {
+  const tipo = $("#adc-tipo").value;
+  $("#adc-list").innerHTML = "";
+  $("#adc-viewer").style.display = "none";
+  _curCarta = null;
+  cStatus(TF("c_searching", icao), false);
+  let res, data;
+  try {
+    res = await fetch(`/api/cartas?icao=${encodeURIComponent(icao)}&tipo=${encodeURIComponent(tipo)}`);
+    data = await res.json();
+  } catch (_) { return cStatus(T("c_conn_fail"), true); }
+  if (!res.ok) return cStatus(data.detail || T("c_query_fail"), true);
+  const cartas = data.cartas || [];
+  if (!cartas.length) return cStatus(TF("c_none", icao), false);
+  const list = $("#adc-list");
+  list.innerHTML = "";
+  cartas.forEach((c) => {
+    const meta = [c.amdt && `AMDT ${c.amdt}`, c.dt].filter(Boolean).join(" · ");
+    const el = document.createElement("div");
+    el.className = "c-card";
+    el.innerHTML = `<div><div class="c-nm">${esc(c.nome)}</div>${meta ? `<div class="c-meta">${esc(meta)}</div>` : ""}</div><span class="c-type">${esc(c.tipo || "—")}</span>`;
+    el.addEventListener("click", () => openCarta(c, el));
+    list.appendChild(el);
+  });
+  cStatus(TF("c_found", cartas.length, icao), false);
+  openCarta(cartas[0]);
+}
+
+async function renderCartaPage() {
+  if (!_pdfDoc) return;
+  if (_rendering) { _pendingRender = true; return; }
+  _rendering = true;
+  try {
+    const page = await _pdfDoc.getPage(_pageNum);
+    const wrap = $("#adc-view");
+    const base = page.getViewport({ scale: 1 });
+    const fit = (wrap.clientWidth || base.width) / base.width;
+    const vp = page.getViewport({ scale: fit * _zoom * _DPR });
+    const canvas = $("#adc-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = Math.floor(vp.width);
+    canvas.height = Math.floor(vp.height);
+    canvas.style.width = Math.floor(vp.width / _DPR) + "px";
+    canvas.style.height = Math.floor(vp.height / _DPR) + "px";
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    $("#adc-page").textContent = `${_pageNum} / ${_pageCount}`;
+    $("#adc-zoom").textContent = Math.round(_zoom * 100) + "%";
+  } finally {
+    _rendering = false;
+    if (_pendingRender) { _pendingRender = false; renderCartaPage(); }
+  }
+}
+
+async function openCarta(c, el) {
+  _curCarta = c;
+  if (!_pdfWorkerSet) { pdfjsLib.GlobalWorkerOptions.workerSrc = "/static/vendor/pdfjs/pdf.worker.min.js"; _pdfWorkerSet = true; }
+  document.querySelectorAll("#adc-list .c-card").forEach((x) => x.classList.remove("on"));
+  if (el) el.classList.add("on");
+  $("#adc-title").textContent = `${c.tipo ? c.tipo + " · " : ""}${c.nome}`;
+  $("#adc-viewer").style.display = "";
+  _zoom = 1;
+  _pageNum = 1;
+  $("#adc-load").hidden = false;
+  try {
+    if (_loadTask) { try { await _loadTask.destroy(); } catch (_) {} }
+    const resp = await fetch(cartaUrl(c, false));
+    if (!resp.ok) throw new Error("http " + resp.status);
+    const buf = await resp.arrayBuffer();
+    _loadTask = pdfjsLib.getDocument({ data: new Uint8Array(buf) });
+    _pdfDoc = await _loadTask.promise;
+    _pageCount = _pdfDoc.numPages;
+    await renderCartaPage();
+  } catch (_) {
+    cStatus(T("c_render_fail"), true);
+  } finally {
+    $("#adc-load").hidden = true;
+  }
+}
+
+(function cartaControls() {
+  const on = (id, fn) => { const el = $("#" + id); if (el) el.addEventListener("click", fn); };
+  const setZoom = (z) => { _zoom = Math.max(0.5, Math.min(z, 6)); renderCartaPage(); };
+  on("adc-prev", () => { if (_pageNum > 1) { _pageNum--; renderCartaPage(); } });
+  on("adc-next", () => { if (_pageNum < _pageCount) { _pageNum++; renderCartaPage(); } });
+  on("adc-zin", () => setZoom(_zoom + 0.25));
+  on("adc-zout", () => setZoom(_zoom - 0.25));
+  on("adc-zfit", () => setZoom(1));
+  on("adc-down", () => {
+    if (!_curCarta) return;
+    const a = document.createElement("a");
+    a.href = cartaUrl(_curCarta, true);
+    a.download = `${icao}-${_curCarta.nome}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  on("adc-open", () => { if (_curCarta) window.open(cartaUrl(_curCarta, false), "_blank"); });
+  const sel = $("#adc-tipo");
+  if (sel) sel.addEventListener("change", () => { if (icao) loadCartas(); });
+})();
+
+// Deep-link: /aerodromo?icao=SBGR (+ #tempo | #cartas) abre direto.
 (function fromQuery() {
   const q = new URLSearchParams(location.search).get("icao");
   if (q && /^[A-Za-z]{4}$/.test(q)) {
     icao = q.toUpperCase();
     $("#aero").value = icao;
+    const h = (location.hash || "").replace("#", "");
+    if (h === "tempo" || h === "cartas") Tabs.setInitial(h);
     load();
   }
 })();
