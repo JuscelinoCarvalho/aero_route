@@ -742,17 +742,13 @@ def _fmt(n: float, lang: str = "pt") -> str:
 
 
 def _nav(active: str = "", lang: str = "pt") -> str:
-    """Menu de navegação compartilhado por todas as páginas (links prefixados depois)."""
-    items = [
-        ("/", "nav_calc"),
-        ("/comparar", "nav_compare"),
-        ("/tempo", "nav_tempo"),
-        ("/radar", "nav_radar"),
-        ("/cartas", "nav_cartas"),
-        ("/aerodromo", "nav_aero"),
-        ("/curiosidades", "nav_curio"),
-        ("/rotas", "nav_rotas"),
-    ]
+    """Menu primário (3 itens) compartilhado por todas as páginas (links prefixados depois).
+
+    As páginas secundárias moram no rodapé (sitemap). O item primário destaca-se por
+    grupo: comparar → Calculadora; tempo/cartas → Aeródromo.
+    """
+    items = [("/", "nav_calc"), ("/aerodromo", "nav_aero"), ("/radar", "nav_radar")]
+    active = {"/comparar": "/", "/tempo": "/aerodromo", "/cartas": "/aerodromo"}.get(active, active)
     links = "".join(
         f'<a href="{href}"{" class=\"active\"" if href == active else ""}>{_t(key, lang)}</a>'
         for href, key in items
