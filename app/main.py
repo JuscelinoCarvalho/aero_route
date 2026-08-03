@@ -30,11 +30,14 @@ from . import faa_charts as faa_mod
 from . import history as history_mod
 from . import i18n
 from . import metar as metar_mod
+from . import notam as notam_mod
 from . import push as push_mod
 from . import radar_wx
 from . import redemet
+from . import rotaer as rotaer_mod
 from . import routing as routing_mod
 from . import seo
+from . import sol as sol_mod
 from . import taf as taf_mod
 from .airports import AirportStore
 from .calc import Point
@@ -224,6 +227,62 @@ def api_taf(
         hh["hist_n"] = ch["total"] if ch else 0
     tl["clim_samples"] = clim["samples"]
     return decoded
+
+
+@app.get("/api/rotaer")
+def api_rotaer(
+    icao: str = Query(..., min_length=3, max_length=4, description="Código ICAO/IATA do aeródromo"),
+) -> dict:
+    """Ficha ROTAER do aeródromo (AISWEB): pistas, elevação, FIR, auxílios NAV."""
+    ap = store.resolve(icao)
+    code = ap.icao if ap and ap.icao else icao.upper()
+    if not rotaer_mod.configured():
+        raise HTTPException(503, "Consulta ROTAER indisponível: credenciais do AISWEB não configuradas.")
+    try:
+        fb_lat = ap.lat if ap else None
+        fb_lon = ap.lon if ap else None
+        data = rotaer_mod.fetch_rotaer(code, fb_lat, fb_lon)
+    except RuntimeError as exc:
+        raise HTTPException(502, str(exc))
+    if ap is not None:
+        data["airport"] = ap.to_dict()
+    return data
+
+
+@app.get("/api/notam")
+def api_notam(
+    icao: str = Query(..., min_length=3, max_length=4, description="Código ICAO/IATA do aeródromo"),
+) -> dict:
+    """NOTAMs ativos do aeródromo (AISWEB). De apoio — não substitui o briefing oficial."""
+    ap = store.resolve(icao)
+    code = ap.icao if ap and ap.icao else icao.upper()
+    if not notam_mod.configured():
+        raise HTTPException(503, "Consulta de NOTAM indisponível: credenciais do AISWEB não configuradas.")
+    try:
+        notams = notam_mod.fetch_notam(code)
+    except RuntimeError as exc:
+        raise HTTPException(502, str(exc))
+    return {"icao": code, "total": len(notams), "notams": notams}
+
+
+@app.get("/api/sol")
+def api_sol(
+    icao: str = Query(..., min_length=3, max_length=4, description="Código ICAO/IATA do aeródromo"),
+    utc: int = Query(-3, ge=-12, le=14, description="Fuso do aeródromo para a hora local"),
+    date: str = Query("", description="Data AAAA-MM-DD (padrão: hoje)"),
+) -> dict:
+    """Nascer/pôr do sol do aeródromo (AISWEB) — janela VFR diurna. UTC + hora local."""
+    ap = store.resolve(icao)
+    code = ap.icao if ap and ap.icao else icao.upper()
+    if not sol_mod.configured():
+        raise HTTPException(503, "Consulta de nascer/pôr do sol indisponível: credenciais do AISWEB não configuradas.")
+    try:
+        data = sol_mod.fetch_sol(code, utc_offset=utc, date=date)
+    except RuntimeError as exc:
+        raise HTTPException(502, str(exc))
+    if ap is not None:
+        data["airport"] = ap.to_dict()
+    return data
 
 
 @app.get("/api/push/key")
@@ -424,6 +483,7 @@ PAGES = {
     "tempo": "tempo.html",
     "radar": "radar.html",
     "cartas": "cartas.html",
+    "aerodromo": "aerodromo.html",
     "sobre": "sobre.html",
 }
 
@@ -516,6 +576,17 @@ def _tempo_aerodromo(icao: str, lang: str) -> str:
     return seo.render_tempo_page(ap, raw, obs, related, lang)
 
 
+def _aerodromo_page(icao: str, lang: str) -> Response:
+    """Página SEO por aeródromo (/aerodromo/{icao}) — ficha ROTAER (DECEA/AISWEB)."""
+    ap = store.resolve(icao)
+    if ap is None or ap.country != "BR" or not ap.icao:
+        raise HTTPException(404, f"Aeródromo não encontrado: {icao!r}")
+    # IATA ou caixa diferente → 301 para a URL canônica em ICAO.
+    if icao.upper() != ap.icao:
+        return RedirectResponse(f"{i18n.prefix(lang)}/aerodromo/{ap.icao}", status_code=301)
+    return HTMLResponse(seo.render_aerodromo_page(store, ap.icao, lang))
+
+
 def _rota_page(origin: str, dest: str, lang: str) -> Response:
     o = seo.CITY_BY_SLUG.get(origin)
     d = seo.CITY_BY_SLUG.get(dest)
@@ -570,6 +641,12 @@ def _make_tempo_route(lang: str):
     return _r
 
 
+def _make_aero_route(lang: str):
+    def _r(icao: str) -> Response:
+        return _aerodromo_page(icao, lang)
+    return _r
+
+
 # NB: não usar "_lang" como variável do loop — isso rebindaria a função _lang()
 # do topo do módulo (usada pelos endpoints /api/metar, /api/taf, /api/nowcast).
 for _lg in ("pt", "en", "es"):
@@ -584,12 +661,15 @@ for _lg in ("pt", "en", "es"):
                       methods=["GET"], response_class=HTMLResponse)
     app.add_api_route(f"{_pre}/tempo/{{icao}}", _make_tempo_route(_lg),
                       methods=["GET"], response_class=HTMLResponse)
+    app.add_api_route(f"{_pre}/aerodromo/{{icao}}", _make_aero_route(_lg),
+                      methods=["GET"], response_class=HTMLResponse)
 
 
 @app.get("/sitemap.xml")
 def sitemap() -> Response:
     icaos = history_mod.stations_with_metar()
-    return Response(content=seo.build_sitemap(icaos), media_type="application/xml")
+    aero = seo.aero_seo_icaos(store)
+    return Response(content=seo.build_sitemap(icaos, aero), media_type="application/xml")
 
 
 @app.get("/robots.txt", response_class=PlainTextResponse)

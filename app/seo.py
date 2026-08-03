@@ -18,6 +18,7 @@ from . import aircraft as aircraft_mod
 from . import calc
 from . import i18n
 from . import metar as metar_mod
+from . import rotaer as rotaer_mod
 from .airports import Airport, AirportStore
 from .calc import Point
 
@@ -49,6 +50,7 @@ TR: dict[str, dict[str, str]] = {
     "nav_tempo": {"pt": "Tempo", "en": "Weather", "es": "Meteo"},
     "nav_radar": {"pt": "Radar", "en": "Radar", "es": "Radar"},
     "nav_cartas": {"pt": "Cartas", "en": "Charts", "es": "Cartas"},
+    "nav_aero": {"pt": "Aeródromo", "en": "Aerodrome", "es": "Aeródromo"},
     "nav_curio": {"pt": "Curiosidades", "en": "Facts", "es": "Curiosidades"},
     "nav_rotas": {"pt": "Rotas", "en": "Routes", "es": "Rutas"},
 
@@ -230,6 +232,52 @@ TR: dict[str, dict[str, str]] = {
         "es": "Aún no tenemos un METAR reciente de este aeródromo en el histórico. Usa la <a href=\"/tempo\" style=\"color:var(--cyan)\">consulta interactiva</a> para buscarlo en vivo.",
     },
     "tp_metar_of": {"pt": "METAR decodificado e condição de voo (VFR/IFR)", "en": "decoded METAR and flight condition (VFR/IFR)", "es": "METAR decodificado y condición de vuelo (VFR/IFR)"},
+
+    # ---- página por aeródromo (/aerodromo/{icao}) ----
+    "ae_title": {
+        "pt": "Aeroporto {0} ({1}): pistas, elevação e informações (ROTAER)",
+        "en": "{0} Airport ({1}): runways, elevation and information (ROTAER)",
+        "es": "Aeropuerto {0} ({1}): pistas, elevación e información (ROTAER)",
+    },
+    "ae_desc": {
+        "pt": "Informações do aeródromo {0} ({1}): pistas (dimensões e piso), elevação, FIR, fuso e auxílios à navegação. Ficha ROTAER oficial do DECEA/AISWEB, com NOTAM e nascer/pôr do sol na consulta interativa.",
+        "en": "Information for {0} airport ({1}): runways (dimensions and surface), elevation, FIR, time zone and navigation aids. Official ROTAER record from DECEA/AISWEB, with NOTAM and sunrise/sunset in the interactive lookup.",
+        "es": "Información del aeródromo {0} ({1}): pistas (dimensiones y superficie), elevación, FIR, huso y ayudas a la navegación. Ficha ROTAER oficial de DECEA/AISWEB, con NOTAM y amanecer/atardecer en la consulta interactiva.",
+    },
+    "ae_brand": {"pt": "aeródromo · rotaer", "en": "aerodrome · rotaer", "es": "aeródromo · rotaer"},
+    "ae_sub": {
+        "pt": "{0} · {1} · ficha do aeródromo (pistas, elevação, FIR, auxílios)",
+        "en": "{0} · {1} · aerodrome record (runways, elevation, FIR, aids)",
+        "es": "{0} · {1} · ficha del aeródromo (pistas, elevación, FIR, ayudas)",
+    },
+    "ae_intro": {
+        "pt": "Ficha do aeródromo <strong>{0}</strong> ({1}), em <strong>{2}</strong>: pistas, elevação, FIR, fuso e auxílios à navegação, da publicação oficial <strong>ROTAER (DECEA/AISWEB)</strong>. Para <strong>NOTAM ativos</strong> e <strong>nascer/pôr do sol</strong>, use a consulta interativa.",
+        "en": "Record for <strong>{0}</strong> airport ({1}), in <strong>{2}</strong>: runways, elevation, FIR, time zone and navigation aids, from the official <strong>ROTAER (DECEA/AISWEB)</strong> publication. For <strong>active NOTAMs</strong> and <strong>sunrise/sunset</strong>, use the interactive lookup.",
+        "es": "Ficha del aeródromo <strong>{0}</strong> ({1}), en <strong>{2}</strong>: pistas, elevación, FIR, huso y ayudas a la navegación, de la publicación oficial <strong>ROTAER (DECEA/AISWEB)</strong>. Para <strong>NOTAM activos</strong> y <strong>amanecer/atardecer</strong>, usa la consulta interactiva.",
+    },
+    "ae_open": {"pt": "Abrir NOTAM + nascer/pôr do sol na consulta interativa →", "en": "Open NOTAM + sunrise/sunset in the interactive lookup →", "es": "Abrir NOTAM + amanecer/atardecer en la consulta interactiva →"},
+    "ae_sec_pistas": {"pt": "Pistas", "en": "Runways", "es": "Pistas"},
+    "ae_sec_nav": {"pt": "Auxílios à navegação", "en": "Navigation aids", "es": "Ayudas a la navegación"},
+    "ae_f_elev": {"pt": "Elevação", "en": "Elevation", "es": "Elevación"},
+    "ae_f_fir": {"pt": "FIR", "en": "FIR", "es": "FIR"},
+    "ae_f_utc": {"pt": "Fuso (UTC)", "en": "Time zone (UTC)", "es": "Huso (UTC)"},
+    "ae_f_cat": {"pt": "Categoria", "en": "Category", "es": "Categoría"},
+    "ae_f_type": {"pt": "Tipo", "en": "Type", "es": "Type"},
+    "ae_f_use": {"pt": "Utilização", "en": "Use", "es": "Utilización"},
+    "ae_f_opr": {"pt": "Operação", "en": "Operation", "es": "Operación"},
+    "ae_f_coord": {"pt": "Coordenadas", "en": "Coordinates", "es": "Coordenadas"},
+    "ae_thr": {"pt": "cab. {0}", "en": "thr {0}", "es": "cab. {0}"},
+    "ae_other": {"pt": "Outros aeródromos em {0}", "en": "Other airports in {0}", "es": "Otros aeródromos en {0}"},
+    "ae_note": {
+        "pt": "Ficha <strong>ROTAER</strong> oficial do <strong>DECEA</strong> (via AISWEB), na emenda (AIRAC) vigente. Informação de <strong>apoio</strong> — não substitui a publicação oficial (AIP/ROTAER) e o briefing (NOTAM) para planejamento de voo real.",
+        "en": "Official <strong>ROTAER</strong> record from <strong>DECEA</strong> (via AISWEB), on the current (AIRAC) amendment. <strong>Supporting</strong> information — it does not replace the official publication (AIP/ROTAER) and the briefing (NOTAM) for real flight planning.",
+        "es": "Ficha <strong>ROTAER</strong> oficial de <strong>DECEA</strong> (vía AISWEB), en la enmienda (AIRAC) vigente. Información de <strong>apoyo</strong> — no sustituye la publicación oficial (AIP/ROTAER) y el briefing (NOTAM) para planificación de vuelo real.",
+    },
+    "ae_empty": {
+        "pt": "A ficha ROTAER deste aeródromo não está disponível no momento. Use a <a href=\"/aerodromo\" style=\"color:var(--cyan)\">consulta interativa</a> para buscar ao vivo.",
+        "en": "The ROTAER record for this airport is not available right now. Use the <a href=\"/aerodromo\" style=\"color:var(--cyan)\">interactive lookup</a> to fetch it live.",
+        "es": "La ficha ROTAER de este aeródromo no está disponible por ahora. Usa la <a href=\"/aerodromo\" style=\"color:var(--cyan)\">consulta interactiva</a> para buscarla en vivo.",
+    },
 }
 
 
@@ -242,7 +290,7 @@ def _t(key: str, lang: str, *args) -> str:
 
 # Caminhos root-relative que ganham prefixo de idioma nas páginas traduzidas.
 # Exclui /static, /api e /tempo/{icao} (este último ainda só em pt — Leva 2 futura).
-_PREFIX_EXACT = {"/", "/comparar", "/tempo", "/radar", "/cartas", "/sobre", "/rotas", "/curiosidades"}
+_PREFIX_EXACT = {"/", "/comparar", "/tempo", "/radar", "/cartas", "/aerodromo", "/sobre", "/rotas", "/curiosidades"}
 _LINK_RE = re.compile(r'(href|action)="(/[^":]*)"')
 _LANGSW_RE = re.compile(r'<div class="langsw".*?</div>', re.S)
 
@@ -267,7 +315,7 @@ def _localize_links(html: str, lang: str) -> str:
     def rep(m: "re.Match[str]") -> str:
         attr, url = m.group(1), m.group(2)
         path = re.split(r"[?#]", url, 1)[0]
-        if path in _PREFIX_EXACT or path.startswith(("/rota/", "/tempo/")):
+        if path in _PREFIX_EXACT or path.startswith(("/rota/", "/tempo/", "/aerodromo/")):
             return f'{attr}="{i18n.loc_url(pre, url)}"'
         return m.group(0)
 
@@ -701,6 +749,7 @@ def _nav(active: str = "", lang: str = "pt") -> str:
         ("/tempo", "nav_tempo"),
         ("/radar", "nav_radar"),
         ("/cartas", "nav_cartas"),
+        ("/aerodromo", "nav_aero"),
         ("/curiosidades", "nav_curio"),
         ("/rotas", "nav_rotas"),
     ]
@@ -1339,6 +1388,214 @@ def render_tempo_page(ap: Airport, raw: str | None, observed_epoch: int | None,
     return _localize_links(html, lang)
 
 
+def aero_seo_icaos(store: AirportStore) -> list[str]:
+    """ICAOs dos aeródromos do Brasil com página SEO própria (/aerodromo/{icao}).
+
+    Curadoria: só grandes e médios com ICAO brasileiro (S..) de 4 letras — evita
+    milhares de pistas pequenas virarem 'thin content'. Ordenado para estabilidade.
+    """
+    aps = store.candidates({"large_airport", "medium_airport"})
+    icaos = {
+        a.icao
+        for a in aps
+        if a.country == "BR" and a.icao and len(a.icao) == 4 and a.icao.startswith("S")
+    }
+    return sorted(icaos)
+
+
+def _dms(value: float, pos: str, neg: str) -> str:
+    """Grau decimal -> 'DD MM SS H' (para exibir coordenadas do aeródromo)."""
+    hemi = pos if value >= 0 else neg
+    value = abs(value)
+    d = int(value)
+    m = int((value - d) * 60)
+    s = round((value - d - m / 60) * 3600)
+    if s == 60:
+        s = 0
+        m += 1
+    return f"{d:02d}° {m:02d}' {s:02d}\" {hemi}"
+
+
+def render_aerodromo_page(store: AirportStore, icao: str, lang: str = "pt") -> str:
+    """Página SEO por aeródromo (/aerodromo/{icao}): ficha ROTAER (DECEA/AISWEB).
+
+    O conteúdo estável (pistas, elevação, FIR, auxílios) vem do ROTAER, memoizado
+    em ``rotaer.fetch_rotaer_cached`` para não onerar a API nos crawls. NOTAM e sol
+    (voláteis) ficam na consulta interativa, via CTA. Se o ROTAER falhar, a página
+    ainda renderiza com a identidade local (nome/cidade/coordenadas) + aviso.
+    """
+    icao = icao.upper()
+    ap = store.resolve(icao)
+    base_path = f"/aerodromo/{icao}"
+    canonical = f"{BASE_URL}{i18n.prefix(lang)}{base_path}"
+
+    # Dados ao vivo (cacheados). Falha não derruba a página.
+    data: dict | None = None
+    if rotaer_mod.configured():
+        try:
+            fb_lat = ap.lat if ap else None
+            fb_lon = ap.lon if ap else None
+            data = rotaer_mod.fetch_rotaer_cached(icao, fb_lat=fb_lat, fb_lon=fb_lon)
+        except Exception:  # noqa: BLE001 — API fora/aeródromo sem ROTAER
+            data = None
+
+    name = (data and data.get("nome")) or (ap.name if ap else icao)
+    city = (data and data.get("cidade")) or (ap.city if ap else "")
+    uf = (data and data.get("uf")) or ""
+    place = " / ".join(p for p in (city, uf) if p) or (ap.country if ap else "Brasil")
+
+    # --- fatos (cards) ---
+    def _int(v: str) -> str:
+        """Arredonda para inteiro (o ROTAER às vezes traz elevação com decimais)."""
+        try:
+            return str(round(float(v)))
+        except (TypeError, ValueError):
+            return v or ""
+
+    facts: list[tuple[str, str]] = []
+    if data:
+        ft, m = _int(data.get("alt_ft", "")), _int(data.get("alt_m", ""))
+        elev = (f"{ft} ft" + (f" · {m} m" if m else "")) if ft else ""
+        for key, val in (
+            ("ae_f_elev", elev),
+            ("ae_f_fir", data.get("fir", "")),
+            ("ae_f_utc", data.get("utc", "")),
+            ("ae_f_cat", data.get("categoria", "")),
+            ("ae_f_type", data.get("tipo", "")),
+            ("ae_f_use", data.get("utilizacao", "")),
+            ("ae_f_opr", data.get("operacao", "")),
+        ):
+            if val:
+                facts.append((_t(key, lang), val))
+    if ap is not None:
+        facts.append((_t("ae_f_coord", lang), f"{_dms(ap.lat,'N','S')} {_dms(ap.lon,'E','W')}"))
+    facts_html = "".join(
+        f'<div class="a-fact"><div class="k">{k}</div><div class="v">{v}</div></div>' for k, v in facts
+    )
+
+    def _row(main: str, sub: str, chip: str) -> str:
+        sub_html = f'<div class="dim">{sub}</div>' if sub else ""
+        chip_html = f'<span class="a-chip">{chip}</span>' if chip else ""
+        return f'<div class="a-card a-rwy"><div><div class="id">{main}</div>{sub_html}</div>{chip_html}</div>'
+
+    # --- pistas ---
+    pistas_html = ""
+    for p in (data or {}).get("pistas", []):
+        dim = f"{p['comprimento_m']} × {p['largura_m']} m" if p.get("comprimento_m") and p.get("largura_m") else ""
+        meta = " · ".join(x for x in (dim, f"PCN {p['pcn']}" if p.get("pcn") else "") if x)
+        pistas_html += _row(p.get("ident", "—"), meta, p.get("piso", ""))
+    pistas_block = (
+        f'<h3 class="ae-h3">{_t("ae_sec_pistas", lang)}</h3><div class="a-list">{pistas_html}</div>'
+        if pistas_html else ""
+    )
+
+    # --- auxílios à navegação ---
+    nav_html = ""
+    for nvd in (data or {}).get("navaids", []):
+        thr = _t("ae_thr", lang, nvd["cabeceira"]) if nvd.get("cabeceira") else ""
+        sub = " · ".join(x for x in (nvd.get("ident", ""), thr) if x)
+        nav_html += _row(nvd.get("tipo", "NAV"), sub, nvd.get("freq", ""))
+    nav_block = (
+        f'<h3 class="ae-h3">{_t("ae_sec_nav", lang)}</h3><div class="a-list">{nav_html}</div>'
+        if nav_html else ""
+    )
+
+    if facts_html:
+        name_line = f"{name} · {place}" if place else name
+        status = data.get("status") if data else ""
+        status_html = f'<span class="a-status ok">{status}</span>' if status else ""
+        body = (
+            f'<div class="panel a-head"><div class="a-hrow">'
+            f'<div><div class="a-icao">{icao}</div><div class="a-name">{name_line}</div></div>'
+            f"{status_html}</div>"
+            f'<div class="a-facts">{facts_html}</div></div>'
+        )
+    else:
+        body = f'<div class="note">{_t("ae_empty", lang)}</div>'
+
+    # --- outros aeródromos do mesmo estado (links internos) ---
+    rel = ""
+    if ap is not None and ap.region:
+        seo_set = set(aero_seo_icaos(store))
+        others = [a for a in store.by_region(ap.region) if a.icao in seo_set and a.icao != icao][:12]
+        rel = "".join(f'<a class="rel" href="/aerodromo/{a.icao}">{a.icao} · {a.city or a.name}</a>' for a in others)
+    rel_block = (
+        f'<h3 style="font-family:\'Chakra Petch\',sans-serif;font-size:14px;text-transform:uppercase;'
+        f'letter-spacing:.04em;color:var(--cyan);margin:22px 0 10px">{_t("ae_other", lang, place)}</h3>'
+        f'<div style="display:flex;flex-wrap:wrap;gap:8px">{rel}</div>'
+    ) if rel else ""
+
+    title = _t("ae_title", lang, city or name, icao)
+    desc = _t("ae_desc", lang, name, icao)
+
+    html = f"""<!DOCTYPE html>
+<html lang="{i18n.html_lang(lang)}">
+<head>
+<meta charset="UTF-8" />
+{gtag_block(lang, "aerodromo", icao)}
+{PWA_HEAD}
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title} | Aero Jussa</title>
+<meta name="description" content="{desc}" />
+{i18n.hreflang_block(base_path, lang)}
+<meta property="og:title" content="{title}" />
+<meta property="og:description" content="{desc}" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{canonical}" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/style.css" />
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4915226991502750" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" /></svg></div>
+    <h1 style="font-size:18px">Aero Jussa<small>{_t("ae_brand", lang)}</small></h1>
+  </div>
+  <div class="tag"><span>ROTAER {icao}</span><span>DECEA / AISWEB</span></div>
+  {_nav("/aerodromo", lang)}
+  {i18n.switcher_block(base_path, lang)}
+
+  <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;margin:6px 0 4px">{name} ({icao})</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px">{_t("ae_sub", lang, place, icao)}</p>
+  <p style="font-size:14px;color:#c3d3e6;margin:0 0 14px">{_t("ae_intro", lang, name, icao, place)}</p>
+  {body}
+
+  <p style="font-size:13px;margin:16px 0 8px"><a href="/aerodromo?icao={icao}" style="color:var(--cyan)">{_t("ae_open", lang)}</a></p>
+  {pistas_block}
+  {nav_block}
+  {rel_block}
+
+  <div class="note" style="margin-top:18px">{_t("ae_note", lang)}</div>
+  <footer class="foot" style="margin-top:24px"><a href="/" style="color:var(--cyan);text-decoration:none">{_t("foot_calc", lang)}</a> · <a href="/aerodromo" style="color:var(--cyan);text-decoration:none">{_t("nav_aero", lang)}</a> · <a href="/cartas" style="color:var(--cyan);text-decoration:none">{_t("nav_cartas", lang)}</a> · <a href="/sobre" style="color:var(--cyan);text-decoration:none">{_t("foot_about", lang)}</a></footer>
+</div>
+<style>
+.rel{{background:var(--panel-2);border:1px solid var(--line);border-radius:30px;padding:7px 13px;font-size:12.5px;color:var(--cyan);text-decoration:none}}.rel:hover{{background:#16335a}}
+.ae-h3{{font-family:'Chakra Petch',sans-serif;font-size:16px;letter-spacing:.02em;color:var(--ink);margin:20px 0 10px}}
+.a-head{{padding:16px}}
+.a-hrow{{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}}
+.a-icao{{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em;color:var(--cyan);line-height:1}}
+.a-name{{font-family:'Inter',sans-serif;font-size:14px;color:var(--ink);margin-top:5px}}
+.a-status{{flex:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:30px;padding:5px 11px;color:var(--muted)}}
+.a-status.ok{{color:#38e08a;border-color:rgba(56,224,138,.5)}}
+.a-facts{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}}
+.a-fact{{background:#0a1424;border:1px solid var(--line);border-radius:10px;padding:9px 11px}}
+.a-fact .k{{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--label);text-transform:uppercase}}
+.a-fact .v{{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;color:var(--ink);margin-top:3px}}
+.a-list{{display:flex;flex-direction:column;gap:8px}}
+.a-card{{background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:11px;padding:12px 14px}}
+.a-rwy{{display:flex;align-items:center;justify-content:space-between;gap:10px}}
+.a-rwy .id{{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px;color:var(--ink);letter-spacing:.03em}}
+.a-rwy .dim{{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);margin-top:3px;letter-spacing:.03em}}
+.a-chip{{flex:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--cyan);border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase}}
+</style>
+</body>
+</html>"""
+    return _localize_links(html, lang)
+
+
 def _url_i18n(path: str) -> str:
     """Bloco <url> para cada idioma de um caminho traduzido, com alternates hreflang."""
     alts = "".join(
@@ -1353,12 +1610,14 @@ def _url_i18n(path: str) -> str:
     )
 
 
-def build_sitemap(tempo_icaos: list[str] | None = None) -> str:
+def build_sitemap(tempo_icaos: list[str] | None = None,
+                  aero_icaos: list[str] | None = None) -> str:
     # Páginas traduzidas (pt/en/es): cada idioma vira um <url> com alternates hreflang.
-    translated = ["/", "/comparar", "/tempo", "/radar", "/cartas", "/rotas",
-                  "/curiosidades", "/sobre"]
+    translated = ["/", "/comparar", "/tempo", "/radar", "/cartas", "/aerodromo",
+                  "/rotas", "/curiosidades", "/sobre"]
     translated += [f"/rota/{o.slug}/{d.slug}" for o, d in ROUTE_PAIRS]
     translated += [f"/tempo/{ic}" for ic in (tempo_icaos or [])]
+    translated += [f"/aerodromo/{ic}" for ic in (aero_icaos or [])]
     body = "".join(_url_i18n(p) for p in translated)
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

@@ -211,7 +211,9 @@ def _carta_to_dict(carta: ET.Element) -> dict:
 
     nome = d.get("nome") or d.get("name") or d.get("titulo") or "Carta"
     tipo = (d.get("tipo") or d.get("type") or "").upper()
-    link = d.get("link") or d.get("url") or d.get("arquivo") or d.get("pdf") or ""
+    # O <link> vem em CDATA com &amp; literal — normaliza como no path de scraping,
+    # senão o "apikey=" de download chega corrompido (&amp;apikey) e o PDF falha.
+    link = (d.get("link") or d.get("url") or d.get("arquivo") or d.get("pdf") or "").replace("&amp;", "&")
     amdt = d.get("amdt") or d.get("emenda") or ""
     dt = d.get("dt") or d.get("data") or d.get("dctmd") or ""
     return {"nome": nome, "tipo": tipo, "link": link, "amdt": amdt, "dt": dt}
@@ -243,7 +245,8 @@ def _fetch_cartas_api(icao: str, tipo: str = "") -> list[dict]:
 
     out: list[dict] = []
     for carta in root.iter():
-        if carta.tag.split("}")[-1].lower() != "carta":
+        # A API devolve cada carta num nó <item> (dentro de <cartas>).
+        if carta.tag.split("}")[-1].lower() != "item":
             continue
         info = _carta_to_dict(carta)
         if not info["link"] or not host_allowed(info["link"]):

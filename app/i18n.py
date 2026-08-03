@@ -25,7 +25,7 @@ LANG_NAME = {"pt": "Português", "en": "English", "es": "Español"}
 
 # Slugs das páginas traduzidas (Leva 1). "" = home. Só estes links recebem
 # prefixo de idioma; links para páginas ainda não traduzidas ficam em pt.
-TRANSLATED_SLUGS = ("", "comparar", "tempo", "radar", "cartas", "sobre")
+TRANSLATED_SLUGS = ("", "comparar", "tempo", "radar", "cartas", "aerodromo", "sobre")
 
 # ---------------------------------------------------------------------------
 # Catálogo de textos. Cada chave -> {pt, en, es}.
@@ -37,6 +37,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "nav_tempo": {"pt": "Tempo", "en": "Weather", "es": "Meteo"},
     "nav_radar": {"pt": "Radar", "en": "Radar", "es": "Radar"},
     "nav_cartas": {"pt": "Cartas", "en": "Charts", "es": "Cartas"},
+    "nav_aero": {"pt": "Aeródromo", "en": "Aerodrome", "es": "Aeródromo"},
     "nav_curio": {"pt": "Curiosidades", "en": "Facts", "es": "Curiosidades"},
     "nav_rotas": {"pt": "Rotas", "en": "Routes", "es": "Rutas"},
     # ---- Rodapé (comum) ----
@@ -166,6 +167,34 @@ STRINGS: dict[str, dict[str, str]] = {
         "pt": "Cartas oficiais do <strong>DECEA</strong> (Brasil, via AISWEB) e da <strong>FAA</strong> (EUA, d-TPP), servidas ao vivo na emenda vigente — este site não armazena nem altera as cartas. Na <strong>Europa</strong>, cada país publica seu eAIP com direitos próprios, então apenas encaminhamos ao portal oficial. Use sempre a publicação oficial e o briefing (NOTAM) para planejamento de voo real.",
         "en": "Official charts from <strong>DECEA</strong> (Brazil, via AISWEB) and the <strong>FAA</strong> (USA, d-TPP), served live on the current amendment — this site does not store or alter the charts. In <strong>Europe</strong>, each country publishes its own eAIP under its own rights, so we only forward you to the official portal. Always use the official publication and briefing (NOTAM) for real flight planning.",
         "es": "Cartas oficiales de <strong>DECEA</strong> (Brasil, vía AISWEB) y la <strong>FAA</strong> (EE. UU., d-TPP), servidas en vivo en la enmienda vigente — este sitio no almacena ni altera las cartas. En <strong>Europa</strong>, cada país publica su eAIP con derechos propios, así que solo te reenviamos al portal oficial. Usa siempre la publicación oficial y el briefing (NOTAM) para planificación de vuelo real.",
+    },
+
+    # ---- Aeródromo: título/descrição (Leva 1) ----
+    "adt_title": {
+        "pt": "Informações do Aeródromo · ROTAER, NOTAM e Sol | Aero Jussa",
+        "en": "Aerodrome Information · ROTAER, NOTAM and Sun | Aero Jussa",
+        "es": "Información del Aeródromo · ROTAER, NOTAM y Sol | Aero Jussa",
+    },
+    "adt_desc": {
+        "pt": "Consulte a ficha ROTAER de qualquer aeródromo do Brasil — pistas, elevação, FIR e auxílios de navegação —, os NOTAM ativos e os horários de nascer e pôr do sol. Dados oficiais do DECEA/AISWEB.",
+        "en": "Look up the ROTAER record of any airport in Brazil — runways, elevation, FIR and navigation aids —, the active NOTAMs and the sunrise and sunset times. Official DECEA/AISWEB data.",
+        "es": "Consulta la ficha ROTAER de cualquier aeródromo de Brasil — pistas, elevación, FIR y ayudas a la navegación —, los NOTAM activos y los horarios de amanecer y atardecer. Datos oficiales de DECEA/AISWEB.",
+    },
+    # ---- Aeródromo (corpo) ----
+    "adb_sub": {"pt": "ficha · notam · sol", "en": "record · notam · sun", "es": "ficha · notam · sol"},
+    "adb_tag": {"pt": "INFORMAÇÕES DO AERÓDROMO", "en": "AERODROME INFORMATION", "es": "INFORMACIÓN DEL AERÓDROMO"},
+    "adb_h2": {"pt": "Aeródromo: ficha, NOTAM e sol", "en": "Aerodrome: record, NOTAM and sun", "es": "Aeródromo: ficha, NOTAM y sol"},
+    "adb_intro": {
+        "pt": "Digite um <strong>aeródromo do Brasil</strong> e veja a <strong>ficha ROTAER</strong> (pistas, elevação, FIR, auxílios de navegação), os <strong>NOTAM ativos</strong> e os <strong>horários de nascer e pôr do sol</strong> — tudo do <strong>AISWEB (DECEA)</strong>.",
+        "en": "Type a <strong>Brazilian airport</strong> and see the <strong>ROTAER record</strong> (runways, elevation, FIR, navigation aids), the <strong>active NOTAMs</strong> and the <strong>sunrise and sunset times</strong> — all from <strong>AISWEB (DECEA)</strong>.",
+        "es": "Escribe un <strong>aeródromo de Brasil</strong> y consulta la <strong>ficha ROTAER</strong> (pistas, elevación, FIR, ayudas a la navegación), los <strong>NOTAM activos</strong> y los <strong>horarios de amanecer y atardecer</strong> — todo de <strong>AISWEB (DECEA)</strong>.",
+    },
+    "adb_lbl_aero": {"pt": "Aeródromo (Brasil)", "en": "Airport (Brazil)", "es": "Aeródromo (Brasil)"},
+    "adb_status0": {"pt": "Selecione um aeródromo para ver as informações.", "en": "Select an airport to see the information.", "es": "Selecciona un aeródromo para ver la información."},
+    "adb_note": {
+        "pt": "Dados oficiais do <strong>DECEA</strong> (Brasil, via AISWEB): ficha <strong>ROTAER</strong>, <strong>NOTAM</strong> e horários do sol. Informação de <strong>apoio</strong> — o NOTAM e o ROTAER aqui não substituem o briefing oficial (AIS) para planejamento de voo real. Horários do sol em hora local do aeródromo (e UTC).",
+        "en": "Official <strong>DECEA</strong> data (Brazil, via AISWEB): <strong>ROTAER</strong> record, <strong>NOTAM</strong> and sun times. <strong>Supporting</strong> information — the NOTAM and ROTAER here do not replace the official briefing (AIS) for real flight planning. Sun times in the airport's local time (and UTC).",
+        "es": "Datos oficiales de <strong>DECEA</strong> (Brasil, vía AISWEB): ficha <strong>ROTAER</strong>, <strong>NOTAM</strong> y horarios del sol. Información de <strong>apoyo</strong> — el NOTAM y el ROTAER aquí no sustituyen el briefing oficial (AIS) para planificación de vuelo real. Horarios del sol en hora local del aeródromo (y UTC).",
     },
 
     # ---- Tempo (corpo) ----

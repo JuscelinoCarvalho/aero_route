@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7C0B22Z8EC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-7C0B22Z8EC', {
+      content_group: 'app-aerodromo',
+      page_language: (document.documentElement.lang || 'pt').slice(0, 2)
+    });
+  </script>
+  <script defer src="/static/track.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Aero Jussa" />
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <script>if('serviceWorker' in navigator){var _swR=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swR)return;_swR=true;location.reload();});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).catch(function(){});});}</script>
+  <script defer src="/static/install.js"></script>
+  <title>{{adt_title}}</title>
+  <meta name="description" content="{{adt_desc}}" />
+  {{hreflang}}
+  <meta property="og:title" content="Informações do Aeródromo · ROTAER, NOTAM e Sol | Aero Jussa" />
+  <meta property="og:description" content="Ficha ROTAER (pistas, elevação, FIR, auxílios), NOTAM ativos e nascer/pôr do sol de qualquer aeródromo do Brasil. Dados oficiais do DECEA/AISWEB." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aero.jussa.com.br/aerodromo" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- MONETIZAÇÃO · Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7055237765703978" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
+        </svg>
+      </div>
+      <h1>Aero Jussa<small>{{adb_sub}}</small></h1>
+    </div>
+
+    <div class="tag">
+      <span>{{adb_tag}}</span>
+      <span>{{src}} <b>DECEA / AISWEB · Brasil</b></span>
+    </div>
+
+    <!-- Navegação -->
+    {{lang_switcher}}
+
+    <nav class="nav">
+      <a href="/">{{nav_calc}}</a>
+      <a href="/comparar">{{nav_compare}}</a>
+      <a href="/tempo">{{nav_tempo}}</a>
+      <a href="/radar">{{nav_radar}}</a>
+      <a href="/cartas">{{nav_cartas}}</a>
+      <a href="/aerodromo" class="active">{{nav_aero}}</a>
+      <a href="/curiosidades">{{nav_curio}}</a>
+      <a href="/rotas">{{nav_rotas}}</a>
+    </nav>
+
+    <h2 style="font-family:'Chakra Petch',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 8px">{{adb_h2}}</h2>
+    <p style="font-size:14px;color:#c3d3e6;margin-bottom:14px">
+      {{adb_intro}}
+    </p>
+
+    <!-- Seleção: aeródromo -->
+    <div class="route" style="grid-template-columns:1fr">
+      <div class="field">
+        <label>{{adb_lbl_aero}}</label>
+        <input id="aero" placeholder="SBGR, SBSP, Congonhas…" autocomplete="off" spellcheck="false" />
+        <div class="ac" id="acAero"></div>
+      </div>
+    </div>
+
+    <!-- Ficha ROTAER -->
+    <div class="panel a-head" id="a-head" style="display:none">
+      <div class="a-hrow">
+        <div>
+          <div class="a-icao" id="a-icao">—</div>
+          <div class="a-name" id="a-name">—</div>
+        </div>
+        <span class="a-status" id="a-astatus"></span>
+      </div>
+      <div class="a-facts" id="a-facts"></div>
+    </div>
+
+    <!-- Vento nas pistas -->
+    <div class="a-block" id="a-wind" style="display:none">
+      <div class="a-wind-h">
+        <span class="a-sec-h" data-i18n="ad_sec_wind">Vento nas pistas</span>
+        <span class="a-wind-now" id="a-wind-now"></span>
+      </div>
+      <div class="a-list" id="a-wind-list"></div>
+      <div class="a-wind-foot">
+        <label class="a-wind-ctl"><span data-i18n="ad_wind_limit">Meu vento cruzado máx.</span>
+          <input id="a-wind-limit" type="number" min="1" max="60" step="1" inputmode="numeric" /> kt</label>
+        <div class="a-wind-note" data-i18n="ad_wind_note">—</div>
+      </div>
+    </div>
+
+    <!-- Altitude-densidade -->
+    <div class="panel a-block" id="a-dens" style="display:none">
+      <div class="a-dens-top">
+        <div>
+          <div class="a-sec-h" data-i18n="ad_sec_dens" style="margin:0">Altitude-densidade</div>
+          <div class="a-dens-sub" id="a-dens-sub"></div>
+        </div>
+        <div class="a-dens-val"><span id="a-dens-da">—</span><small>ft</small></div>
+      </div>
+      <div class="a-dens-dist" id="a-dens-dist"></div>
+      <div class="a-wind-note" data-i18n="ad_dens_note">—</div>
+    </div>
+
+    <!-- Sol -->
+    <div class="panel a-block" id="a-sun" style="display:none">
+      <div class="a-sec-h" data-i18n="ad_sec_sol">Nascer e pôr do sol</div>
+      <div class="a-sun-grid">
+        <div class="a-sun-c">
+          <div class="a-sun-ic">☀️↑</div>
+          <div class="a-sun-lab" data-i18n="ad_sun_rise">Nascer do sol</div>
+          <div class="a-sun-t" id="a-sunrise">—</div>
+          <div class="a-sun-utc" id="a-sunrise-utc"></div>
+        </div>
+        <div class="a-sun-c">
+          <div class="a-sun-ic">☀️↓</div>
+          <div class="a-sun-lab" data-i18n="ad_sun_set">Pôr do sol</div>
+          <div class="a-sun-t" id="a-sunset">—</div>
+          <div class="a-sun-utc" id="a-sunset-utc"></div>
+        </div>
+      </div>
+      <div class="a-sun-day" id="a-daylight"></div>
+    </div>
+
+    <!-- Pistas -->
+    <div class="a-block" id="a-pistas" style="display:none">
+      <div class="a-sec-h" data-i18n="ad_sec_pistas">Pistas</div>
+      <div class="a-list" id="a-pistas-list"></div>
+    </div>
+
+    <!-- Auxílios à navegação -->
+    <div class="a-block" id="a-nav" style="display:none">
+      <div class="a-sec-h" data-i18n="ad_sec_nav">Auxílios à navegação</div>
+      <div class="a-list" id="a-nav-list"></div>
+    </div>
+
+    <!-- NOTAM -->
+    <div class="a-block" id="a-notam" style="display:none">
+      <div class="a-sec-h" id="a-notam-h" data-i18n="ad_sec_notam">NOTAM ativos</div>
+      <div class="a-list" id="a-notam-list"></div>
+    </div>
+
+    <div class="c-status" id="a-status">{{adb_status0}}</div>
+
+    <div class="note">
+      {{adb_note}}
+    </div>
+
+    <!-- MONETIZAÇÃO · afiliados -->
+    <div class="aff">
+      <div class="aff-h">{{aff_header}}</div>
+      <div class="aff-grid" id="aff-grid"></div>
+    </div>
+
+    <footer class="foot">
+      Aero Jussa · Python + FastAPI · dados © DECEA/AISWEB (fonte oficial)<br />
+      <a href="/" style="color:var(--cyan);text-decoration:none">{{nav_calc}}</a> ·
+      <a href="/cartas" style="color:var(--cyan);text-decoration:none">{{nav_cartas}}</a> ·
+      <a href="/radar" style="color:var(--cyan);text-decoration:none">{{nav_radar}}</a> ·
+      <a href="/sobre" style="color:var(--cyan);text-decoration:none">{{foot_about}}</a> ·
+      <a href="/static/privacidade.html" style="color:var(--cyan);text-decoration:none">{{foot_privacy}}</a>
+    </footer>
+  </div>
+
+  <style>
+    .a-block{margin-top:14px}
+    .a-sec-h{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:16px;letter-spacing:.02em;color:var(--ink);margin:0 0 10px}
+    /* Cabeçalho do aeródromo */
+    .a-head{padding:16px}
+    .a-hrow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .a-icao{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em;color:var(--cyan);line-height:1}
+    .a-name{font-family:"Inter",sans-serif;font-size:14px;color:var(--ink);margin-top:5px}
+    .a-status{flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+      border:1px solid var(--line);border-radius:30px;padding:5px 11px;color:var(--muted)}
+    .a-status.ok{color:#38e08a;border-color:rgba(56,224,138,.5)}
+    .a-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}
+    .a-fact{background:#0a1424;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+    .a-fact .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.08em;color:var(--label);text-transform:uppercase}
+    .a-fact .v{font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:15px;color:var(--ink);margin-top:3px}
+    /* Sol */
+    .a-sun-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .a-sun-c{background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);
+      border-radius:11px;padding:14px;text-align:center}
+    .a-sun-ic{font-size:20px}
+    .a-sun-lab{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--label);text-transform:uppercase;margin-top:4px}
+    .a-sun-t{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:28px;color:var(--ink);margin-top:4px;letter-spacing:.02em}
+    .a-sun-utc{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--label);margin-top:2px}
+    .a-sun-day{margin-top:10px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cyan);text-align:center;letter-spacing:.03em}
+    /* Listas (pistas / nav / notam) */
+    .a-list{display:flex;flex-direction:column;gap:8px}
+    .a-card{background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+    .a-rwy{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .a-rwy .id{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:16px;color:var(--ink);letter-spacing:.03em}
+    .a-rwy .dim{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--label);margin-top:3px;letter-spacing:.03em}
+    .a-chip{flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--cyan);
+      border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase}
+    /* NOTAM */
+    .a-nt-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+    .a-nt-n{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:13.5px;color:var(--cyan);letter-spacing:.03em}
+    .a-nt-cat{flex:none;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.08em;color:var(--muted);
+      border:1px solid var(--line);border-radius:30px;padding:4px 9px;text-transform:uppercase}
+    .a-nt-per{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--amber);margin-bottom:6px;letter-spacing:.02em}
+    .a-nt-txt{font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.55;color:#c3d3e6;white-space:pre-wrap;word-break:break-word}
+    /* Vento nas pistas */
+    .a-wind-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+    .a-wind-h .a-sec-h{margin:0}
+    .a-wind-now{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--cyan);letter-spacing:.03em}
+    .a-wind-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
+      background:linear-gradient(180deg,var(--panel) 0%,#0a1424 100%);border:1px solid var(--line);border-radius:11px;padding:11px 14px}
+    .a-wind-row.fav{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(31,216,230,.18)}
+    .a-wind-rwy{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:20px;color:var(--ink);letter-spacing:.03em;min-width:52px}
+    .a-wind-rwy small{display:block;font-family:"JetBrains Mono",monospace;font-weight:400;font-size:9.5px;color:var(--label);letter-spacing:.04em;margin-top:2px}
+    .a-wind-comp{display:flex;flex-direction:column;gap:3px}
+    .a-wind-line{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.02em;color:#c3d3e6}
+    .a-wind-line b{font-weight:700}
+    .a-wind-x{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:15px;text-align:right;min-width:70px}
+    .a-wind-x small{display:block;font-family:"JetBrains Mono",monospace;font-weight:400;font-size:9.5px;color:var(--label);letter-spacing:.06em;text-transform:uppercase}
+    .xw-ok{color:var(--green)} .xw-warn{color:var(--amber)} .xw-bad{color:#ff6b6b}
+    .hw-head{color:var(--green)} .hw-tail{color:var(--amber)}
+    .a-wind-fav{flex:none;font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.08em;color:var(--cyan);
+      border:1px solid var(--cyan-dim);border-radius:30px;padding:3px 8px;text-transform:uppercase;margin-left:8px}
+    .a-wind-foot{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+    .a-wind-ctl{display:flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--label);letter-spacing:.03em}
+    .a-wind-ctl input{width:56px;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+      padding:6px 8px;font-family:"JetBrains Mono",monospace;font-size:13px;text-align:center;outline:none}
+    .a-wind-ctl input:focus{border-color:var(--cyan)}
+    .a-wind-note{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--label);line-height:1.55;letter-spacing:.02em}
+    /* Altitude-densidade */
+    .a-dens-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .a-dens-sub{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--label);margin-top:5px;letter-spacing:.02em;line-height:1.5}
+    .a-dens-val{flex:none;text-align:right;font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:30px;letter-spacing:.01em;line-height:1}
+    .a-dens-val small{font-family:"JetBrains Mono",monospace;font-weight:400;font-size:12px;color:var(--label);margin-left:4px}
+    .da-ok{color:var(--green)} .da-warn{color:var(--amber)} .da-bad{color:#ff6b6b}
+    .a-dens-dist{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+    .a-dens-dist .h{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+    .a-dens-drow{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#c3d3e6;letter-spacing:.02em}
+    .a-dens-drow b{color:var(--ink);font-family:"Chakra Petch",sans-serif}
+    @media (max-width:420px){.a-icao{font-size:22px}.a-sun-t{font-size:24px}.a-dens-val{font-size:26px}}
+  </style>
+
+  <script src="/static/affiliates.js"></script>
+  <script src="/static/aerodromo.js"></script>
+</body>
+</html>
