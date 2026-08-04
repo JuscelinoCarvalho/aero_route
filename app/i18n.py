@@ -35,7 +35,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "nav_calc": {"pt": "Calculadora", "en": "Calculator", "es": "Calculadora"},
     "nav_compare": {"pt": "Comparar aeronaves", "en": "Compare aircraft", "es": "Comparar aeronaves"},
     "nav_tempo": {"pt": "Tempo", "en": "Weather", "es": "Meteo"},
-    "nav_radar": {"pt": "Radar", "en": "Radar", "es": "Radar"},
+    "nav_radar": {"pt": "Mapa", "en": "Map", "es": "Mapa"},
     "nav_cartas": {"pt": "Cartas", "en": "Charts", "es": "Cartas"},
     "nav_aero": {"pt": "Aeródromo", "en": "Aerodrome", "es": "Aeródromo"},
     "nav_curio": {"pt": "Curiosidades", "en": "Facts", "es": "Curiosidades"},
