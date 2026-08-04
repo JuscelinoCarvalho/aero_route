@@ -195,6 +195,7 @@
     ad_wind_now: { pt: "{0}° / {1} kt", en: "{0}° / {1} kt", es: "{0}° / {1} kt" },
     ad_wind_gust: { pt: " raj {0}", en: " gust {0}", es: " ráf {0}" },
     ad_wind_na: { pt: "vento indisponível", en: "wind unavailable", es: "viento no disponible" },
+    ad_wind_nocomp: { pt: "sem componente", en: "no component", es: "sin componente" },
     ad_wind_head: { pt: "Proa {0}", en: "Head {0}", es: "Proa {0}" },
     ad_wind_tail: { pt: "Cauda {0}", en: "Tail {0}", es: "Cola {0}" },
     ad_wind_cross: { pt: "Cruzado {0}", en: "Cross {0}", es: "Cruz. {0}" },

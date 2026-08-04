@@ -264,6 +264,7 @@ function renderWind() {
 
   const limit = xwindLimit();
   const canCompute = w && !w.vrb && w.speed_kt > 0;
+  const isCalm = w && !w.vrb && w.speed_kt === 0; // vento 0 → sem componente (≠ indisponível)
   // Pista favorável = maior componente de proa.
   let favIdent = null;
   if (canCompute) {
@@ -294,6 +295,9 @@ function renderWind() {
         }
         compHtml = `<div class="a-wind-line">${hwTxt}</div><div class="a-wind-line">${TF("ad_wind_cross", side)}${gustTxt}</div>`;
         xHtml = `<div class="a-wind-x"><span class="${xwClass(xw, limit)}">${xw}</span><small>kt xw</small></div>`;
+      } else if (isCalm) {
+        compHtml = `<div class="a-wind-line">${T("ad_wind_nocomp")}</div>`;
+        xHtml = `<div class="a-wind-x"><span class="xw-ok">0</span><small>kt xw</small></div>`;
       }
       const fav = c.ident === favIdent ? `<span class="a-wind-fav">${T("ad_wind_fav")}</span>` : "";
       return (
