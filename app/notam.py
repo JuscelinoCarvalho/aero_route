@@ -26,50 +26,96 @@ def configured() -> bool:
 # mais confiável para triar do que tentar interpretar o texto livre.
 # --------------------------------------------------------------------------- #
 
-# Fallback pelo 2º caractere (grupo do assunto).
+# Rótulos em (pt, en, es, ícone). Fallback pelo 2º caractere (grupo do assunto).
 _QGROUP = {
-    "A": ("Espaço aéreo", "🛰"), "C": ("Comunicações", "📡"),
-    "F": ("Instalações e serviços", "🛠"), "G": ("GNSS", "🛰"),
-    "I": ("ILS / instrumentos", "📶"), "L": ("Iluminação", "💡"),
-    "M": ("Área de manobras / pista", "🛬"), "N": ("Auxílios à navegação", "📡"),
-    "O": ("Outras informações", "ℹ️"), "P": ("Procedimentos ATM", "🧭"),
-    "R": ("Restrição de espaço aéreo", "⛔"), "S": ("Tráfego aéreo (ATS)", "🗼"),
-    "W": ("Aviso / atividade", "⚠️"),
+    "A": ("Espaço aéreo", "Airspace", "Espacio aéreo", "🛰"),
+    "C": ("Comunicações", "Communications", "Comunicaciones", "📡"),
+    "F": ("Instalações e serviços", "Facilities and services", "Instalaciones y servicios", "🛠"),
+    "G": ("GNSS", "GNSS", "GNSS", "🛰"),
+    "I": ("ILS / instrumentos", "ILS / instruments", "ILS / instrumentos", "📶"),
+    "L": ("Iluminação", "Lighting", "Iluminación", "💡"),
+    "M": ("Área de manobras / pista", "Movement area / runway", "Área de maniobras / pista", "🛬"),
+    "N": ("Auxílios à navegação", "Navigation aids", "Ayudas a la navegación", "📡"),
+    "O": ("Outras informações", "Other information", "Otra información", "ℹ️"),
+    "P": ("Procedimentos ATM", "ATM procedures", "Procedimientos ATM", "🧭"),
+    "R": ("Restrição de espaço aéreo", "Airspace restriction", "Restricción de espacio aéreo", "⛔"),
+    "S": ("Tráfego aéreo (ATS)", "Air traffic (ATS)", "Tráfico aéreo (ATS)", "🗼"),
+    "W": ("Aviso / atividade", "Warning / activity", "Aviso / actividad", "⚠️"),
 }
 
-# Assunto específico (AB) — sobrepõe o grupo quando conhecido.
+# Assunto específico (AB) em (pt, en, es, ícone) — sobrepõe o grupo quando conhecido.
 _QSUBJECT = {
-    "OB": ("Obstáculo", "🏗"), "OL": ("Obstáculo luminoso", "🏗"), "OA": ("Info operacional", "ℹ️"),
-    "MR": ("Pista (RWY)", "🛬"), "MX": ("Pista de táxi (TWY)", "🛣"), "MS": ("Stopway", "🛬"),
-    "MT": ("Cabeceira (THR)", "🛬"), "MD": ("Distâncias declaradas", "📏"),
-    "MB": ("Atrito / frenagem da pista", "🛬"), "MK": ("Pátio / estacionamento", "🅿"),
-    "MN": ("Pátio (apron)", "🅿"), "MP": ("Posição de estacionamento", "🅿"),
-    "IC": ("ILS", "📶"), "IL": ("ILS localizer", "📶"), "IG": ("ILS glide path", "📶"),
-    "ID": ("DME do ILS", "📶"), "IM": ("Marcador do ILS", "📶"),
-    "NB": ("NDB", "📡"), "NV": ("VOR", "📡"), "ND": ("DME", "📡"), "NM": ("Auxílio à navegação", "📡"),
-    "LR": ("Luzes de pista", "💡"), "LA": ("Luzes de aproximação", "💡"), "LP": ("PAPI / VASI", "💡"),
-    "FA": ("Aeródromo", "🏢"), "FF": ("Combate a incêndio (SCI)", "🚒"), "FU": ("Combustível", "⛽"),
-    "FT": ("Instalação / serviço", "🛠"), "FM": ("Meteorologia", "🌦"),
-    "RT": ("Área restrita temporária", "⛔"), "RR": ("Área restrita", "⛔"),
-    "RD": ("Área perigosa", "☢"), "RP": ("Área proibida", "⛔"), "RA": ("Rota / área", "⛔"),
-    "WU": ("Atividade de drone (RPAS)", "🛸"), "WP": ("Salto de paraquedas", "🪂"),
-    "WB": ("Acrobacia aérea", "✈"), "WE": ("Exercício militar", "🎖"),
-    "WG": ("Detonação de explosivos", "💥"), "WL": ("Laser / balão", "🔦"), "WW": ("Atividade significativa", "⚠️"),
-    "PI": ("Aproximação por instrumentos (IAC)", "🧭"), "PD": ("Saída por instrumentos (SID)", "🧭"),
-    "PA": ("Mínimos de aproximação", "🧭"), "PK": ("Chegada (STAR)", "🧭"), "PT": ("Procedimento", "🧭"),
-    "XX": ("Aviso (texto livre)", "ℹ️"),
+    "OB": ("Obstáculo", "Obstacle", "Obstáculo", "🏗"),
+    "OL": ("Obstáculo luminoso", "Lighted obstacle", "Obstáculo luminoso", "🏗"),
+    "OA": ("Info operacional", "Operational info", "Info operativa", "ℹ️"),
+    "MR": ("Pista (RWY)", "Runway (RWY)", "Pista (RWY)", "🛬"),
+    "MX": ("Pista de táxi (TWY)", "Taxiway (TWY)", "Calle de rodaje (TWY)", "🛣"),
+    "MS": ("Stopway", "Stopway", "Zona de parada", "🛬"),
+    "MT": ("Cabeceira (THR)", "Threshold (THR)", "Umbral (THR)", "🛬"),
+    "MD": ("Distâncias declaradas", "Declared distances", "Distancias declaradas", "📏"),
+    "MB": ("Atrito / frenagem da pista", "Runway friction / braking", "Rozamiento / frenado", "🛬"),
+    "MK": ("Pátio / estacionamento", "Parking", "Estacionamiento", "🅿"),
+    "MN": ("Pátio (apron)", "Apron", "Plataforma", "🅿"),
+    "MP": ("Posição de estacionamento", "Aircraft stand", "Posición de estacionamiento", "🅿"),
+    "IC": ("ILS", "ILS", "ILS", "📶"),
+    "IL": ("ILS localizer", "ILS localizer", "ILS localizador", "📶"),
+    "IG": ("ILS glide path", "ILS glide path", "ILS senda de planeo", "📶"),
+    "ID": ("DME do ILS", "ILS DME", "DME del ILS", "📶"),
+    "IM": ("Marcador do ILS", "ILS marker", "Baliza del ILS", "📶"),
+    "NB": ("NDB", "NDB", "NDB", "📡"), "NV": ("VOR", "VOR", "VOR", "📡"), "ND": ("DME", "DME", "DME", "📡"),
+    "NM": ("Auxílio à navegação", "Navigation aid", "Ayuda a la navegación", "📡"),
+    "LR": ("Luzes de pista", "Runway lights", "Luces de pista", "💡"),
+    "LA": ("Luzes de aproximação", "Approach lights", "Luces de aproximación", "💡"),
+    "LP": ("PAPI / VASI", "PAPI / VASI", "PAPI / VASI", "💡"),
+    "FA": ("Aeródromo", "Aerodrome", "Aeródromo", "🏢"),
+    "FF": ("Combate a incêndio (SCI)", "Fire fighting (RFF)", "Extinción de incendios (SEI)", "🚒"),
+    "FU": ("Combustível", "Fuel", "Combustible", "⛽"),
+    "FT": ("Instalação / serviço", "Facility / service", "Instalación / servicio", "🛠"),
+    "FM": ("Meteorologia", "Meteorology", "Meteorología", "🌦"),
+    "RT": ("Área restrita temporária", "Temporary restricted area", "Área restringida temporal", "⛔"),
+    "RR": ("Área restrita", "Restricted area", "Área restringida", "⛔"),
+    "RD": ("Área perigosa", "Danger area", "Área peligrosa", "☢"),
+    "RP": ("Área proibida", "Prohibited area", "Área prohibida", "⛔"),
+    "RA": ("Rota / área", "Route / area", "Ruta / área", "⛔"),
+    "WU": ("Atividade de drone (RPAS)", "Drone activity (RPAS)", "Actividad de dron (RPAS)", "🛸"),
+    "WP": ("Salto de paraquedas", "Parachute jumping", "Salto en paracaídas", "🪂"),
+    "WB": ("Acrobacia aérea", "Aerobatics", "Acrobacia aérea", "✈"),
+    "WE": ("Exercício militar", "Military exercise", "Ejercicio militar", "🎖"),
+    "WG": ("Detonação de explosivos", "Blasting", "Voladura", "💥"),
+    "WL": ("Laser / balão", "Laser / balloon", "Láser / globo", "🔦"),
+    "WW": ("Atividade significativa", "Significant activity", "Actividad significativa", "⚠️"),
+    "PI": ("Aproximação por instrumentos (IAC)", "Instrument approach (IAP)", "Aproximación por instrumentos", "🧭"),
+    "PD": ("Saída por instrumentos (SID)", "Instrument departure (SID)", "Salida por instrumentos (SID)", "🧭"),
+    "PA": ("Mínimos de aproximação", "Approach minima", "Mínimos de aproximación", "🧭"),
+    "PK": ("Chegada (STAR)", "Arrival (STAR)", "Llegada (STAR)", "🧭"),
+    "PT": ("Procedimento", "Procedure", "Procedimiento", "🧭"),
+    "XX": ("Aviso (texto livre)", "Notice (free text)", "Aviso (texto libre)", "ℹ️"),
 }
 
-# Condição (CD) -> (rótulo, severidade 0-2).
+# Condição (CD) em (pt, en, es, severidade 0-2).
 _QCOND = {
-    "LC": ("fechado(a)", 2), "LW": ("em curso", 1), "LT": ("limitado(a)", 1),
-    "LR": ("restrito(a)", 1),
-    "CH": ("alterado(a)", 1), "CE": ("erguido / instalado", 1), "CA": ("ativado(a) / em atividade", 1),
-    "CG": ("rebaixado(a)", 1), "CF": ("frequência alterada", 1), "CM": ("realocado(a)", 1),
-    "CS": ("instalado(a)", 0), "CN": ("cancelado(a)", 0), "CC": ("restabelecido(a)", 0),
-    "AS": ("inoperante (U/S)", 2), "AU": ("indisponível", 2), "AW": ("retirado(a)", 0),
-    "AH": ("horário alterado", 0), "AM": ("uso militar", 1), "AK": ("operante", 0), "AP": ("aprovado(a)", 0),
-    "TT": ("aviso relacionado (trigger)", 0), "XX": ("(ver texto)", 0),
+    "LC": ("fechado(a)", "closed", "cerrado(a)", 2),
+    "LW": ("em curso", "in progress", "en curso", 1),
+    "LT": ("limitado(a)", "limited", "limitado(a)", 1),
+    "LR": ("restrito(a)", "restricted", "restringido(a)", 1),
+    "CH": ("alterado(a)", "changed", "modificado(a)", 1),
+    "CE": ("erguido / instalado", "erected / installed", "erigido / instalado", 1),
+    "CA": ("ativado(a) / em atividade", "activated / active", "activado(a) / en actividad", 1),
+    "CG": ("rebaixado(a)", "downgraded", "degradado(a)", 1),
+    "CF": ("frequência alterada", "frequency changed", "frecuencia modificada", 1),
+    "CM": ("realocado(a)", "relocated", "reubicado(a)", 1),
+    "CS": ("instalado(a)", "installed", "instalado(a)", 0),
+    "CN": ("cancelado(a)", "cancelled", "cancelado(a)", 0),
+    "CC": ("restabelecido(a)", "restored", "restablecido(a)", 0),
+    "AS": ("inoperante (U/S)", "unserviceable (U/S)", "fuera de servicio (U/S)", 2),
+    "AU": ("indisponível", "not available", "no disponible", 2),
+    "AW": ("retirado(a)", "withdrawn", "retirado(a)", 0),
+    "AH": ("horário alterado", "hours changed", "horario modificado", 0),
+    "AM": ("uso militar", "military use", "uso militar", 1),
+    "AK": ("operante", "operational", "operativo", 0),
+    "AP": ("aprovado(a)", "approved", "aprobado(a)", 0),
+    "TT": ("aviso relacionado (trigger)", "related notice (trigger)", "aviso relacionado (trigger)", 0),
+    "XX": ("(ver texto)", "(see text)", "(ver texto)", 0),
 }
 
 # Assunto de ALTO impacto (fecha/derruba algo que você precisa para operar):
@@ -82,18 +128,24 @@ _SEVERE = {"LC", "AS", "AU", "CA", "CG", "CH", "CE", "LT"}
 _TRIVIAL = {"CN", "AW", "AK", "AH", "TT"}
 
 
-def _decode_qcode(cod: str) -> dict:
-    """QABCD -> {assunto, condicao, titulo, icone, prioridade(0-2)}.
+_LANG_IDX = {"pt": 0, "en": 1, "es": 2}
+
+
+def _decode_qcode(cod: str, lang: str = "pt") -> dict:
+    """QABCD -> {assunto, condicao, titulo, icone, prioridade(0-2)} no idioma ``lang``.
 
     Prioridade por IMPACTO do assunto × condição: alto impacto + condição severa
     = ALTA (2); demais assuntos = MÉDIA (1); condição trivial = INFO (0).
     """
+    i = _LANG_IDX.get(lang, 0)
     cod = (cod or "").strip().upper()
     if len(cod) != 5 or cod[0] != "Q":
         return {"assunto": "", "condicao": "", "titulo": "", "icone": "📄", "prioridade": 1}
     ab, cd = cod[1:3], cod[3:5]
-    assunto, icone = _QSUBJECT.get(ab) or _QGROUP.get(ab[0], ("Aviso", "📄"))
-    cond_label = _QCOND.get(cd, ("", 1))[0]
+    subj = _QSUBJECT.get(ab) or _QGROUP.get(ab[0], ("Aviso", "Notice", "Aviso", "📄"))
+    assunto, icone = subj[i], subj[3]
+    cond = _QCOND.get(cd)
+    cond_label = cond[i] if cond else ""
     high = ab in _HIGH_SUBJ or ab[0] in ("I", "N", "R", "A")
 
     if cd in _TRIVIAL:
@@ -103,7 +155,7 @@ def _decode_qcode(cod: str) -> dict:
     else:
         prio = 1
 
-    titulo = assunto + (f" — {cond_label}" if cond_label and cond_label != "(ver texto)" else "")
+    titulo = assunto + (f" — {cond_label}" if cd != "XX" and cond_label else "")
     return {"assunto": assunto, "condicao": cond_label, "titulo": titulo, "icone": icone, "prioridade": prio}
 
 
@@ -150,15 +202,16 @@ def _fmt_dt(v: str) -> str:
     return v
 
 
-def fetch_notam(icao: str) -> list[dict]:
-    """Lista os NOTAMs ativos de um aeródromo. Lança ``RuntimeError`` em falha."""
+def fetch_notam(icao: str, lang: str = "pt") -> list[dict]:
+    """Lista os NOTAMs ativos de um aeródromo (rótulos decodificados no idioma
+    ``lang``). Lança ``RuntimeError`` em falha."""
     root = aisweb.fetch("notam", icaoCode=icao.upper())
 
     out: list[dict] = []
     for item in aisweb.iter_tag(root, "item"):
         d = aisweb.to_dict(item)
         texto = d.get("e", "")
-        q = _decode_qcode(d.get("cod", ""))
+        q = _decode_qcode(d.get("cod", ""), lang)
         out.append(
             {
                 "numero": d.get("n", ""),

@@ -252,6 +252,7 @@ def api_rotaer(
 @app.get("/api/notam")
 def api_notam(
     icao: str = Query(..., min_length=3, max_length=4, description="Código ICAO/IATA do aeródromo"),
+    lang: str = Query("pt", description="Idioma dos rótulos decodificados (pt/en/es)"),
 ) -> dict:
     """NOTAMs ativos do aeródromo (AISWEB). De apoio — não substitui o briefing oficial."""
     ap = store.resolve(icao)
@@ -259,7 +260,7 @@ def api_notam(
     if not notam_mod.configured():
         raise HTTPException(503, "Consulta de NOTAM indisponível: credenciais do AISWEB não configuradas.")
     try:
-        notams = notam_mod.fetch_notam(code)
+        notams = notam_mod.fetch_notam(code, _lang(lang))
     except RuntimeError as exc:
         raise HTTPException(502, str(exc))
     return {"icao": code, "total": len(notams), "notams": notams}

@@ -125,7 +125,7 @@ async function load() {
   try {
     const [rot, ntm, sun, met] = await Promise.allSettled([
       getJSON(`/api/rotaer?icao=${encodeURIComponent(icao)}`),
-      getJSON(`/api/notam?icao=${encodeURIComponent(icao)}`),
+      getJSON(`/api/notam?icao=${encodeURIComponent(icao)}&lang=${window.APP_LANG || "pt"}`),
       getJSON(`/api/sol?icao=${encodeURIComponent(icao)}`),
       getJSON(`/api/metar?icao=${encodeURIComponent(icao)}`),
     ]);
