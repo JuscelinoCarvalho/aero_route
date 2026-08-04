@@ -34,7 +34,7 @@ TR: dict[str, dict[str, str]] = {
     # ---- comum ----
     "all_routes": {"pt": "todas as rotas", "en": "all routes", "es": "todas las rutas"},
     "brand_planning": {"pt": "flight planning · jussa.com.br", "en": "flight planning · jussa.com.br", "es": "flight planning · jussa.com.br"},
-    "foot_calc": {"pt": "Calculadora", "en": "Calculator", "es": "Calculadora"},
+    "foot_calc": {"pt": "Rota", "en": "Route", "es": "Ruta"},
     "foot_routes": {"pt": "Rotas", "en": "Routes", "es": "Rutas"},
     "foot_about": {"pt": "Sobre", "en": "About", "es": "Acerca de"},
     "foot_privacy": {"pt": "Privacidade", "en": "Privacy", "es": "Privacidad"},
@@ -45,8 +45,8 @@ TR: dict[str, dict[str, str]] = {
         "es": "Estimaciones de crucero, sin viento. No usar para planificación operacional real.",
     },
     # ---- nav ----
-    "nav_calc": {"pt": "Calculadora", "en": "Calculator", "es": "Calculadora"},
-    "nav_compare": {"pt": "Comparar aeronaves", "en": "Compare aircraft", "es": "Comparar aeronaves"},
+    "nav_calc": {"pt": "Rota", "en": "Route", "es": "Ruta"},
+    "nav_compare": {"pt": "Comparar", "en": "Compare", "es": "Comparar"},
     "nav_tempo": {"pt": "Tempo", "en": "Weather", "es": "Meteo"},
     "nav_radar": {"pt": "Mapa", "en": "Map", "es": "Mapa"},
     "nav_cartas": {"pt": "Cartas", "en": "Charts", "es": "Cartas"},
@@ -748,8 +748,8 @@ def _nav(active: str = "", lang: str = "pt") -> str:
     grupo: comparar → Calculadora; tempo → Aeródromo. Cartas tem item próprio
     (é a página internacional: Brasil, EUA, Europa e Japão).
     """
-    items = [("/", "nav_calc"), ("/aerodromo", "nav_aero"), ("/cartas", "nav_cartas"), ("/radar", "nav_radar")]
-    active = {"/comparar": "/", "/tempo": "/aerodromo"}.get(active, active)
+    items = [("/", "nav_calc"), ("/comparar", "nav_compare"), ("/aerodromo", "nav_aero"), ("/cartas", "nav_cartas"), ("/radar", "nav_radar")]
+    active = {"/tempo": "/aerodromo"}.get(active, active)
     links = "".join(
         f'<a href="{href}"{" class=\"active\"" if href == active else ""}>{_t(key, lang)}</a>'
         for href, key in items

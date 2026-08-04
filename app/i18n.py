@@ -32,8 +32,8 @@ TRANSLATED_SLUGS = ("", "comparar", "tempo", "radar", "cartas", "aerodromo", "so
 # ---------------------------------------------------------------------------
 STRINGS: dict[str, dict[str, str]] = {
     # ---- Navegação (comum a todas as páginas) ----
-    "nav_calc": {"pt": "Calculadora", "en": "Calculator", "es": "Calculadora"},
-    "nav_compare": {"pt": "Comparar aeronaves", "en": "Compare aircraft", "es": "Comparar aeronaves"},
+    "nav_calc": {"pt": "Rota", "en": "Route", "es": "Ruta"},
+    "nav_compare": {"pt": "Comparar", "en": "Compare", "es": "Comparar"},
     "nav_tempo": {"pt": "Tempo", "en": "Weather", "es": "Meteo"},
     "nav_radar": {"pt": "Mapa", "en": "Map", "es": "Mapa"},
     "nav_cartas": {"pt": "Cartas", "en": "Charts", "es": "Cartas"},
@@ -45,7 +45,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "foot_curio": {"pt": "Curiosidades", "en": "Facts", "es": "Curiosidades"},
     "foot_about": {"pt": "Sobre", "en": "About", "es": "Acerca de"},
     "foot_privacy": {"pt": "Política de Privacidade", "en": "Privacy Policy", "es": "Política de Privacidad"},
-    "foot_calc": {"pt": "Calculadora", "en": "Calculator", "es": "Calculadora"},
+    "foot_calc": {"pt": "Rota", "en": "Route", "es": "Ruta"},
     "aff_header": {"pt": "Recomendados para aviação", "en": "Recommended for aviation", "es": "Recomendados para aviación"},
     "status_online": {"pt": "● ONLINE", "en": "● ONLINE", "es": "● ONLINE"},
     # ---- Home / Calculadora ----
