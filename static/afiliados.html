@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Idioma vem do parametro ?lang= (a home monta o link com o idioma atual).
+       Precisa rodar ANTES do i18n.js, que le window.APP_LANG. -->
+  <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var lang = (p.get("lang") || "pt").slice(0, 2);
+      if (["pt", "en", "es"].indexOf(lang) < 0) lang = "pt";
+      window.APP_LANG = lang;
+      document.documentElement.lang = { pt: "pt-BR", en: "en-US", es: "es-ES" }[lang];
+    })();
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7C0B22Z8EC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-7C0B22Z8EC', {
+      content_group: 'app-affiliates',
+      page_language: (document.documentElement.lang || 'pt').slice(0, 2)
+    });
+  </script>
+  <script defer src="/static/track.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="apple-touch-icon" href="/static/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png" />
+  <title>Aero Jussa</title>
+  <meta name="robots" content="noindex,follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="page-wide">
+  <div class="wrap">
+    <!-- Header -->
+    <div class="top">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fd8e6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12l8-1 4-8 2 0-1 8 6 1-6 1 1 8-2 0-4-8-8-1z" />
+        </svg>
+      </div>
+      <a href="/" style="text-decoration:none;color:inherit">
+        <strong style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:17px;color:var(--ink)">Aero Jussa</strong>
+      </a>
+    </div>
+
+    <div id="aff-page"></div>
+
+    <footer class="foot">Aero Jussa · jussa.com.br</footer>
+  </div>
+
+  <script src="/static/i18n.js"></script>
+  <script src="/static/affiliates.js"></script>
+  <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      window.renderAffiliatePage(document.getElementById("aff-page"), p.get("cat") || "");
+    })();
+  </script>
+</body>
+</html>
