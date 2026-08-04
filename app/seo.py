@@ -745,10 +745,11 @@ def _nav(active: str = "", lang: str = "pt") -> str:
     """Menu primário (3 itens) compartilhado por todas as páginas (links prefixados depois).
 
     As páginas secundárias moram no rodapé (sitemap). O item primário destaca-se por
-    grupo: comparar → Calculadora; tempo/cartas → Aeródromo.
+    grupo: comparar → Calculadora; tempo → Aeródromo. Cartas tem item próprio
+    (é a página internacional: Brasil, EUA, Europa e Japão).
     """
-    items = [("/", "nav_calc"), ("/aerodromo", "nav_aero"), ("/radar", "nav_radar")]
-    active = {"/comparar": "/", "/tempo": "/aerodromo", "/cartas": "/aerodromo"}.get(active, active)
+    items = [("/", "nav_calc"), ("/aerodromo", "nav_aero"), ("/cartas", "nav_cartas"), ("/radar", "nav_radar")]
+    active = {"/comparar": "/", "/tempo": "/aerodromo"}.get(active, active)
     links = "".join(
         f'<a href="{href}"{" class=\"active\"" if href == active else ""}>{_t(key, lang)}</a>'
         for href, key in items
