@@ -236,9 +236,9 @@ STRINGS: dict[str, dict[str, str]] = {
     "rb_weak": {"pt": "Fraca", "en": "Light", "es": "Débil"},
     "rb_strong": {"pt": "Forte", "en": "Heavy", "es": "Fuerte"},
     "rb_extreme": {"pt": "Extrema", "en": "Extreme", "es": "Extrema"},
-    "rb_leg_sat": {"pt": "Satélite (infravermelho)", "en": "Satellite (infrared)", "es": "Satélite (infrarrojo)"},
-    "rb_clearsky": {"pt": "Céu limpo", "en": "Clear sky", "es": "Cielo despejado"},
-    "rb_highcloud": {"pt": "Nuvens altas / frias", "en": "High / cold clouds", "es": "Nubes altas / frías"},
+    "rb_leg_sat": {"pt": "Convecção (satélite IR)", "en": "Convection (IR satellite)", "es": "Convección (satélite IR)"},
+    "rb_clearsky": {"pt": "Convecção fraca", "en": "Weak convection", "es": "Convección débil"},
+    "rb_highcloud": {"pt": "Tempestade (CB)", "en": "Storm (CB)", "es": "Tormenta (CB)"},
 
     # ---- Comparar (corpo) ----
     "mb_sub": {"pt": "comparar aeronaves", "en": "compare aircraft", "es": "comparar aeronaves"},
