@@ -349,11 +349,19 @@
     .a-chip{flex:none;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--cyan);
       border:1px solid var(--line);border-radius:30px;padding:5px 10px;text-transform:uppercase}
     /* NOTAM */
-    .a-nt-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
-    .a-nt-n{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:13.5px;color:var(--cyan);letter-spacing:.03em}
-    .a-nt-cat{flex:none;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.08em;color:var(--muted);
-      border:1px solid var(--line);border-radius:30px;padding:4px 9px;text-transform:uppercase}
-    .a-nt-per{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--amber);margin-bottom:6px;letter-spacing:.02em}
+    /* NOTAM triado por prioridade */
+    .a-nt{border-left:3px solid var(--line)}
+    .a-nt.prio-2{border-left-color:#ff6b6b}
+    .a-nt.prio-1{border-left-color:var(--amber)}
+    .a-nt.prio-0{border-left-color:var(--cyan-dim)}
+    .a-nt-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px}
+    .a-nt-title{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:13.5px;color:var(--ink);letter-spacing:.02em}
+    .a-nt-prio{flex:none;font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.1em;padding:3px 8px;border-radius:20px;text-transform:uppercase}
+    .a-nt-prio.prio-2{background:rgba(255,107,107,.14);color:#ff8a8a;border:1px solid rgba(255,107,107,.5)}
+    .a-nt-prio.prio-1{background:rgba(255,178,62,.12);color:var(--amber);border:1px solid rgba(255,178,62,.45)}
+    .a-nt-prio.prio-0{background:rgba(111,135,168,.14);color:var(--label);border:1px solid var(--line)}
+    .a-nt-meta{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--label);margin-bottom:7px;letter-spacing:.02em}
+    .a-nt-meta .a-nt-n{color:var(--cyan)}
     .a-nt-txt{font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.55;color:#c3d3e6;white-space:pre-wrap;word-break:break-word}
     /* Vento nas pistas */
     .a-wind-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}

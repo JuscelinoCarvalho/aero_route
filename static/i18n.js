@@ -183,6 +183,10 @@
     ad_notam_period: { pt: "{0} → {1}", en: "{0} → {1}", es: "{0} → {1}" },
     ad_notam_perm: { pt: "permanente", en: "permanent", es: "permanente" },
     ad_none: { pt: "—", en: "—", es: "—" },
+    ad_prio_2: { pt: "ALTA", en: "HIGH", es: "ALTA" },
+    ad_prio_1: { pt: "MÉDIA", en: "MEDIUM", es: "MEDIA" },
+    ad_prio_0: { pt: "INFO", en: "INFO", es: "INFO" },
+    ad_notam_crit: { pt: "{0} crítico(s)", en: "{0} critical", es: "{0} crítico(s)" },
 
     // ---- Vento nas pistas (aerodromo.js) ----
     ad_sec_wind: { pt: "Vento nas pistas", en: "Wind on the runways", es: "Viento en las pistas" },

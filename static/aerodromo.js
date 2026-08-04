@@ -378,9 +378,13 @@ function fmtNotamEnd(fim) {
   return fim;
 }
 
+const PRIO_CLS = { 2: "prio-2", 1: "prio-1", 0: "prio-0" };
+
 function renderNotam(d) {
   const list = d.notams || [];
-  $("#a-notam-h").textContent = `${T("ad_sec_notam")} · ${d.total != null ? d.total : list.length}`;
+  const crit = list.filter((n) => n.prioridade === 2).length;
+  const total = d.total != null ? d.total : list.length;
+  $("#a-notam-h").textContent = `${T("ad_sec_notam")} · ${total}` + (crit ? ` · ${TF("ad_notam_crit", crit)}` : "");
   if (!list.length) {
     $("#a-notam-list").innerHTML = `<div class="a-card"><div class="a-nt-txt">${esc(TF("ad_notam_none", icao))}</div></div>`;
     $("#a-notam").style.display = "";
@@ -388,13 +392,16 @@ function renderNotam(d) {
   }
   $("#a-notam-list").innerHTML = list
     .map((n) => {
+      const p = n.prioridade == null ? 1 : n.prioridade;
+      const cls = PRIO_CLS[p] || "prio-1";
       const per = TF("ad_notam_period", n.inicio || "?", fmtNotamEnd(n.fim) || "?");
+      const title = n.titulo || n.categoria || "NOTAM";
       return (
-        `<div class="a-card">` +
-        `<div class="a-nt-top"><span class="a-nt-n">${esc(n.numero || "NOTAM")}</span>` +
-        `${n.categoria ? `<span class="a-nt-cat">${esc(n.categoria)}</span>` : ""}</div>` +
-        `<div class="a-nt-per">${esc(per)}</div>` +
-        `<div class="a-nt-txt">${esc(n.texto || "")}</div>` +
+        `<div class="a-card a-nt ${cls}">` +
+        `<div class="a-nt-top"><span class="a-nt-title">${n.icone ? esc(n.icone) + " " : ""}${esc(title)}</span>` +
+        `<span class="a-nt-prio ${cls}">${T("ad_prio_" + p)}</span></div>` +
+        `<div class="a-nt-meta"><span class="a-nt-n">${esc(n.numero || "")}</span> · ${esc(per)}</div>` +
+        `<div class="a-nt-txt">${esc(n.traduzido || n.texto || "")}</div>` +
         `</div>`
       );
     })
