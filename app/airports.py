@@ -34,6 +34,63 @@ def normalize(text: str) -> str:
     return "".join(c for c in nfkd if not unicodedata.combining(c))
 
 
+# Apelidos de cidades em português/espanhol → nome da cidade na base (inglês).
+# A base OurAirports só traz o nome em inglês, então "Tóquio", "Londres" ou
+# "Nova York" não encontrariam nada. Aqui mapeamos o apelido para o termo em
+# inglês; a busca então também casa aeródromos dessa cidade. Só listamos casos
+# em que a grafia difere do inglês (Paris/Berlin já casam direto). Chave e valor
+# são normalizados (sem acento, minúsculas) no carregamento.
+_CITY_ALIASES_RAW: dict[str, str] = {
+    # Ásia
+    "tóquio": "tokyo", "tokio": "tokyo",
+    "quioto": "kyoto", "kioto": "kyoto",
+    "osaka": "osaka", "nagoia": "nagoya", "sapporo": "sapporo", "okinawa": "okinawa",
+    "seul": "seoul",
+    "pequim": "beijing", "pekin": "beijing",
+    "xangai": "shanghai", "cantão": "guangzhou",
+    "cingapura": "singapore", "singapura": "singapore", "singapur": "singapore",
+    "bangcoc": "bangkok", "bangcoque": "bangkok",
+    "nova delhi": "new delhi", "nueva delhi": "new delhi",
+    "bombaim": "mumbai", "calcutá": "kolkata",
+    "taipé": "taipei", "taipe": "taipei",
+    "dubai": "dubai", "abu dhabi": "abu dhabi", "doha": "doha",
+    # Europa
+    "londres": "london",
+    "roma": "rome", "milão": "milan", "veneza": "venice",
+    "florença": "florence", "turim": "turin", "nápoles": "naples", "gênova": "genoa",
+    "genebra": "geneva", "ginebra": "geneva", "zurique": "zurich", "basileia": "basel", "berna": "bern",
+    "munique": "munich", "colônia": "cologne", "hamburgo": "hamburg", "berlim": "berlin",
+    "viena": "vienna",
+    "praga": "prague", "varsóvia": "warsaw", "cracóvia": "krakow",
+    "bruxelas": "brussels", "antuérpia": "antwerp", "amberes": "antwerp",
+    "haia": "the hague", "la haya": "the hague", "roterdã": "rotterdam", "roterdão": "rotterdam",
+    "amsterdã": "amsterdam", "amsterdão": "amsterdam",
+    "copenhague": "copenhagen", "estocolmo": "stockholm", "gotemburgo": "gothenburg",
+    "helsinque": "helsinki", "helsínquia": "helsinki",
+    "atenas": "athens", "lisboa": "lisbon",
+    "istambul": "istanbul", "estambul": "istanbul", "moscou": "moscow", "moscovo": "moscow", "moscu": "moscow",
+    # Américas
+    "nova york": "new york", "nova iorque": "new york", "nueva york": "new york",
+    "cidade do méxico": "mexico city", "ciudad de mexico": "mexico city",
+    # África
+    "joanesburgo": "johannesburg", "cidade do cabo": "cape town",
+    "cairo": "cairo", "el cairo": "cairo", "casablanca": "casablanca",
+}
+_CITY_ALIASES: dict[str, str] = {
+    normalize(k): normalize(v) for k, v in _CITY_ALIASES_RAW.items()
+}
+
+
+def _alias_city_terms(q: str) -> set[str]:
+    """Termos-alvo (cidade em inglês) dos apelidos cuja chave começa por ``q``.
+
+    Casa incrementalmente para o autocomplete: "toq" já aponta para "tokyo".
+    """
+    if len(q) < 2:
+        return set()
+    return {target for alias, target in _CITY_ALIASES.items() if alias.startswith(q)}
+
+
 @dataclass(frozen=True)
 class Airport:
     icao: str
@@ -139,6 +196,9 @@ class AirportStore:
         if not q:
             return []
 
+        # Apelidos de cidade PT/ES (ex.: "tóquio" -> "tokyo") para casar a base inglesa.
+        alias_terms = _alias_city_terms(q)
+
         # Código exato tem prioridade absoluta.
         exact = self.resolve(query)
         results: list[tuple[int, Airport]] = []
@@ -156,6 +216,9 @@ class AirportStore:
             elif item.n_city and q in item.n_city:
                 # Cidade que começa com a busca pontua mais (ex.: "rio" -> Rio).
                 score = 30 if item.n_city.startswith(q) else 20
+            elif alias_terms and item.n_city and any(item.n_city.startswith(t) for t in alias_terms):
+                # Apelido PT/ES (ex.: "tóquio" -> aeródromos de Tokyo).
+                score = 28
             elif q in item.n_name:
                 score = 10
             if score:
