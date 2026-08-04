@@ -30,7 +30,9 @@ const GIBS_SAT =
   "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/" +
   "GOES-East_ABI_Band13_Clean_Infrared/default/default/" +
   "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
-const SAT_OPACITY_ALONE = 0.8;   // satélite sozinho (deixa a base aparecer p/ orientação)
+// Com "mix-blend-mode: screen" (classe .sat-screen) o céu limpo (preto no IR)
+// some e o mapa aparece por baixo; opacidade alta mantém as nuvens nítidas.
+const SAT_OPACITY_ALONE = 0.9;   // satélite sozinho
 const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
 
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
@@ -68,7 +70,7 @@ let satLayer = null;      // camada única de satélite (GIBS), criada sob deman
 let pos = 0;
 let playing = false;
 let timer = null;
-let mode = "radar";       // "radar" | "satellite" | "both"
+let mode = "satellite";   // "radar" | "satellite" | "both" — satélite é o padrão
 
 // Elementos da UI
 const $ = (id) => document.getElementById(id);
@@ -95,6 +97,7 @@ function ensureSat() {
       opacity: 0,
       tileSize: 256,
       zIndex: 250, // abaixo dos quadros de radar (zIndex 300)
+      className: "sat-screen", // blend "screen": céu limpo transparente, mapa visível
       maxZoom: MAX_ZOOM,
       maxNativeZoom: SAT_NATIVE_ZOOM,
       attribution:

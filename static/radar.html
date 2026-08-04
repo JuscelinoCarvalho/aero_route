@@ -97,8 +97,8 @@
       </div>
       <div class="r-bar2">
         <div class="r-modes">
-          <button class="r-mode on" data-mode="radar">{{rb_mode_radar}}</button>
-          <button class="r-mode" data-mode="satellite">{{rb_mode_sat}}</button>
+          <button class="r-mode on" data-mode="satellite">{{rb_mode_sat}}</button>
+          <button class="r-mode" data-mode="radar">{{rb_mode_radar}}</button>
           <button class="r-mode" data-mode="both">{{rb_mode_both}}</button>
         </div>
         <span class="r-clock" id="r-time">—</span>
@@ -110,7 +110,7 @@
       </div>
 
       <!-- Legenda -->
-      <div class="r-legend" id="legend-radar">
+      <div class="r-legend" id="legend-radar" style="display:none">
         <span class="r-leg-t">{{rb_leg_rain}}</span>
         <div class="r-scale">
           <i style="background:#3a78ff"></i><i style="background:#22c1d6"></i>
@@ -120,7 +120,7 @@
         </div>
         <div class="r-scale-lab"><span>{{rb_weak}}</span><span>{{rb_strong}}</span><span>{{rb_extreme}}</span></div>
       </div>
-      <div class="r-legend" id="legend-sat" style="display:none">
+      <div class="r-legend" id="legend-sat">
         <span class="r-leg-t">{{rb_leg_sat}}</span>
         <div class="r-scale">
           <i style="background:#10203a"></i><i style="background:#33455f"></i>
@@ -160,6 +160,10 @@
     /* Altura do mapa do radar (id vence a regra genérica .calc-main .plot) */
     #radar-panel .plot{height:420px}
     @media (min-width:1024px){ #radar-panel .plot{height:min(74vh,640px)} }
+    /* Satélite (infravermelho): "screen" torna o céu limpo (quase preto no IR)
+       transparente — o mapa aparece nítido por baixo e só as nuvens ficam
+       sobrepostas, em vez de o satélite apagar o mapa inteiro. */
+    .sat-screen{mix-blend-mode:screen}
     /* Controles do radar — usam as variáveis do tema avionics */
     .r-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:#0b1626}
     .r-bar2{display:flex;align-items:center;gap:10px;padding:0 12px 10px;background:#0b1626;flex-wrap:wrap}
