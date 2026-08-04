@@ -30,9 +30,10 @@ const GIBS_SAT =
   "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/" +
   "GOES-East_ABI_Band13_Clean_Infrared/default/default/" +
   "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
-// Satélite translúcido sobre o mapa claro (véu): opacidade menor deixa o mapa
-// de dia aparecer; o céu limpo (preto no IR) escurece o mapa só um pouco.
-const SAT_OPACITY_ALONE = 0.4;   // satélite sozinho
+// O satélite é filtrado (ver SatFiltered) p/ mostrar só os topos frios de
+// convecção (tempestades/CB); a névoa cinza/branca some, então a opacidade
+// 0.5 só suaviza os núcleos coloridos sobre o mapa de dia.
+const SAT_OPACITY_ALONE = 0.5;   // satélite sozinho
 const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
 
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
@@ -94,9 +95,50 @@ function clearLayers() {
 }
 
 // ----- Camada de satélite (NASA GIBS), independente da animação de radar -----
+// O Clean IR do GIBS coloriza os topos mais frios (convecção profunda / CB) e
+// deixa o resto em grayscale. Filtramos cada tile num canvas: pixel COLORIDO
+// (saturação alta = topo frio) fica; grayscale (céu limpo + nuvem rasa cinza/
+// branca) vira transparente. Assim mostramos só as formações pesadas, sem a
+// névoa cobrindo o mapa. GIBS envia CORS (Access-Control-Allow-Origin: *), então
+// o canvas não "tainta" e o getImageData funciona.
+const SAT_SAT_LO = 24;  // saturação: abaixo disso é grayscale -> transparente
+const SAT_SAT_HI = 48;  // acima disso é topo frio pleno -> opaco (borda suave entre os dois)
+const SatFiltered = L.TileLayer.extend({
+  createTile(coords, done) {
+    const tile = document.createElement("canvas");
+    const size = this.getTileSize();
+    tile.width = size.x;
+    tile.height = size.y;
+    const ctx = tile.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, size.x, size.y);
+      try {
+        const im = ctx.getImageData(0, 0, size.x, size.y);
+        const d = im.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const sat = Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]);
+          d[i + 3] =
+            sat <= SAT_SAT_LO ? 0
+            : sat >= SAT_SAT_HI ? 255
+            : Math.round(((sat - SAT_SAT_LO) / (SAT_SAT_HI - SAT_SAT_LO)) * 255);
+        }
+        ctx.putImageData(im, 0, 0);
+      } catch (e) {
+        // Sem CORS o canvas fica "tainted": degrada para o tile cru (sem filtro).
+      }
+      done(null, tile);
+    };
+    img.onerror = (e) => done(e, tile);
+    img.src = this.getTileUrl(coords);
+    return tile;
+  },
+});
+
 function ensureSat() {
   if (!satLayer) {
-    satLayer = L.tileLayer(GIBS_SAT, {
+    satLayer = new SatFiltered(GIBS_SAT, {
       opacity: 0,
       tileSize: 256,
       zIndex: 250, // abaixo dos quadros de radar (zIndex 300)
