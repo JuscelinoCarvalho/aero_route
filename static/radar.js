@@ -53,7 +53,10 @@ const map = L.map("map", {
   maxZoom: MAX_ZOOM,
 }).setView([-22.3, -49.0], 6);
 
-L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+// Basemap ESCURO (CARTO dark_matter): com o satélite IR em "screen", as nuvens/
+// tempestades (brancas) saltam sobre o fundo escuro e o céu limpo deixa o mapa
+// aparecer — combinação padrão de apps de meteorologia. Também combina com o tema.
+L.tileLayer("https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a> · radar © <a href="https://www.rainviewer.com/">RainViewer</a>',
   maxZoom: MAX_ZOOM,
