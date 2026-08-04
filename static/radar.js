@@ -30,8 +30,8 @@ const GIBS_SAT =
   "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/" +
   "GOES-East_ABI_Band13_Clean_Infrared/default/default/" +
   "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
-// Com "mix-blend-mode: screen" (classe .sat-screen) o céu limpo (preto no IR)
-// some e o mapa aparece por baixo; opacidade alta mantém as nuvens nítidas.
+// Satélite translúcido sobre o mapa claro (véu): opacidade menor deixa o mapa
+// de dia aparecer; o céu limpo (preto no IR) escurece o mapa só um pouco.
 const SAT_OPACITY_ALONE = 0.6;   // satélite sozinho
 const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
 
@@ -53,10 +53,10 @@ const map = L.map("map", {
   maxZoom: MAX_ZOOM,
 }).setView([-22.3, -49.0], 6);
 
-// Basemap ESCURO (CARTO dark_matter): com o satélite IR em "screen", as nuvens/
-// tempestades (brancas) saltam sobre o fundo escuro e o céu limpo deixa o mapa
-// aparecer — combinação padrão de apps de meteorologia. Também combina com o tema.
-L.tileLayer("https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png", {
+// Basemap CLARO (CARTO Voyager, aparência de dia): o satélite entra por cima
+// translúcido (ver SAT_OPACITY_ALONE), como um véu — cidades/estradas seguem
+// visíveis e os topos de tempestade (coloridos pelo IR) aparecem sobre o mapa.
+L.tileLayer("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a> · radar © <a href="https://www.rainviewer.com/">RainViewer</a>',
   maxZoom: MAX_ZOOM,
@@ -100,7 +100,6 @@ function ensureSat() {
       opacity: 0,
       tileSize: 256,
       zIndex: 250, // abaixo dos quadros de radar (zIndex 300)
-      className: "sat-screen", // blend "screen": céu limpo transparente, mapa visível
       maxZoom: MAX_ZOOM,
       maxNativeZoom: SAT_NATIVE_ZOOM,
       attribution:
