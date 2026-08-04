@@ -41,43 +41,61 @@ def normalize(text: str) -> str:
 # em que a grafia difere do inglês (Paris/Berlin já casam direto). Chave e valor
 # são normalizados (sem acento, minúsculas) no carregamento.
 _CITY_ALIASES_RAW: dict[str, str] = {
-    # Ásia
+    # --- Ásia ---
     "tóquio": "tokyo", "tokio": "tokyo",
-    "quioto": "kyoto", "kioto": "kyoto",
-    "osaka": "osaka", "nagoia": "nagoya", "sapporo": "sapporo", "okinawa": "okinawa",
+    "quioto": "kyoto", "kioto": "kyoto", "nagoia": "nagoya",
     "seul": "seoul",
-    "pequim": "beijing", "pekin": "beijing",
-    "xangai": "shanghai", "cantão": "guangzhou",
+    "pequim": "beijing", "pekin": "beijing", "xangai": "shanghai", "cantão": "guangzhou",
     "cingapura": "singapore", "singapura": "singapore", "singapur": "singapore",
-    "bangcoc": "bangkok", "bangcoque": "bangkok",
+    "bangcoc": "bangkok", "bangcoque": "bangkok", "jacarta": "jakarta",
     "nova delhi": "new delhi", "nueva delhi": "new delhi",
     "bombaim": "mumbai", "calcutá": "kolkata",
     "taipé": "taipei", "taipe": "taipei",
-    "dubai": "dubai", "abu dhabi": "abu dhabi", "doha": "doha",
-    # Europa
-    "londres": "london",
-    "roma": "rome", "milão": "milan", "veneza": "venice",
-    "florença": "florence", "turim": "turin", "nápoles": "naples", "gênova": "genoa",
-    "genebra": "geneva", "ginebra": "geneva", "zurique": "zurich", "basileia": "basel", "berna": "bern",
+    # --- Oriente Médio ---
+    "telavive": "tel aviv", "jidá": "jeddah",
+    # --- Europa: Reino Unido / França ---
+    "londres": "london", "edimburgo": "edinburgh",
+    "marselha": "marseille", "lião": "lyon", "bordéus": "bordeaux", "estrasburgo": "strasbourg",
+    # --- Europa: Ibéria ---
+    "lisboa": "lisbon", "sevilha": "seville", "saragoça": "zaragoza", "bilbau": "bilbao",
+    # --- Europa: Itália ---
+    "roma": "rome", "milão": "milan", "veneza": "venice", "florença": "florence",
+    "turim": "turin", "nápoles": "naples", "gênova": "genoa", "bolonha": "bologna",
+    # --- Europa: Alemanha / Áustria / Suíça ---
     "munique": "munich", "colônia": "cologne", "hamburgo": "hamburg", "berlim": "berlin",
-    "viena": "vienna",
-    "praga": "prague", "varsóvia": "warsaw", "cracóvia": "krakow",
+    "nuremberga": "nuremberg", "estugarda": "stuttgart", "hanôver": "hannover",
+    "viena": "vienna", "salzburgo": "salzburg",
+    "genebra": "geneva", "ginebra": "geneva", "zurique": "zurich", "basileia": "basel", "berna": "bern",
+    # --- Europa: Benelux ---
     "bruxelas": "brussels", "antuérpia": "antwerp", "amberes": "antwerp",
     "haia": "the hague", "la haya": "the hague", "roterdã": "rotterdam", "roterdão": "rotterdam",
     "amsterdã": "amsterdam", "amsterdão": "amsterdam",
+    # --- Europa: Nórdicos ---
     "copenhague": "copenhagen", "estocolmo": "stockholm", "gotemburgo": "gothenburg",
     "helsinque": "helsinki", "helsínquia": "helsinki",
-    "atenas": "athens", "lisboa": "lisbon",
-    "istambul": "istanbul", "estambul": "istanbul", "moscou": "moscow", "moscovo": "moscow", "moscu": "moscow",
-    # Américas
+    # --- Europa: Central / Leste ---
+    "praga": "prague", "varsóvia": "warsaw", "cracóvia": "krakow", "breslávia": "wrocław",
+    "budapeste": "budapest", "bucareste": "bucharest", "belgrado": "belgrade",
+    # --- Europa: Grécia / Malta / Turquia / Rússia ---
+    "atenas": "athens", "valeta": "valletta",
+    "istambul": "istanbul", "estambul": "istanbul",
+    "moscou": "moscow", "moscovo": "moscow", "moscu": "moscow",
+    # --- Américas: EUA ---
     "nova york": "new york", "nova iorque": "new york", "nueva york": "new york",
-    "cidade do méxico": "mexico city", "ciudad de mexico": "mexico city",
-    # África
+    "são francisco": "san francisco", "filadélfia": "philadelphia", "nova orleans": "new orleans",
+    # --- Américas: México / LATAM ---
+    "cidade do méxico": "mexico city", "ciudad de mexico": "mexico city", "monterrei": "monterrey",
+    "assunção": "asuncion", "montevidéu": "montevideo",
+    # --- África ---
     "joanesburgo": "johannesburg", "cidade do cabo": "cape town",
-    "cairo": "cairo", "el cairo": "cairo", "casablanca": "casablanca",
+    "el cairo": "cairo", "argel": "algiers", "dacar": "dakar",
 }
+# Só apelidos que realmente diferem em inglês após tirar acento (ex.: "málaga"
+# já casaria direto, então é descartado); chave e alvo normalizados.
 _CITY_ALIASES: dict[str, str] = {
-    normalize(k): normalize(v) for k, v in _CITY_ALIASES_RAW.items()
+    nk: nv
+    for k, v in _CITY_ALIASES_RAW.items()
+    if (nk := normalize(k)) != (nv := normalize(v))
 }
 
 
@@ -89,6 +107,20 @@ def _alias_city_terms(q: str) -> set[str]:
     if len(q) < 2:
         return set()
     return {target for alias, target in _CITY_ALIASES.items() if alias.startswith(q)}
+
+
+def _alias_hit(n_city: str, n_name: str, terms: set[str]) -> bool:
+    """A cidade (por prefixo) ou o nome do aeroporto (palavra inteira) casa um alvo?
+
+    O nome cobre metrópoles cujo *município* na base é o subúrbio do aeroporto
+    (ex.: Marseille → município "Marignane", mas o nome traz "Marseille").
+    """
+    for t in terms:
+        if n_city.startswith(t):
+            return True
+        if n_name == t or n_name.startswith(t + " ") or n_name.endswith(" " + t) or f" {t} " in n_name:
+            return True
+    return False
 
 
 @dataclass(frozen=True)
@@ -216,8 +248,8 @@ class AirportStore:
             elif item.n_city and q in item.n_city:
                 # Cidade que começa com a busca pontua mais (ex.: "rio" -> Rio).
                 score = 30 if item.n_city.startswith(q) else 20
-            elif alias_terms and item.n_city and any(item.n_city.startswith(t) for t in alias_terms):
-                # Apelido PT/ES (ex.: "tóquio" -> aeródromos de Tokyo).
+            elif alias_terms and _alias_hit(item.n_city, item.n_name, alias_terms):
+                # Apelido PT/ES (ex.: "tóquio" -> Tokyo; "marselha" -> Marseille).
                 score = 28
             elif q in item.n_name:
                 score = 10
