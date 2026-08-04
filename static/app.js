@@ -281,6 +281,20 @@ function render(d, m, hasAc) {
     dashArray: unreachable ? "6 7" : null,
   });
   layers.push(line);
+  // Círculos de alcance da etapa: feedback visual da reserva. Raio = alcance útil
+  // (alcance × reserva). Crescem/encolhem ao mudar o combo, mesmo quando as
+  // escalas não mudam — mostrando por que a rota se manteve ou não.
+  if (hasAc && m && m.max_leg_nm) {
+    const legM = m.max_leg_nm * 1852; // nm -> metros (Leaflet usa metros)
+    const reachColor = unreachable ? "#e03131" : "#1fd8e6";
+    const centers = [[d.origin.lat, d.origin.lon]];
+    if (hasStops) m.stops.forEach((s) => centers.push([s.lat, s.lon]));
+    centers.forEach((c) =>
+      layers.push(L.circle(c, {
+        radius: legM, color: reachColor, weight: 1.2, opacity: 0.65,
+        dashArray: "3 7", fillColor: reachColor, fillOpacity: 0.05,
+      }).bindTooltip(TF("r_leg_reach", fmt(Math.round(m.max_leg_nm))))));
+  }
   if (hasStops) {
     m.stops.forEach((s) =>
       layers.push(L.circleMarker([s.lat, s.lon], { radius: 5, weight: 2, color: "#f08c00", fillColor: "#ffd43b", fillOpacity: 1 })
@@ -298,6 +312,11 @@ loadAircraft();
 const params = new URLSearchParams(location.search);
 const pOrig = (params.get("origin") || "").toUpperCase();
 const pDest = (params.get("dest") || "").toUpperCase();
+// Deep-link opcional da aeronave e da reserva (loadAircraft preenche o nome).
+const pAc = params.get("aircraft") || "";
+if (pAc) selAircraft = pAc;
+const pReserve = params.get("reserve");
+if (pReserve && $("#reserve")) $("#reserve").value = pReserve;
 if (pOrig && pDest) {
   $("#orig").value = pOrig; fromCode = pOrig;
   $("#dest").value = pDest; toCode = pDest;

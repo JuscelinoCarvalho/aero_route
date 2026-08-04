@@ -7,7 +7,7 @@
  *  - /api/* e métodos não-GET: sempre rede, nunca cacheados.
  *  - Recursos cross-origin (fontes, Leaflet, tiles): deixados para o navegador.
  */
-const VERSION = "v25";
+const VERSION = "v26";
 const STATIC_CACHE = "jussa-static-" + VERSION;
 const PAGES_CACHE = "jussa-pages-" + VERSION;
 

@@ -49,6 +49,7 @@
     r_block: { pt: "Tempo de bloco", en: "Block time", es: "Tiempo de bloque" },
     r_cruise: { pt: "Vel. cruzeiro", en: "Cruise speed", es: "Vel. crucero" },
     r_bearing: { pt: "Proa inicial", en: "Initial heading", es: "Rumbo inicial" },
+    r_leg_reach: { pt: "Alcance da etapa: {0} nm", en: "Leg range: {0} nm", es: "Alcance de la etapa: {0} nm" },
     r_aircraft: { pt: "Aeronave", en: "Aircraft", es: "Aeronave" },
     pick_ac: { pt: "Selecione uma aeronave para ver tempo, combustível e escalas.", en: "Select an aircraft to see time, fuel and stops.", es: "Selecciona una aeronave para ver tiempo, combustible y escalas." },
     burn_na: { pt: "Consumo não disponível para o {0}.", en: "Fuel burn not available for the {0}.", es: "Consumo no disponible para el {0}." },

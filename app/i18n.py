@@ -65,9 +65,9 @@ STRINGS: dict[str, dict[str, str]] = {
     "home_swap": {"pt": "Inverter", "en": "Swap", "es": "Invertir"},
     "home_aircraft": {"pt": "Aeronave", "en": "Aircraft", "es": "Aeronave"},
     "home_reserve": {
-        "pt": "Reserva de combustível (etapa = alcance × usável)",
-        "en": "Fuel reserve (leg = range × usable)",
-        "es": "Reserva de combustible (etapa = alcance × utilizable)",
+        "pt": "Alcance útil por etapa (reserva) · quanto maior o %, menos escalas",
+        "en": "Usable range per leg (reserve) · higher % = fewer stops",
+        "es": "Alcance útil por etapa (reserva) · mayor % = menos escalas",
     },
     "home_reserve_none": {"pt": "100% · sem reserva", "en": "100% · no reserve", "es": "100% · sin reserva"},
     "home_reserve_rec": {"pt": "85% · recomendado", "en": "85% · recommended", "es": "85% · recomendado"},
