@@ -265,6 +265,52 @@
     });
   };
 
+  // ===== Busca compartilhada de aeronaves (app.js + comparar.js) =============
+  // Corrige a "descoberta": busca por palavras (ordem livre) sobre nome+família+
+  // categoria+chave, com fallback tolerante a erro de digitação (subsequência).
+  function _acNorm(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function _hay(a) {
+    return _acNorm([a.name, a.family, a.category, (window.TCAT ? window.TCAT(a.category) : ""), a.key].join(" "));
+  }
+  function _subseq(t, w) { // chars de t aparecem em ordem em w (tolera letra faltando/trocada)
+    for (var i = 0, j = 0; j < w.length && i < t.length; j++) if (w[j] === t[i]) i++;
+    return i === t.length;
+  }
+  // Busca: divide a query em palavras; cada palavra precisa casar (substring).
+  // Se nada casar por substring, tenta por subsequência ANCORADA numa palavra do
+  // texto com a mesma inicial (ex.: "boeng" -> Boeing, sem casar "King Air").
+  window.acFilter = function (list, query, limit) {
+    limit = limit || 12;
+    var toks = _acNorm(query).split(/\s+/).filter(Boolean);
+    if (!toks.length) return window.acDefault(list, limit);
+    var hays = list.map(_hay);
+    var sub = list.filter(function (a, i) { return toks.every(function (t) { return hays[i].indexOf(t) >= 0; }); });
+    if (sub.length) return sub.slice(0, limit);
+    var words = hays.map(function (h) { return h.split(/[^a-z0-9]+/).filter(Boolean); });
+    return list.filter(function (a, i) {
+      return toks.every(function (t) {
+        return words[i].some(function (w) { return w[0] === t[0] && _subseq(t, w); });
+      });
+    }).slice(0, limit);
+  };
+  // Lista padrão (query vazia): variedade por categoria em vez dos 12 primeiros
+  // do catálogo (que eram todos monomotores) — assim jatos aparecem de cara.
+  window.acDefault = function (list, limit) {
+    limit = limit || 12;
+    var order = ["Jato comercial", "Jato wide-body", "Jato regional", "Turboélice",
+      "Jato executivo", "Monomotor pistão", "Bimotor pistão", "Clássico", "Agrícola"];
+    var byCat = {};
+    list.forEach(function (a) { (byCat[a.category] = byCat[a.category] || []).push(a); });
+    var out = [];
+    for (var round = 0; round < 40 && out.length < limit; round++) {
+      for (var i = 0; i < order.length && out.length < limit; i++) {
+        var arr = byCat[order[i]];
+        if (arr && arr[round]) out.push(arr[round]);
+      }
+    }
+    return out.slice(0, limit);
+  };
+
   // Rola APENAS o dropdown do autocomplete (nunca a página) para manter a opção
   // destacada (.hl) visível ao navegar com as setas até o limite do combo.
   // Usado por todos os autocompletes (app, comparar, tempo, cartas).

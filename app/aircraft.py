@@ -165,8 +165,8 @@ AIRCRAFT: list[Aircraft] = [
     Aircraft("emb110", "Embraer EMB-110 Bandeirante", "Turboélice", 220, 350, 1060, "1968–1990", 0.6),
     Aircraft("emb120", "Embraer EMB-120 Brasília", "Turboélice", 300, 450, 1020, "1985–2001", 1.8),
     Aircraft("be1900", "Beechcraft 1900D", "Turboélice", 280, 430, 1480, "1982–2002", 2.0),
-    Aircraft("atr72", "ATR 72-600", "Turboélice", 275, 650, 825, "1988–em produção", 26.0),
-    Aircraft("dash8q400", "De Havilland Dash 8 Q400", "Turboélice", 360, 1100, 1100, "1999–2021", 32.0),
+    Aircraft("atr72", "ATR 72-600", "Turboélice", 275, 650, 825, "1988–em produção", 26.0, family="ATR"),
+    Aircraft("dash8q400", "De Havilland Dash 8 Q400", "Turboélice", 360, 1100, 1100, "1999–2021", 32.0, family="De Havilland Dash 8"),
     # Turboélices brasileiros (Embraer)
     Aircraft("emb121", "Embraer EMB-121 Xingu (2×PT6A)", "Turboélice", 248, 250, 1300, "1977–1987", 0.8),
     Aircraft("emb312", "Embraer EMB-312 Tucano (T-27)", "Turboélice", 222, 150, 1000, "1983–1996", None),
@@ -215,7 +215,7 @@ AIRCRAFT: list[Aircraft] = [
     Aircraft("hawker900", "Hawker 900XP", "Jato executivo", 448, 680, 2930, "2007–2013", 8.0, family="Hawker"),
     Aircraft("pc24", "Pilatus PC-24", "Jato executivo", 440, 550, 2000, "2018–em produção", 11.0),
     # --- Jato regional ---
-    Aircraft("crj900", "Bombardier CRJ900", "Jato regional", 470, 1300, 1550, "2001–2020", 48.0),
+    Aircraft("crj900", "Bombardier CRJ900", "Jato regional", 470, 1300, 1550, "2001–2020", 48.0, family="Bombardier CRJ"),
     Aircraft("e175", "Embraer E175", "Jato regional", 447, 1150, 2200, "2004–em produção", 50.0, family="Embraer E-Jet"),
     Aircraft("e190", "Embraer E190", "Jato regional", 470, 1500, 2400, "2004–em produção", 52.0, family="Embraer E-Jet"),
     Aircraft("e195e2", "Embraer E195-E2", "Jato regional", 470, 1550, 2600, "2019–em produção", 60.4, family="Embraer E-Jet"),
@@ -270,6 +270,66 @@ AIRCRAFT: list[Aircraft] = [
     Aircraft("t6", "North American T-6 Texan", "Clássico", 145, 180, 730, "1935–1945", None),
     Aircraft("dc3", "Douglas DC-3", "Clássico", 180, 600, 1500, "1936–1942", None),
     Aircraft("ipanema", "Embraer EMB-202 Ipanema", "Agrícola", 98, 70, None, "1970–em produção", 0.30),
+
+    # ======================================================================= #
+    # Ampliação do catálogo: clássicos de companhia (muitos voaram no Brasil),
+    # regionais e marcas que faltavam. Valores didáticos (a validar por piloto).
+    # ======================================================================= #
+    # --- Boeing 737 clássicos/originais (estendem a família) ---
+    Aircraft("b732", "Boeing 737-200", "Jato comercial", 430, 2900, 2300, "1967–1988", None, family="Boeing 737"),
+    Aircraft("b733", "Boeing 737-300", "Jato comercial", 430, 2500, 2600, "1984–1999", None, family="Boeing 737"),
+    Aircraft("b734", "Boeing 737-400", "Jato comercial", 430, 2700, 2350, "1988–2000", None, family="Boeing 737"),
+    Aircraft("b735", "Boeing 737-500", "Jato comercial", 430, 2400, 2400, "1989–1999", None, family="Boeing 737"),
+    # --- Trijatos e primeiros jatões (Jato comercial) ---
+    Aircraft("b727", "Boeing 727-200", "Jato comercial", 467, 4500, 2400, "1967–1984", None, family="Boeing 727"),
+    Aircraft("b707", "Boeing 707-320B", "Jato comercial", 480, 6000, 5000, "1958–1979", None),
+    Aircraft("dc9", "McDonnell Douglas DC-9-30", "Jato comercial", 440, 2900, 1500, "1965–1982", None),
+    Aircraft("md83", "McDonnell Douglas MD-83", "Jato comercial", 440, 3000, 2500, "1985–1999", None, family="McDonnell Douglas MD-80"),
+    Aircraft("md88", "McDonnell Douglas MD-88", "Jato comercial", 440, 3000, 2050, "1987–1997", None, family="McDonnell Douglas MD-80"),
+    Aircraft("md90", "McDonnell Douglas MD-90", "Jato comercial", 440, 2900, 2400, "1993–2000", None, family="McDonnell Douglas MD-80"),
+    Aircraft("a318", "Airbus A318", "Jato comercial", 447, 2200, 3100, "2003–2013", None, family="Airbus A320"),
+    Aircraft("c919", "COMAC C919", "Jato comercial", 450, 2400, 3000, "2023–em produção", 99.0),
+    # --- Wide-body clássicos e famílias que faltavam ---
+    Aircraft("md11", "McDonnell Douglas MD-11", "Jato wide-body", 490, 7000, 6800, "1990–2000", None),
+    Aircraft("dc10", "McDonnell Douglas DC-10-30", "Jato wide-body", 490, 7200, 5200, "1971–1989", None),
+    Aircraft("l1011", "Lockheed L-1011 TriStar", "Jato wide-body", 480, 7000, 4250, "1972–1984", None),
+    Aircraft("a300", "Airbus A300-600R", "Jato wide-body", 470, 5200, 4050, "1972–2007", None, family="Airbus A300/A310"),
+    Aircraft("a310", "Airbus A310-300", "Jato wide-body", 470, 4800, 5200, "1983–1998", None, family="Airbus A300/A310"),
+    Aircraft("a343", "Airbus A340-300", "Jato wide-body", 488, 6800, 7300, "1993–2011", None, family="Airbus A340"),
+    Aircraft("a346", "Airbus A340-600", "Jato wide-body", 488, 7800, 7500, "2002–2011", None, family="Airbus A340"),
+    # --- Jatos regionais: Embraer ERJ (muito comum no Brasil), E-Jets E1, CRJ, Fokker, novos ---
+    Aircraft("erj145", "Embraer ERJ-145", "Jato regional", 450, 1100, 1550, "1996–2020", 21.0, family="Embraer ERJ"),
+    Aircraft("erj135", "Embraer ERJ-135", "Jato regional", 450, 1050, 1750, "1998–2010", 18.0, family="Embraer ERJ"),
+    Aircraft("erj140", "Embraer ERJ-140", "Jato regional", 450, 1080, 1650, "2001–2008", 19.0, family="Embraer ERJ"),
+    Aircraft("e170", "Embraer E170", "Jato regional", 447, 1050, 2100, "2004–em produção", 42.0, family="Embraer E-Jet"),
+    Aircraft("e195e1", "Embraer E195 (E1)", "Jato regional", 470, 1500, 2300, "2004–2020", 50.0, family="Embraer E-Jet"),
+    Aircraft("e190e2", "Embraer E190-E2", "Jato regional", 470, 1400, 2850, "2018–em produção", 58.0, family="Embraer E-Jet"),
+    Aircraft("crj200", "Bombardier CRJ200", "Jato regional", 424, 1100, 1700, "1992–2006", None, family="Bombardier CRJ"),
+    Aircraft("crj700", "Bombardier CRJ700", "Jato regional", 447, 1200, 1650, "1999–2020", 30.0, family="Bombardier CRJ"),
+    Aircraft("fokker100", "Fokker 100", "Jato regional", 410, 1500, 1300, "1988–1997", None, family="Fokker"),
+    Aircraft("fokker70", "Fokker 70", "Jato regional", 410, 1400, 1200, "1994–1997", None, family="Fokker"),
+    Aircraft("b717", "Boeing 717-200", "Jato regional", 438, 2400, 2060, "1998–2006", None),
+    Aircraft("superjet", "Sukhoi Superjet 100", "Jato regional", 450, 1600, 1600, "2011–em produção", 35.0),
+    Aircraft("arj21", "COMAC ARJ21-700", "Jato regional", 420, 1700, 1200, "2016–em produção", 38.0),
+    # --- Turboélices regionais/utilitários que faltavam ---
+    Aircraft("atr42", "ATR 42-600", "Turboélice", 275, 500, 840, "1985–em produção", 20.0, family="ATR"),
+    Aircraft("dash8_300", "De Havilland Dash 8-300", "Turboélice", 285, 600, 1000, "1989–2009", None, family="De Havilland Dash 8"),
+    Aircraft("f27", "Fokker F27 Friendship", "Turboélice", 250, 550, 1000, "1958–1987", None),
+    Aircraft("mu2", "Mitsubishi MU-2", "Turboélice", 290, 250, 1500, "1967–1986", 0.6),
+    Aircraft("skycourier", "Cessna 408 SkyCourier", "Turboélice", 200, 320, 900, "2022–em produção", 5.5),
+    Aircraft("c212", "CASA C-212 Aviocar", "Turboélice", 200, 300, 900, "1971–2012", None),
+    # --- Jatos executivos: flagships e VLJ que faltavam ---
+    Aircraft("global6000", "Bombardier Global 6000", "Jato executivo", 488, 1500, 6000, "2012–em produção", 62.0, family="Bombardier Challenger/Global"),
+    Aircraft("challenger650", "Bombardier Challenger 650", "Jato executivo", 470, 1000, 4000, "2015–em produção", 32.0, family="Bombardier Challenger/Global"),
+    Aircraft("g700", "Gulfstream G700", "Jato executivo", 516, 1600, 7500, "2022–em produção", 78.0, family="Gulfstream"),
+    Aircraft("g500", "Gulfstream G500", "Jato executivo", 500, 1100, 5300, "2018–em produção", 48.0, family="Gulfstream"),
+    Aircraft("falcon900", "Dassault Falcon 900LX", "Jato executivo", 480, 900, 4750, "1986–em produção", 44.0, family="Dassault Falcon"),
+    Aircraft("eclipse500", "Eclipse 500 (VLJ)", "Jato executivo", 370, 250, 1125, "2006–2008", 2.0),
+    # --- Clássicos icônicos ---
+    Aircraft("concorde", "Aérospatiale/BAC Concorde (SST)", "Clássico", 1150, 25000, 3550, "1969–1979", None),
+    Aircraft("constellation", "Lockheed L-1049 Super Constellation", "Clássico", 250, 1200, 4000, "1951–1958", None),
+    Aircraft("an2", "Antonov An-2 (biplano)", "Clássico", 100, 130, 450, "1947–2001", None),
+    Aircraft("beaver", "De Havilland Canada DHC-2 Beaver (bush)", "Monomotor pistão", 120, 60, 400, "1947–1967", 0.5),
 ]
 
 _BY_KEY = {a.key: a for a in AIRCRAFT}

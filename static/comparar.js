@@ -59,9 +59,9 @@ function buildAircraftAC() {
   let hl = -1;
   function close() { acEl.classList.remove("open"); acEl.innerHTML = ""; hl = -1; }
   function filter(q) {
-    const n = norm(q);
-    const base = n ? AIRCRAFT.filter((a) => norm(a.name).includes(n) || norm(a.category).includes(n) || norm(TCAT(a.category)).includes(n) || norm(a.family || "").includes(n)) : AIRCRAFT;
-    return base.filter((a) => !selected.some((s) => s.key === a.key)).slice(0, 12);
+    // Exclui as já selecionadas ANTES de buscar, para não "gastar" o limite de 12.
+    const avail = AIRCRAFT.filter((a) => !selected.some((s) => s.key === a.key));
+    return acFilter(avail, q, 12);
   }
   function render() {
     acEl.innerHTML = list
@@ -82,7 +82,7 @@ function buildAircraftAC() {
     redraw();
   }
   inputEl.addEventListener("input", () => { list = filter(inputEl.value); hl = -1; render(); });
-  inputEl.addEventListener("focus", () => { list = filter(inputEl.value); hl = -1; render(); });
+  inputEl.addEventListener("focus", () => { inputEl.select(); list = filter(inputEl.value); hl = -1; render(); });
   inputEl.addEventListener("keydown", (e) => {
     if (!acEl.classList.contains("open")) return;
     if (e.key === "ArrowDown") { hl = Math.min(hl + 1, list.length - 1); render(); e.preventDefault(); }

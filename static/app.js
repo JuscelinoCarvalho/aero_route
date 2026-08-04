@@ -97,11 +97,7 @@ function buildAircraftAC() {
   let hl = -1;
 
   function close() { acEl.classList.remove("open"); acEl.innerHTML = ""; hl = -1; }
-  function filter(q) {
-    const n = norm(q);
-    if (!n) return AIRCRAFT.slice(0, 12);
-    return AIRCRAFT.filter((a) => norm(a.name).includes(n) || norm(a.category).includes(n) || norm(TCAT(a.category)).includes(n) || norm(a.family || "").includes(n)).slice(0, 12);
-  }
+  const filter = (q) => acFilter(AIRCRAFT, q, 12);
   function render() {
     acEl.innerHTML = list
       .map((a, i) =>
@@ -115,7 +111,9 @@ function buildAircraftAC() {
   function pick(a) { selAircraft = a.key; inputEl.value = a.name; close(); renderAircraftCard(); compute(); }
 
   inputEl.addEventListener("input", () => { list = filter(inputEl.value); hl = -1; render(); });
-  inputEl.addEventListener("focus", () => { list = filter(inputEl.value); hl = -1; render(); });
+  // Ao focar: seleciona o texto pré-preenchido (a 1ª tecla substitui, não
+  // concatena) e mostra a lista variada — antes, digitar sem apagar dava 0.
+  inputEl.addEventListener("focus", () => { inputEl.select(); list = acDefault(AIRCRAFT, 12); hl = -1; render(); });
   inputEl.addEventListener("keydown", (e) => {
     if (!acEl.classList.contains("open")) return;
     if (e.key === "ArrowDown") { hl = Math.min(hl + 1, list.length - 1); render(); e.preventDefault(); }
