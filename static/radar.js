@@ -32,7 +32,7 @@ const GIBS_SAT =
   "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
 // Com "mix-blend-mode: screen" (classe .sat-screen) o céu limpo (preto no IR)
 // some e o mapa aparece por baixo; opacidade alta mantém as nuvens nítidas.
-const SAT_OPACITY_ALONE = 0.9;   // satélite sozinho
+const SAT_OPACITY_ALONE = 0.8;   // satélite sozinho
 const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
 
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
