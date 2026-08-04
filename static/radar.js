@@ -32,7 +32,7 @@ const GIBS_SAT =
   "GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
 // Satélite translúcido sobre o mapa claro (véu): opacidade menor deixa o mapa
 // de dia aparecer; o céu limpo (preto no IR) escurece o mapa só um pouco.
-const SAT_OPACITY_ALONE = 0.5;   // satélite sozinho
+const SAT_OPACITY_ALONE = 0.4;   // satélite sozinho
 const SAT_OPACITY_UNDER = 0.5;   // satélite por baixo do radar no modo "ambos"
 
 // Centro inicial: interior de SP (cobertura clássica dos radares de Bauru/P. Prudente)
